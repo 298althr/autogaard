@@ -77,6 +77,7 @@ investor-docs-*.html
 ui standard.html
 *.backup.zip
 *.ps1
+server/reset_admin.js
 
 # Database Seeds (Optional - user requested ignoring test scripts)
 server/db/seeds/demo_seed.js
