@@ -59,7 +59,7 @@ export default function Home() {
                         transition={{ duration: 0.8, ease: "easeOut" }}
                     >
                         <h1 className="text-[3.5rem] leading-[1] md:text-[6rem] lg:text-[7.5rem] font-heading font-extrabold tracking-tighter text-content-primary">
-                            RIDE <br />
+                            BUY&DRIVE <br />
                             <span className="inline-flex relative min-h-[60px] md:min-h-[140px] items-center">
                                 <AnimatePresence mode="wait">
                                     <motion.span

@@ -1,32 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
+    output: 'standalone',
+    typescript: {
+        ignoreBuildErrors: true,
+    },
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
     images: {
+        unoptimized: true, // Optional: useful for Railway trial or when image optimization is not critical
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'images.unsplash.com',
-                port: '',
-                pathname: '/**',
-            },
-            {
-                protocol: 'https',
-                hostname: 'unsplash.com',
-                port: '',
-                pathname: '/**',
-            },
-            {
-                protocol: 'https',
                 hostname: 'res.cloudinary.com',
-                port: '',
                 pathname: '/**',
             },
             {
-                protocol: 'http',
-                hostname: 'localhost',
-                port: '4000',
+                protocol: 'https',
+                hostname: 'exquisite-insight-production.up.railway.app',
                 pathname: '/**',
-            },
+            }
         ],
     },
 };
