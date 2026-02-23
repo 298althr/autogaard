@@ -69,6 +69,7 @@ docker_logs.txt
 # Project Specific (Inconsequential to Production)
 docs/
 Presentation/
+svg-logos/
 tests/
 server/tests/
 debug_auctions.js
