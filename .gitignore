@@ -63,3 +63,22 @@ coverage/
 report.json
 report.txt
 *.zip
+load-test.yml
+docker_logs.txt
+
+# Project Specific (Inconsequential to Production)
+docs/
+Presentation/
+tests/
+server/tests/
+debug_auctions.js
+test-autoconcierge.ps1
+investor-docs-*.html
+ui standard.html
+*.backup.zip
+*.ps1
+
+# Database Seeds (Optional - user requested ignoring test scripts)
+server/db/seeds/demo_seed.js
+server/db/seeds/auction_seed.js
+server/db/seeds/create_user.js
