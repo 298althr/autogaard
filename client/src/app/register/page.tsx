@@ -21,8 +21,20 @@ export default function RegisterPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { register, googleLogin } = useAuth();
+    const { register, googleLogin, user, isLoading } = useAuth();
     const router = useRouter();
+
+    React.useEffect(() => {
+        if (!isLoading && user) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect');
+            if (user.kyc_status === 'none') {
+                router.replace('/onboarding' + (redirect ? `?redirect=${redirect}` : ''));
+            } else {
+                router.replace(redirect || '/dashboard');
+            }
+        }
+    }, [user, isLoading, router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,7 +51,7 @@ export default function RegisterPage() {
             if (user.kyc_status === 'none') {
                 router.push('/onboarding' + (redirect ? `?redirect=${redirect}` : ''));
             } else {
-                router.push(redirect || '/');
+                router.push(redirect || '/dashboard');
             }
         } catch (err: any) {
             setError(err.message || 'Google registration failed');
@@ -91,7 +103,7 @@ export default function RegisterPage() {
             if (user.kyc_status === 'none') {
                 router.push('/onboarding' + (redirect ? `?redirect=${redirect}` : ''));
             } else {
-                router.push(redirect || '/');
+                router.push(redirect || '/dashboard');
             }
         } catch (err: any) {
             setError(err.message || 'Failed to register');

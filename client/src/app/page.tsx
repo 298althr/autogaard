@@ -11,13 +11,23 @@ import FeatureCard from '@/components/landing/FeatureCard';
 import AILoader from '@/components/landing/AILoader';
 import { apiFetch } from '@/lib/api';
 import VehicleCard from '@/components/VehicleCard';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
     const [liveVehicles, setLiveVehicles] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const [headlineIndex, setHeadlineIndex] = React.useState(0);
     const headlines = ["VALUATIONS", "LIQUIDITY", "AUCTIONS"];
     const subtexts = ["IN 60 SECONDS.", "IN 60 SECONDS.", "IN REAL-TIME."];
+
+    React.useEffect(() => {
+        if (!isLoading && user) {
+            router.replace('/dashboard');
+        }
+    }, [user, isLoading, router]);
 
     React.useEffect(() => {
         async function fetchLive() {

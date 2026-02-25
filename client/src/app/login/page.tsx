@@ -17,8 +17,20 @@ export default function LoginPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { login, googleLogin } = useAuth();
+    const { login, googleLogin, user, isLoading } = useAuth();
     const router = useRouter();
+
+    React.useEffect(() => {
+        if (!isLoading && user) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect');
+            if (user.kyc_status === 'none') {
+                router.replace('/onboarding' + (redirect ? `?redirect=${redirect}` : ''));
+            } else {
+                router.replace(redirect || '/dashboard');
+            }
+        }
+    }, [user, isLoading, router]);
 
     const handleGoogleResponse = async (response: any) => {
         setLoading(true);
@@ -31,7 +43,7 @@ export default function LoginPage() {
             if (user.kyc_status === 'none') {
                 router.push('/onboarding' + (redirect ? `?redirect=${redirect}` : ''));
             } else {
-                router.push(redirect || '/');
+                router.push(redirect || '/dashboard');
             }
         } catch (err: any) {
             setError(err.message || 'Google login failed');
@@ -84,7 +96,7 @@ export default function LoginPage() {
             if (user.kyc_status === 'none') {
                 router.push('/onboarding' + (redirect ? `?redirect=${redirect}` : ''));
             } else {
-                router.push(redirect || '/');
+                router.push(redirect || '/dashboard');
             }
         } catch (err: any) {
             setError(err.message || 'Failed to login');
