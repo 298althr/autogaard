@@ -71,9 +71,9 @@ export default function Home() {
                             <AnimatePresence mode="wait">
                                 <motion.h1
                                     key={headlineIndex}
-                                    initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
-                                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                                    exit={{ opacity: 0, y: -40, filter: 'blur(10px)' }}
+                                    initial={{ opacity: 0, y: 40 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -40 }}
                                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                                     className="text-[2.75rem] md:text-[7.5rem] font-extrabold tracking-tighter leading-[0.9] text-slate-900 absolute"
                                 >
