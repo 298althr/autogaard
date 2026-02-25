@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const response = await apiFetch('/auth/register', {
             body: data,
         });
-        const { user, accessToken } = response.data;
+        const { user, accessToken } = response;
         setUser(user);
         setToken(accessToken);
         localStorage.setItem('token', accessToken);

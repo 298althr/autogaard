@@ -42,8 +42,15 @@ export default function LoginPage() {
 
     const initializeGoogleLogin = () => {
         if (typeof window !== 'undefined' && (window as any).google) {
+            const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+            if (!clientId) {
+                console.error('❌ NEXT_PUBLIC_GOOGLE_CLIENT_ID is missing in environment variables.');
+                return;
+            }
+
             (window as any).google.accounts.id.initialize({
-                client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+                client_id: clientId,
                 callback: handleGoogleResponse,
             });
             (window as any).google.accounts.id.renderButton(

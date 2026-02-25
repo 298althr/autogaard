@@ -16,7 +16,9 @@ const envSchema = z.object({
     CLOUDINARY_API_KEY: z.string().optional(),
     CLOUDINARY_API_SECRET: z.string().optional(),
     SENDGRID_API_KEY: z.string().optional(),
-    SENDGRID_FROM_EMAIL: z.string().email().default('no-reply@Autogaard.ng')
+    SENDGRID_FROM_EMAIL: z.string().email().default('no-reply@Autogaard.ng'),
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional()
 });
 
 const env = envSchema.safeParse(process.env);

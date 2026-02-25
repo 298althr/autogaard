@@ -3,10 +3,10 @@ const authService = require('../services/authService');
 class AuthController {
     async register(req, res, next) {
         try {
-            const user = await authService.register(req.body);
+            const result = await authService.register(req.body);
             res.status(201).json({
                 success: true,
-                data: user
+                ...result
             });
         } catch (err) {
             next(err);
