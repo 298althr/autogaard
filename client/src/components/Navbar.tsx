@@ -38,7 +38,11 @@ const Navbar = () => {
                 <Link href="/" className="flex items-center group flex-shrink-0">
                     <Image
                         src="/logo.png"
+<<<<<<< HEAD
                         alt="Autogaard"
+=======
+                        alt="AutoConcierge"
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                         width={200}
                         height={40}
                         className="object-contain hover:opacity-80 transition-opacity"
@@ -135,4 +139,7 @@ const Navbar = () => {
 };
 
 export default Navbar;
+<<<<<<< HEAD
 
+=======
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28

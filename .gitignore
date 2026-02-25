@@ -80,8 +80,8 @@ ui standard.html
 *.ps1
 server/reset_admin.js
 
-# Database Seeds (Optional - user requested ignoring test scripts)
+# Database Seeds 
+server/db/seeds/*.sql
 server/db/seeds/demo_seed.js
 server/db/seeds/auction_seed.js
 server/db/seeds/create_user.js
-

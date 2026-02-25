@@ -20,7 +20,11 @@ if (env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SE
     storage = new CloudinaryStorage({
         cloudinary: cloudinary,
         params: {
+<<<<<<< HEAD
             folder: 'Autogaard/vehicles',
+=======
+            folder: 'autoconcierge/vehicles',
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
             allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
             transformation: [{ width: 1200, height: 900, crop: 'limit' }]
         }
@@ -54,4 +58,7 @@ module.exports = {
     cloudinary,
     upload
 };
+<<<<<<< HEAD
 
+=======
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28

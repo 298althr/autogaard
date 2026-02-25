@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { query } = require('../config/database');
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt');
+<<<<<<< HEAD
 const { OAuth2Client } = require('google-auth-library');
 const env = require('../config/env');
 
@@ -51,6 +52,11 @@ class AuthService {
 
     async register(userData) {
 
+=======
+
+class AuthService {
+    async register(userData) {
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
         const { email, password, display_name, phone } = userData;
 
         // Check if user exists

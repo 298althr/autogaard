@@ -149,7 +149,11 @@ export default function VehicleDetail() {
                             <div className="flex items-center space-x-3">
                                 <ShieldCheck className="text-emerald" size={24} />
                                 <div>
+<<<<<<< HEAD
                                     <p className="text-sm font-bold">Verified by Autogaard</p>
+=======
+                                    <p className="text-sm font-bold">Verified by AutoConcierge</p>
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                                     <p className="text-xs text-onyx-light">Paperwork & physical check complete</p>
                                 </div>
                             </div>

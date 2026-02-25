@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # Autogaard
+=======
+# AutoConcierge
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 
 Nigeria's most transparent, AI-powered used car marketplace. Real-time auctions, AI market valuations, escrow wallet, and zero trust games.
 
@@ -13,8 +17,13 @@ Nigeria's most transparent, AI-powered used car marketplace. Real-time auctions,
 
 ### 1. Clone the Repository
 ```bash
+<<<<<<< HEAD
 git clone https://github.com/298althr/Autogaard.git
 cd Autogaard
+=======
+git clone https://github.com/298althr/autoconcierge.git
+cd autoconcierge
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 ```
 
 ### 2. Set Up Environment Variables
@@ -40,7 +49,11 @@ npm run seed      # Load vehicle catalog + demo data
 ```
 
 ### 5. Verify Setup
+<<<<<<< HEAD
 - Open `http://localhost:3000` — should see Autogaard landing page
+=======
+- Open `http://localhost:3000` — should see AutoConcierge landing page
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 - Open `http://localhost:4000/health` — should return `{ "status": "ok", "db": "connected" }`
 
 ---
@@ -62,7 +75,11 @@ npm run seed      # Load vehicle catalog + demo data
 ## Project Structure
 
 ```
+<<<<<<< HEAD
 Autogaard/
+=======
+AutoConcierge/
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 ├── client/         # Next.js 14 frontend (TypeScript)
 ├── server/         # Express.js backend (JavaScript)
 ├── docs/           # All documentation
@@ -133,5 +150,9 @@ Each Issue references: feature description, linked docs, edge cases, code refere
 
 ## License
 
+<<<<<<< HEAD
 Private. All rights reserved — Autogaard 2026.
 
+=======
+Private. All rights reserved — AutoConcierge 2026.
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV production
@@ -12,4 +13,40 @@ COPY public ./public
 
 EXPOSE 3001
 
+=======
+# Build stage
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --legacy-peer-deps
+COPY . .
+
+# Build-time env vars (needed for Next.js build)
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SOCKET_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Copy only what is needed for standalone execution
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+# Note: Standalone mode includes a mini node_modules inside it, 
+# but it doesn't include the .next folder itself unless copied.
+
+EXPOSE 3000
+ENV PORT 3000
+# Run the standalone server
+>>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 CMD ["node", "server.js"]
