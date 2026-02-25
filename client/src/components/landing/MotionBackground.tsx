@@ -7,17 +7,15 @@ const MotionBackground = () => {
     return (
         <div className="fixed inset-0 -z-10 overflow-hidden bg-[#F8FAFC]">
             {/* Subtle Noise Texture */}
-            <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+            <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-            {/* Static Orbs (Replaced animated ones for performance) */}
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-burgundy/5 rounded-full blur-[120px] pointer-events-none translate-x-1/2 -translate-y-1/2" />
+            {/* Simple static color shapes for performance */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-burgundy/5 rounded-full pointer-events-none translate-x-1/2 -translate-y-1/2" />
 
-            <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-rose-200/20 rounded-full blur-[100px] pointer-events-none animate-pulse duration-[10000ms]" />
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-slate-100 rounded-full opacity-50 blur-[80px] pointer-events-none -translate-x-1/2 translate-y-1/2" />
 
-            <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-slate-200/40 rounded-full blur-[110px] pointer-events-none" />
-
-            {/* Grid Pattern Effect */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+            {/* Static Grid */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px]" />
         </div>
     );
 };

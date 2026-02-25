@@ -43,7 +43,7 @@ export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
     } catch (err: any) {
         console.error(`[apiFetch Error] ${endpoint}:`, err.message);
         if (err.message === 'Failed to fetch') {
-            throw new Error('Could not connect to the server. Please check your internet or if the backend is online.');
+            throw new Error(`API Connection Failed: Attempted to reach [${url}]. Ensure NEXT_PUBLIC_API_URL is set in Railway for the frontend service and you have RE-DEPLOYED after setting it.`);
         }
         throw err;
     }
