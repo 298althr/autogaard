@@ -85,6 +85,17 @@ app.get('/health', async (req, res) => {
     }
 });
 
+app.get('/api/trigger-seed', (req, res) => {
+    const { exec } = require('child_process');
+    console.log('Starting background seed process...');
+    exec('node db/seeds/catalog_seed.js && node db/seeds/automobile_specs_seed.js && node db/seeds/demo_seed.js', { maxBuffer: 1024 * 1024 * 50 }, (err, stdout, stderr) => {
+        if (err) console.error('Seed Err:', err);
+        console.log('Seed Stdout:', stdout);
+        console.error('Seed Stderr:', stderr);
+    });
+    res.json({ message: 'Seeding started in background. Check Railway logs.' });
+});
+
 const auctionService = require('./services/auctionService');
 const settlementService = require('./services/settlementService');
 const cron = require('node-cron');
