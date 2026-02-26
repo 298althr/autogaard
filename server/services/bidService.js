@@ -18,7 +18,7 @@ class BidService {
             `, [auctionId]);
             if (!auctionRes.rows[0]) throw { status: 404, message: 'Auction not found' };
             const auction = auctionRes.rows[0];
-            const vehicleName = `${auction.make} ${auction.model}`;
+            const depositPct = parseFloat(auction.deposit_pct || 10) / 100;
 
             if (auction.status !== 'live') throw { status: 400, message: 'Auction is not live' };
 
@@ -29,7 +29,7 @@ class BidService {
             const minBid = currentPrice + parseFloat(auction.bid_increment);
             if (amount < minBid) throw { status: 400, message: `Min bid is ₦${minBid.toLocaleString()}` };
 
-            const depositAmount = amount * 0.10; // 10% commitment hold
+            const depositAmount = amount * depositPct;
             await walletService.executeTransaction(userId, {
                 type: 'bid_hold',
                 amount: depositAmount,
@@ -39,7 +39,7 @@ class BidService {
             if (auction.winner_id && auction.winner_id !== userId) {
                 const prevWinnerBid = await client.query('SELECT amount FROM bids WHERE auction_id = $1 AND user_id = $2 AND is_winning = true', [auctionId, auction.winner_id]);
                 if (prevWinnerBid.rows[0]) {
-                    const prevHold = parseFloat(prevWinnerBid.rows[0].amount) * 0.10;
+                    const prevHold = parseFloat(prevWinnerBid.rows[0].amount) * depositPct;
                     await walletService.executeTransaction(auction.winner_id, {
                         type: 'bid_release',
                         amount: prevHold,
@@ -75,7 +75,13 @@ class BidService {
             `, [amount, userId, newEndTime, extended ? 1 : 0, auctionId]);
 
             await client.query('COMMIT');
-            socketService.broadcastBid(auctionId, { auction_id: auctionId, user_id: userId, amount, end_time: newEndTime });
+            socketService.broadcastBid(auctionId, {
+                auction_id: auctionId,
+                user_id: userId,
+                amount,
+                end_time: newEndTime,
+                bid_count: (auction.bid_count + 1)
+            });
             if (extended) socketService.broadcastAuctionStatus(auctionId, 'extended', { end_time: newEndTime });
 
             return bidRes.rows[0];
@@ -101,12 +107,13 @@ class BidService {
             `, [auctionId]);
             if (!auctionRes.rows[0]) throw { status: 404, message: 'Auction not found' };
             const auction = auctionRes.rows[0];
+            const depositPct = parseFloat(auction.deposit_pct || 10) / 100;
 
             if (auction.status !== 'live') throw { status: 400, message: 'Auction is not live' };
             if (!auction.buy_now_price) throw { status: 400, message: 'Buy Now not available' };
 
             const amount = parseFloat(auction.buy_now_price);
-            const depositAmount = amount * 0.10;
+            const depositAmount = amount * depositPct;
             await walletService.executeTransaction(userId, {
                 type: 'bid_hold',
                 amount: depositAmount,
@@ -116,7 +123,7 @@ class BidService {
             if (auction.winner_id && auction.winner_id !== userId) {
                 const prevWinnerBid = await client.query('SELECT amount FROM bids WHERE auction_id = $1 AND user_id = $2 AND is_winning = true', [auctionId, auction.winner_id]);
                 if (prevWinnerBid.rows[0]) {
-                    const prevHold = parseFloat(prevWinnerBid.rows[0].amount) * 0.10;
+                    const prevHold = parseFloat(prevWinnerBid.rows[0].amount) * depositPct;
                     await walletService.executeTransaction(auction.winner_id, {
                         type: 'bid_release',
                         amount: prevHold,
