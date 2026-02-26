@@ -214,6 +214,42 @@ export default function ValuationPage() {
                                     <label htmlFor="accident_history" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 cursor-pointer">Has Accident History?</label>
                                 </div>
                             </div>
+
+                            {selectedModelId && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="bg-slate-50 border border-slate-100 rounded-3xl p-6 flex items-center space-x-6"
+                                >
+                                    <div className="w-32 h-20 bg-white rounded-xl overflow-hidden relative border border-slate-200">
+                                        {(() => {
+                                            const model = models.find(m => m.id.toString() === selectedModelId);
+                                            let photoUrl = '';
+                                            if (model && model.photos) {
+                                                try {
+                                                    const p = typeof model.photos === 'string' && model.photos.startsWith('[')
+                                                        ? JSON.parse(model.photos)
+                                                        : model.photos.split(',');
+                                                    photoUrl = Array.isArray(p) ? p[0] : p;
+                                                } catch (e) { photoUrl = model.photos; }
+                                            }
+                                            return photoUrl ? (
+                                                <Image src={photoUrl} alt={model?.name || 'Vehicle'} fill className="object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-slate-200">
+                                                    <Zap size={24} />
+                                                </div>
+                                            );
+                                        })()}
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-burgundy">{formData.make}</p>
+                                        <p className="text-xl font-heading font-extrabold text-slate-900">{formData.model}</p>
+                                        <p className="text-xs font-subheading text-slate-400">Selected Configuration Node</p>
+                                    </div>
+                                </motion.div>
+                            )}
+
                             <div className="pt-6 flex justify-end">
                                 <PremiumButton onClick={nextStep} disabled={!formData.make || !formData.model} icon={ArrowRight} tooltip="Proceed to Condition Check">
                                     Assemble Profile

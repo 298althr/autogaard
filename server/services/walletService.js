@@ -19,8 +19,10 @@ class WalletService {
     }
 
     async executeTransaction(userId, { type, amount, status = 'completed', description, paystack_ref }) {
-        // Enforce KYC for high-value transactions
-        await kycService.enforceKYC(userId, amount);
+        // Enforce KYC for outgoing or funding transactions above threshold
+        if (['funding', 'bid_hold', 'purchase'].includes(type)) {
+            await kycService.enforceKYC(userId, amount);
+        }
 
         const client = await pool.connect();
         try {

@@ -20,6 +20,16 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'exquisite-insight-production.up.railway.app',
                 pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: '**.autoevolution.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'http',
+                hostname: '**.autoevolution.com',
+                pathname: '/**',
             }
         ],
     },

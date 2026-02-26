@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
-import { Plus, X, ArrowRight, Zap, Info, ArrowLeftRight } from 'lucide-react';
+import { Plus, X, ArrowRight, Zap, Info, ArrowLeftRight, Trash2, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MotionBackground from '@/components/landing/MotionBackground';
 import PillHeader from '@/components/landing/PillHeader';
@@ -16,8 +16,10 @@ interface Vehicle {
     model: string;
     year_start: number;
     year_end: number;
-    photos: string;
+    photos: string[];
     engines: any[];
+    description?: string;
+    press_release?: string;
 }
 
 export default function ComparePage() {
@@ -64,7 +66,14 @@ export default function ComparePage() {
         setLoading(true);
         try {
             const res = await apiFetch(`/catalog/compare?ids=${selectedIds.join(',')}`);
-            if (res.data) setVehicles(res.data);
+            if (res.data) {
+                setVehicles(res.data);
+                // Sync selectedIds with found vehicles to remove dead IDs from URL
+                const foundIds = res.data.map((v: Vehicle) => v.id);
+                if (foundIds.length !== selectedIds.length) {
+                    setSelectedIds(foundIds);
+                }
+            }
         } catch (err) {
             console.error(err);
         } finally {
@@ -105,17 +114,28 @@ export default function ComparePage() {
         setSelectedIds(selectedIds.filter(v => v !== id));
     };
 
+    const clearMatrix = () => {
+        setSelectedIds([]);
+    };
+
+    const shareComparison = () => {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url);
+        // Could use a toast here if available
+        alert('Comparison link copied to clipboard!');
+    };
+
     const renderSpecRow = (label: string, field: string, engineIdx: number = 0) => {
         return (
-            <div className="grid grid-cols-[150px_1fr] md:grid-cols-[200px_repeat(auto-fit,minmax(150px,1fr))] border-b border-slate-100 py-4 items-center">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{label}</div>
-                <div className="flex gap-4 col-span-1 md:col-span-full ml-[150px] md:ml-0">
+            <div className="grid grid-cols-[150px_1fr] md:grid-cols-[200px_repeat(auto-fit,minmax(150px,1fr))] border-b border-slate-100/50 py-5 items-center group/row hover:bg-slate-50/50 transition-colors">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-4">{label}</div>
+                <div className="flex gap-4 col-span-1 md:col-span-full ml-[150px] md:ml-0 px-4">
                     {vehicles.map(v => {
                         const engine = v.engines[engineIdx] || {};
                         const specs = engine.specs || {};
                         const val = field.split('.').reduce((o, i) => o?.[i], specs) || '—';
                         return (
-                            <div key={v.id} className="flex-1 text-sm font-subheading font-medium text-slate-700 min-w-[150px] px-4">
+                            <div key={v.id} className="flex-1 text-sm font-subheading font-semibold text-slate-700 min-w-[150px] px-2 py-1 rounded-lg group-hover/row:bg-white transition-all">
                                 {val}
                             </div>
                         );
@@ -149,7 +169,26 @@ export default function ComparePage() {
                 </div>
 
                 {/* Selection Bar */}
-                <div className="flex flex-wrap gap-4 mb-12 justify-center">
+                <div className="flex flex-wrap gap-4 mb-12 justify-center items-stretch">
+                    {vehicles.length > 0 && (
+                        <div className="flex flex-col gap-2">
+                            <button
+                                onClick={shareComparison}
+                                className="h-1/2 px-4 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-burgundy hover:border-burgundy/20 transition-all flex items-center justify-center"
+                                title="Share Comparison"
+                            >
+                                <Share2 size={16} />
+                            </button>
+                            <button
+                                onClick={clearMatrix}
+                                className="h-1/2 px-4 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-red-500 hover:border-red-100 transition-all flex items-center justify-center"
+                                title="Clear All"
+                            >
+                                <Trash2 size={16} />
+                            </button>
+                        </div>
+                    )}
+
                     {vehicles.map(v => (
                         <motion.div
                             key={v.id}
@@ -158,8 +197,8 @@ export default function ComparePage() {
                             className="bg-white border-2 border-burgundy/20 rounded-2xl p-4 flex items-center space-x-4 shadow-sm"
                         >
                             <div className="w-12 h-12 bg-slate-100 rounded-xl overflow-hidden relative border border-slate-200">
-                                {v.photos ? (
-                                    <Image src={v.photos.split(',')[0]} alt={v.model} fill className="object-cover" />
+                                {v.photos && v.photos.length > 0 ? (
+                                    <Image src={v.photos[0]} alt={v.model} fill className="object-cover" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-slate-300">
                                         <Zap size={16} />
@@ -206,12 +245,34 @@ export default function ComparePage() {
                                             <button
                                                 key={res.id}
                                                 onClick={() => addVehicle(res.id)}
-                                                className="w-full text-left px-6 py-4 hover:bg-slate-50 flex flex-col transition-colors border-b last:border-0 border-slate-50"
+                                                className="w-full text-left px-6 py-4 hover:bg-slate-50 flex items-center space-x-4 transition-colors border-b last:border-0 border-slate-50"
                                             >
-                                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                                                    {brands.find(b => b.id === res.brand_id)?.name}
-                                                </span>
-                                                <span className="text-sm font-heading font-bold text-slate-900">{res.name}</span>
+                                                <div className="w-12 h-8 bg-slate-100 rounded-lg overflow-hidden relative shrink-0 border border-slate-200">
+                                                    {(() => {
+                                                        let photoUrl = '';
+                                                        if (res.photos) {
+                                                            try {
+                                                                const p = typeof res.photos === 'string' && res.photos.startsWith('[')
+                                                                    ? JSON.parse(res.photos)
+                                                                    : res.photos.split(',');
+                                                                photoUrl = Array.isArray(p) ? p[0] : p;
+                                                            } catch (e) { photoUrl = res.photos; }
+                                                        }
+                                                        return photoUrl ? (
+                                                            <Image src={photoUrl} alt={res.name} fill className="object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                                <Zap size={12} />
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                                        {res.brand_name || brands.find(b => b.id === res.brand_id)?.name}
+                                                    </span>
+                                                    <span className="text-sm font-heading font-bold text-slate-900">{res.name}</span>
+                                                </div>
                                             </button>
                                         ))}
                                     </motion.div>
@@ -237,8 +298,8 @@ export default function ComparePage() {
                                 {vehicles.map(v => (
                                     <div key={v.id} className="flex-1 min-w-[150px] p-6 md:p-8 border-l border-slate-200/50 bg-white/50 backdrop-blur-sm">
                                         <div className="aspect-[16/9] bg-slate-100 rounded-xl mb-6 overflow-hidden relative border border-slate-200 shadow-sm">
-                                            {v.photos ? (
-                                                <Image src={v.photos.split(',')[0]} alt={v.model} fill className="object-cover" />
+                                            {v.photos && v.photos.length > 0 ? (
+                                                <Image src={v.photos[0]} alt={v.model} fill className="object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-slate-300">
                                                     <Zap size={32} />
@@ -274,6 +335,32 @@ export default function ComparePage() {
                                 </h5>
                                 {renderSpecRow('Gearbox', 'Transmission Specs.Gearbox:')}
                                 {renderSpecRow('Drive Type', 'Transmission Specs.Drive Type:')}
+                            </div>
+
+                            <div>
+                                <h5 className="flex items-center space-x-2 text-xs font-bold uppercase tracking-[0.3em] text-slate-400 mb-8">
+                                    <Info size={14} className="text-burgundy" />
+                                    <span>Narrative & Press Release</span>
+                                </h5>
+                                <div className="grid grid-cols-[150px_1fr] md:grid-cols-[200px_repeat(auto-fit,minmax(150px,1fr))] border-b border-slate-100/50 py-5 items-start group/row hover:bg-slate-50/50 transition-colors">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-4 py-2">Deep Description</div>
+                                    <div className="flex gap-4 col-span-1 md:col-span-full ml-[150px] md:ml-0 px-4">
+                                        {vehicles.map(v => (
+                                            <div key={v.id} className="flex-1 text-[11px] leading-relaxed font-subheading text-slate-500 min-w-[150px] px-2 py-4 rounded-lg group-hover/row:bg-white transition-all max-h-48 overflow-y-auto custom-scrollbar">
+                                                {v.description || 'No descriptive data available.'}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-[150px_1fr] md:grid-cols-[200px_repeat(auto-fit,minmax(150px,1fr))] border-b border-slate-100/50 py-5 items-start group/row hover:bg-slate-50/50 transition-colors">
+                                    <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-4 py-2">Press Release</div>
+                                    <div className="flex gap-4 col-span-1 md:col-span-full ml-[150px] md:ml-0 px-4">
+                                        {vehicles.map(v => (
+                                            <div key={v.id} className="flex-1 text-[11px] leading-relaxed font-subheading text-slate-400 italic min-w-[150px] px-2 py-4 rounded-lg group-hover/row:bg-white transition-all max-h-48 overflow-y-auto custom-scrollbar" dangerouslySetInnerHTML={{ __html: v.press_release || 'No press release recorded.' }}>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

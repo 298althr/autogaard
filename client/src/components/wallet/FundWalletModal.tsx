@@ -51,7 +51,7 @@ const FundWalletModal = ({ onClose, onSuccess }: FundWalletModalProps) => {
             return;
         }
         if (needsKYC) {
-            setError('Transactions over ₦5,000,000 require verified KYC.');
+            setError('Transactions over ₦500,000 require verified KYC.');
             return;
         }
         setStep(2);
