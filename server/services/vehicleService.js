@@ -1,7 +1,7 @@
 const { query } = require('../config/database');
 
 class VehicleService {
-    async getAllVehicles({ make, model, condition, minPrice, maxPrice, status, body_type, year, transmission, maxMileage, sort = 'recommended' }) {
+    async getAllVehicles({ make, model, condition, minPrice, maxPrice, status, body_type, year, transmission, maxMileage, fuel_type, drivetrain, sort = 'recommended' }) {
         let sql = `
       SELECT v.*, 
              vc.resell_rank, vc.popularity_index, vc.body_type, vc.transmission,
