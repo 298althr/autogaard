@@ -83,16 +83,17 @@ export default function WorkshopHubs() {
                     className="group"
                 >
                     <Link href={hub.link}>
-                        <div className="glass-card p-6 h-full border border-slate-100 hover:border-burgundy/20 hover:shadow-xl transition-all duration-500 flex flex-col items-start text-left">
-                            <div className={`w-14 h-14 ${hub.bg} ${hub.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500`}>
-                                <hub.icon size={28} />
+                        <div className="glass-card !bg-white/5 !backdrop-blur-2xl p-8 h-full border border-white/10 hover:border-burgundy/40 hover:shadow-[0_0_30px_rgba(159,18,57,0.1)] transition-all duration-500 flex flex-col items-start text-left group">
+                            <div className={`w-16 h-16 ${hub.bg.replace('bg-', 'bg-transparent border border-')} rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-burgundy group-hover:text-white transition-all duration-500 shadow-xl`}>
+                                <hub.icon size={32} className={hub.color} />
                             </div>
-                            <h3 className="text-xl font-heading font-extrabold text-slate-900 mb-2 tracking-tight uppercase tracking-wider">{hub.title}</h3>
-                            <p className="text-slate-500 text-sm leading-relaxed mb-6 font-medium">{hub.description}</p>
+                            <h3 className="text-xl font-heading font-extrabold text-white mb-3 tracking-tight uppercase">{hub.title}</h3>
+                            <p className="text-slate-400 text-sm leading-relaxed mb-8 font-medium">{hub.description}</p>
 
-                            <div className="mt-auto flex items-center text-[10px] font-black uppercase tracking-[0.2em] text-burgundy group-hover:gap-2 transition-all">
+                            <div className="mt-auto flex items-center text-[10px] font-black uppercase tracking-[0.2em] text-burgundy group-hover:gap-3 transition-all">
                                 <span>Deploy Protocol</span>
-                                <Wrench size={12} className="ml-1" />
+                                <div className="w-8 h-px bg-burgundy/30 group-hover:w-12 transition-all" />
+                                <Wrench size={14} className="group-hover:rotate-45 transition-transform" />
                             </div>
                         </div>
                     </Link>

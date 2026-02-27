@@ -17,12 +17,14 @@ import {
     Loader2,
     ChevronLeft,
     ChevronRight,
-    Plus
+    Plus,
+    Wrench
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import RegisterVehicleHero from '@/components/vehicle/RegisterVehicleHero';
 import WorkshopHubs from '@/components/garage/WorkshopHubs';
+import GarageBackground from '@/components/garage/GarageBackground';
 
 export default function GaragePage() {
     const { token } = useAuth();
@@ -115,8 +117,8 @@ export default function GaragePage() {
     }
 
     return (
-        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-32 pb-20 px-6">
-            <MotionBackground />
+        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#0A0D10] text-slate-300 overflow-x-hidden pt-32 pb-20 px-6">
+            <GarageBackground />
             <PillHeader />
 
             <div className="max-w-6xl mx-auto relative z-10">
@@ -126,45 +128,42 @@ export default function GaragePage() {
                             <Car size={16} />
                             <span>Private Collection</span>
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-heading font-extrabold text-slate-900 tracking-tight">AutoGaard Vault.</h1>
-                        <p className="text-slate-500 font-subheading text-sm mt-3 leading-relaxed">Oversee acquired assets, manage workshop services, and finalize custody transfers.</p>
+                        <h1 className="text-4xl md:text-5xl font-heading font-extrabold text-white tracking-tight leading-tight">AutoGaard Vault.</h1>
+                        <p className="text-slate-400 font-subheading text-sm mt-3 leading-relaxed max-w-xl">Oversee acquired assets, manage workshop services, and finalize custody transfers.</p>
                     </motion.div>
 
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
-                        className="flex items-center gap-4"
+                        className="flex flex-col items-end gap-6"
                     >
+                        <div className="flex bg-white/40 backdrop-blur-xl p-1.5 rounded-full shadow-2xl border border-white/20">
+                            {[
+                                { id: 'garage', label: 'Vault', icon: Car },
+                                { id: 'workshop', label: 'Workshop', icon: Wrench },
+                                { id: 'sales', label: 'Sales', icon: Gavel }
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setView(tab.id as any)}
+                                    className={`flex items-center gap-2 px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${view === tab.id ? 'bg-slate-900 text-white shadow-xl scale-105' : 'text-slate-500 hover:text-slate-900'}`}
+                                >
+                                    <tab.icon size={14} />
+                                    <span>{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+
                         <PremiumButton
-                            variant="secondary"
+                            variant="primary"
                             size="sm"
                             icon={Plus}
                             onClick={() => setIsRegistering(true)}
+                            className="shadow-burgundy/20"
                         >
-                            Register Asset
+                            Acquire Asset
                         </PremiumButton>
-
-                        <div className="flex bg-white/60 backdrop-blur-md p-1.5 rounded-full shadow-sm border border-slate-200">
-                            <button
-                                onClick={() => setView('garage')}
-                                className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${view === 'garage' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:text-slate-900'}`}
-                            >
-                                Vault
-                            </button>
-                            <button
-                                onClick={() => setView('workshop')}
-                                className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${view === 'workshop' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:text-slate-900'}`}
-                            >
-                                Workshop
-                            </button>
-                            <button
-                                onClick={() => setView('sales')}
-                                className={`px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${view === 'sales' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:text-slate-900'}`}
-                            >
-                                Sales
-                            </button>
-                        </div>
                     </motion.div>
                 </header>
 
@@ -230,8 +229,8 @@ export default function GaragePage() {
                                                 <div className="flex-1 flex flex-col py-1">
                                                     <div className="flex items-start justify-between mb-4">
                                                         <div>
-                                                            <h3 className="text-2xl font-heading font-extrabold text-slate-900 leading-tight mb-2 tracking-tight">{item.year} {item.make} {item.model}</h3>
-                                                            <div className="flex items-center space-x-2 text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+                                                            <h3 className="text-2xl font-heading font-extrabold text-white leading-tight mb-2 tracking-tight">{item.year} {item.make} {item.model}</h3>
+                                                            <div className="flex items-center space-x-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
                                                                 <MapPin size={12} className="text-burgundy" />
                                                                 <span>{view === 'garage' ? (item.location || 'Escrow Facility') : `Buyer: ${item.buyer_name || 'Verified Buyer'}`}</span>
                                                             </div>
@@ -242,51 +241,62 @@ export default function GaragePage() {
                                                         </div>
                                                     </div>
 
-                                                    <div className="mt-auto pt-6 flex items-end justify-between border-t border-slate-100">
+                                                    <div className="mt-auto pt-6 flex flex-wrap items-end justify-between border-t border-slate-100 gap-4">
                                                         <div>
                                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
-                                                                {view === 'garage' ? 'Acquisition Value' : 'Sale Value'}
+                                                                {view === 'garage' ? 'Equity Value' : 'Sale Value'}
                                                             </p>
-                                                            <p className="text-2xl font-heading font-extrabold text-slate-900">
+                                                            <p className="text-2xl font-heading font-extrabold text-white">
                                                                 ₦{(parseFloat(item.total_deal_amount || item.current_price || 0)).toLocaleString()}
                                                             </p>
                                                         </div>
 
-                                                        {view === 'garage' ? (
-                                                            item.status === 'ended' ? (
-                                                                <PremiumButton
-                                                                    onClick={() => handleSettle(item.id)}
-                                                                    isLoading={actionLoading === item.id}
-                                                                    disabled={!!actionLoading}
-                                                                    icon={ArrowUpRight}
-                                                                    tooltip="Finalize Escrow Transfer"
-                                                                >
-                                                                    Complete Settlement
-                                                                </PremiumButton>
+                                                        <div className="flex items-center gap-3">
+                                                            {view === 'garage' ? (
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => setView('workshop')}
+                                                                        className="flex items-center gap-2 px-5 py-3 rounded-xl bg-burgundy/5 text-burgundy text-[9px] font-black uppercase tracking-widest hover:bg-burgundy hover:text-white transition-all group/btn shadow-sm"
+                                                                    >
+                                                                        <Wrench size={14} className="group-hover/btn:rotate-45 transition-transform" />
+                                                                        <span>Service</span>
+                                                                    </button>
+                                                                    {item.status === 'ended' ? (
+                                                                        <PremiumButton
+                                                                            onClick={() => handleSettle(item.id)}
+                                                                            isLoading={actionLoading === item.id}
+                                                                            disabled={!!actionLoading}
+                                                                            icon={ArrowUpRight}
+                                                                            tooltip="Finalize Escrow Transfer"
+                                                                        >
+                                                                            Settle
+                                                                        </PremiumButton>
+                                                                    ) : (
+                                                                        <Link href={`/vehicles/${item.vehicle_id}`}>
+                                                                            <PremiumButton variant="outline" size="sm" tooltip="View Profile" className="!px-6">
+                                                                                Dossier
+                                                                            </PremiumButton>
+                                                                        </Link>
+                                                                    )}
+                                                                </>
                                                             ) : (
-                                                                <Link href={`/vehicles/${item.vehicle_id}`}>
-                                                                    <PremiumButton variant="outline" size="sm" tooltip="View Profile">
-                                                                        Dossier
+                                                                item.stage === 'waiting_seller_acceptance' ? (
+                                                                    <PremiumButton
+                                                                        onClick={() => handleAcceptDeal(item.id)}
+                                                                        isLoading={actionLoading === item.id}
+                                                                        disabled={!!actionLoading}
+                                                                        variant="secondary"
+                                                                        icon={ShieldCheck}
+                                                                    >
+                                                                        Accept Deal
                                                                     </PremiumButton>
-                                                                </Link>
-                                                            )
-                                                        ) : (
-                                                            item.stage === 'waiting_seller_acceptance' ? (
-                                                                <PremiumButton
-                                                                    onClick={() => handleAcceptDeal(item.id)}
-                                                                    isLoading={actionLoading === item.id}
-                                                                    disabled={!!actionLoading}
-                                                                    variant="secondary"
-                                                                    icon={ShieldCheck}
-                                                                >
-                                                                    Accept Deal
-                                                                </PremiumButton>
-                                                            ) : (
-                                                                <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1">
-                                                                    <ShieldCheck size={14} /> Transferred
-                                                                </div>
-                                                            )
-                                                        )}
+                                                                ) : (
+                                                                    <div className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest flex items-center gap-1">
+                                                                        <ShieldCheck size={14} /> Transferred
+                                                                    </div>
+                                                                )
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
