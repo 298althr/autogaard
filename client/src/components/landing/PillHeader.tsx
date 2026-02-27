@@ -23,7 +23,7 @@ const PillHeader = () => {
                     {/* Branding Logo */}
                     <Link href="/" className="flex items-center transition-opacity hover:opacity-80 md:mr-0 mr-2">
                         <Image
-                            src="/logo.png"
+                            src="/autogaard-logo.png"
                             alt="Autogaard"
                             width={220}
                             height={60}
@@ -89,7 +89,7 @@ const PillHeader = () => {
 
                         <nav className="flex flex-col items-center gap-10 text-center w-full">
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/" className="transition-transform active:scale-95 mb-4">
-                                <Image src="/logo.png" alt="Autogaard" width={220} height={50} priority className="h-8 w-auto" />
+                                <Image src="/autogaard-logo.png" alt="Autogaard" width={220} height={50} priority className="h-8 w-auto" />
                             </Link>
 
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/vehicles" className="text-3xl font-heading font-extrabold text-slate-900 hover:text-burgundy transition-colors px-10">Marketplace</Link>

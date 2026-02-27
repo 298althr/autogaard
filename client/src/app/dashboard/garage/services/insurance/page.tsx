@@ -67,11 +67,11 @@ export default function InsuranceHub() {
     useEffect(() => {
         if (token) {
             apiFetch('/me/garage', { token })
-                .then((res: { data?: any[] }) => {
+                .then((res: any) => {
                     setVehicles(res.data || []);
                     setLoading(false);
                 })
-                .catch((err: Error) => {
+                .catch((err: any) => {
                     console.error('Error fetching vehicles:', err);
                     setLoading(false);
                 });

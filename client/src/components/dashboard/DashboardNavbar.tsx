@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Car, Warehouse, Wallet, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import NotificationBell from './NotificationBell';
 
 export default function DashboardNavbar() {
@@ -22,38 +23,51 @@ export default function DashboardNavbar() {
         <>
             {/* Desktop Top Navbar & Mobile Top Header */}
             <header className="fixed top-0 left-0 w-full bg-white/10 backdrop-blur-xl border-b border-white/20 z-50 md:sticky">
-                <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between relative">
                     {/* Brand Logo */}
-                    <Link href="/dashboard" className="text-xl font-black text-burgundy tracking-tight">
-                        AUTOGAARD
+                    <Link href="/dashboard" className="relative z-10 flex items-center">
+                        <Image
+                            src="/autogaard-logo.png"
+                            alt="Autogaard"
+                            width={160}
+                            height={40}
+                            className="h-10 w-auto object-contain"
+                            priority
+                        />
                     </Link>
 
-                    {/* Desktop Nav Items */}
-                    <div className="hidden md:flex items-center gap-2 h-full">
-                        {navItems.map((item) => {
-                            const Icon = item.icon;
-                            const isActive = item.exact
-                                ? pathname === item.href
-                                : pathname?.startsWith(item.href);
+                    {/* Desktop Nav Items - Centered */}
+                    <div className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none">
+                        <div className="flex items-center gap-1 h-full pointer-events-auto">
+                            {navItems.map((item) => {
+                                const Icon = item.icon;
+                                const isActive = item.exact
+                                    ? pathname === item.href
+                                    : pathname?.startsWith(item.href);
 
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={`relative flex items-center px-4 h-16 transition-all duration-300 group ${isActive ? 'text-burgundy' : 'text-onyx-light hover:text-onyx'}`}
-                                >
-                                    <Icon size={18} className="mr-2" />
-                                    <span className="text-sm font-bold">{item.label}</span>
-                                    {isActive && (
-                                        <motion.div
-                                            layoutId="activeTabUnderline"
-                                            className="absolute bottom-0 left-0 w-full h-[3px] bg-burgundy"
-                                        />
-                                    )}
-                                </Link>
-                            );
-                        })}
-                        <div className="ml-4 pl-4 border-l border-gray-100">
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className={`relative flex items-center px-4 h-16 transition-all duration-300 group ${isActive ? 'text-burgundy' : 'text-onyx-light hover:text-onyx'}`}
+                                    >
+                                        <Icon size={18} className="mr-2" />
+                                        <span className="text-sm font-bold">{item.label}</span>
+                                        {isActive && (
+                                            <motion.div
+                                                layoutId="activeTabUnderline"
+                                                className="absolute bottom-0 left-0 w-full h-[3px] bg-burgundy"
+                                            />
+                                        )}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Right Action Area - Desktop */}
+                    <div className="hidden md:flex items-center relative z-10">
+                        <div className="pl-4 border-l border-gray-100">
                             <NotificationBell />
                         </div>
                     </div>
