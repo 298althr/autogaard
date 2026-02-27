@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Car, Warehouse, Wallet, User } from 'lucide-react';
+import { Home, Car, Warehouse, Wallet, User, Gavel } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import NotificationBell from './NotificationBell';
@@ -14,6 +14,7 @@ export default function DashboardNavbar() {
     const navItems = [
         { label: 'Home', href: '/dashboard', icon: Home, exact: true },
         { label: 'Market', href: '/dashboard/market', icon: Car },
+        { label: 'Auctions', href: '/auctions', icon: Gavel },
         { label: 'Garage', href: '/dashboard/garage', icon: Warehouse },
         { label: 'Wallet', href: '/dashboard/wallet', icon: Wallet },
         { label: 'Profile', href: '/dashboard/profile', icon: User },
@@ -23,15 +24,15 @@ export default function DashboardNavbar() {
         <>
             {/* Desktop Top Navbar & Mobile Top Header */}
             <header className="fixed top-0 left-0 w-full bg-white/10 backdrop-blur-xl border-b border-white/20 z-50 md:sticky">
-                <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between relative">
+                <div className="max-w-7xl mx-auto px-4 md:px-8 h-40 flex items-center justify-between relative">
                     {/* Brand Logo */}
                     <Link href="/dashboard" className="relative z-10 flex items-center">
                         <Image
                             src="/autogaard-logo.png"
                             alt="Autogaard"
-                            width={320}
-                            height={80}
-                            className="h-20 w-auto object-contain"
+                            width={640}
+                            height={160}
+                            className="h-40 w-auto object-contain"
                             priority
                         />
                     </Link>
@@ -49,7 +50,7 @@ export default function DashboardNavbar() {
                                     <Link
                                         key={item.href}
                                         href={item.href}
-                                        className={`relative flex items-center px-4 h-20 transition-all duration-300 group ${isActive ? 'text-burgundy' : 'text-onyx-light hover:text-onyx'}`}
+                                        className={`relative flex items-center px-4 h-40 transition-all duration-300 group ${isActive ? 'text-burgundy' : 'text-onyx-light hover:text-onyx'}`}
                                     >
                                         <Icon size={18} className="mr-2" />
                                         <span className="text-sm font-bold">{item.label}</span>
@@ -107,7 +108,7 @@ export default function DashboardNavbar() {
             </nav>
 
             {/* Spacer for fixed top header on mobile */}
-            <div className="h-20 md:hidden" />
+            <div className="h-40 md:hidden" />
         </>
     );
 }

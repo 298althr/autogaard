@@ -1,7 +1,7 @@
 const { query } = require('../config/database');
 
 class VehicleService {
-    async getAllVehicles({ make, model, condition, minPrice, maxPrice, status, body_type, year, transmission, maxMileage, fuel_type, drivetrain, sort = 'recommended' }) {
+    async getAllVehicles({ make, model, condition, minPrice, maxPrice, status, body_type, year, transmission, maxMileage, fuel_type, drivetrain, search, sort = 'recommended' }) {
         let sql = `
       SELECT v.*, 
              vc.resell_rank, vc.popularity_index, vc.body_type, vc.transmission,
@@ -12,6 +12,11 @@ class VehicleService {
       WHERE v.is_private = false
     `;
         const params = [];
+
+        if (search) {
+            params.push('%' + search + '%');
+            sql += ` AND (v.make ILIKE $${params.length} OR v.model ILIKE $${params.length} OR v.year::text ILIKE $${params.length} OR v.vin ILIKE $${params.length})`;
+        }
 
         if (status) {
             params.push(status);

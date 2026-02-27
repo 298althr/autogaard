@@ -29,6 +29,7 @@ import { apiFetch, getAssetUrl } from '@/lib/api';
 import PremiumButton from '@/components/ui/PremiumButton';
 import PillHeader from '@/components/landing/PillHeader';
 import MotionBackground from '@/components/landing/MotionBackground';
+import DashboardNavbar from '@/components/dashboard/DashboardNavbar';
 
 const STEPS = [
     { id: 'identity', title: 'Identity', description: 'Vehicle identification' },
@@ -215,9 +216,9 @@ export default function ValuationWizard() {
     }
 
     return (
-        <main className="relative min-h-screen bg-[#F8FAFC] overflow-x-hidden pt-12 pb-32 px-6">
+        <main className={`relative min-h-screen bg-[#F8FAFC] overflow-x-hidden pb-32 px-6 ${user ? 'pt-48' : 'pt-12'}`}>
             <MotionBackground />
-            <PillHeader />
+            {user ? <DashboardNavbar /> : <PillHeader />}
 
             <div className="max-w-4xl mx-auto relative z-10">
                 {/* Header Navigation */}

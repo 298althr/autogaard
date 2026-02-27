@@ -32,9 +32,9 @@ const PillHeader = () => {
                         <Image
                             src="/autogaard-logo.png"
                             alt="Autogaard"
-                            width={240}
-                            height={65}
-                            className="h-10 sm:h-12 w-auto object-contain"
+                            width={480}
+                            height={130}
+                            className="h-20 sm:h-24 w-auto object-contain"
                             priority
                         />
                     </Link>
