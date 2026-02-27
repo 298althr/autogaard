@@ -8,10 +8,9 @@ class MeController {
     async getMyGarage(req, res, next) {
         try {
             const result = await pool.query(`
-                SELECT v.*, c.make, c.model, c.year, c.type, c.fuel_type,
+                SELECT v.*, 
                        a.id as active_auction_id, a.status as active_auction_status
                 FROM vehicles v
-                LEFT JOIN vehicle_catalog c ON v.catalog_id = c.id
                 LEFT JOIN auctions a ON v.id = a.vehicle_id AND a.status IN ('scheduled', 'live', 'buy_now_locked', 'pending_seller_acceptance')
                 WHERE v.owner_id = $1 
                 ORDER BY v.updated_at DESC
@@ -31,11 +30,10 @@ class MeController {
     async getMyBids(req, res, next) {
         try {
             const result = await pool.query(`
-                SELECT b.*, c.make, c.model, c.year, a.status as auction_status, a.current_price
+                SELECT b.*, v.make, v.model, v.year, a.status as auction_status, a.current_price
                 FROM bids b
                 JOIN auctions a ON b.auction_id = a.id
                 JOIN vehicles v ON a.vehicle_id = v.id
-                JOIN vehicle_catalog c ON v.catalog_id = c.id
                 WHERE b.user_id = $1
                 ORDER BY b.created_at DESC
             `, [req.user.id]);
@@ -59,13 +57,12 @@ class MeController {
                 SELECT 
                     'escrow' as type,
                     ae.id, ae.stage, ae.status as escrow_status, ae.total_deal_amount as price,
-                    c.make, c.model, c.year, v.images, 
+                    v.make, v.model, v.year, v.images, 
                     u.display_name as counterpart_name,
                     ae.updated_at
                 FROM auction_escrow ae
                 JOIN auctions a ON ae.auction_id = a.id
                 JOIN vehicles v ON a.vehicle_id = v.id
-                JOIN vehicle_catalog c ON v.catalog_id = c.id
                 JOIN users u ON ae.buyer_id = u.id
                 WHERE ae.seller_id = $1 AND ae.status != 'released'
 
@@ -74,12 +71,11 @@ class MeController {
                 SELECT 
                     'auction' as type,
                     a.id, a.status as stage, NULL as escrow_status, a.current_price as price,
-                    c.make, c.model, c.year, v.images,
+                    v.make, v.model, v.year, v.images,
                     NULL as counterpart_name,
                     a.updated_at
                 FROM auctions a
                 JOIN vehicles v ON a.vehicle_id = v.id
-                JOIN vehicle_catalog c ON v.catalog_id = c.id
                 WHERE a.created_by = $1 AND a.status IN ('scheduled', 'live')
                 AND NOT EXISTS (SELECT 1 FROM auction_escrow WHERE auction_id = a.id)
 
