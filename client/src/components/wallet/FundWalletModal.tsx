@@ -13,7 +13,8 @@ import {
     Clock,
     ArrowRight,
     ChevronLeft,
-    Loader2
+    Loader2,
+    Lock
 } from 'lucide-react';
 import { Button } from '@/components/ui/Base';
 import { apiFetch } from '@/lib/api';
@@ -241,23 +242,30 @@ const FundWalletModal = ({ onClose, onSuccess }: FundWalletModalProps) => {
 
                                 {step === 2 && (
                                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-                                        <button
-                                            onClick={() => handleMethodSelect('paystack')}
-                                            className="w-full p-6 bg-white border-2 border-gray-100 rounded-3xl flex items-center justify-between group hover:border-burgundy transition-all"
-                                        >
-                                            <div className="flex items-center space-x-4">
-                                                <div className="w-12 h-12 bg-burgundy/5 rounded-2xl flex items-center justify-center text-burgundy group-hover:bg-burgundy group-hover:text-white transition-all">
-                                                    <CreditCard size={24} />
-                                                </div>
-                                                <div className="text-left">
-                                                    <h4 className="font-black text-onyx">Paystack (Cards & Bank Transfer)</h4>
-                                                    <p className="text-xs text-onyx-light font-medium">Automatic verification • Instant</p>
-                                                </div>
+                                        <div className="relative group grayscale cursor-not-allowed">
+                                            <div className="absolute top-3 right-3 z-10">
+                                                <span className="bg-amber-100 text-amber-700 text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-md border border-amber-200 shadow-sm">
+                                                    Coming Soon
+                                                </span>
                                             </div>
-                                            <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-burgundy/10 group-hover:text-burgundy transition-all">
-                                                <ArrowRight size={16} />
-                                            </div>
-                                        </button>
+                                            <button
+                                                disabled
+                                                className="w-full p-6 bg-white border-2 border-gray-100 rounded-3xl flex items-center justify-between transition-all"
+                                            >
+                                                <div className="flex items-center space-x-4">
+                                                    <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-300 transition-all">
+                                                        <CreditCard size={24} />
+                                                    </div>
+                                                    <div className="text-left">
+                                                        <h4 className="font-black text-gray-400">Paystack (Cards & Bank Transfer)</h4>
+                                                        <p className="text-xs text-gray-300 font-medium">Automatic verification • Instant</p>
+                                                    </div>
+                                                </div>
+                                                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-200 transition-all">
+                                                    <Lock size={14} />
+                                                </div>
+                                            </button>
+                                        </div>
 
                                         <button
                                             onClick={() => handleMethodSelect('manual')}

@@ -16,10 +16,17 @@ interface Vehicle {
     location: string;
     trust_score: number;
     status: string;
+    vin?: string;
+    trim?: string;
+    transmission?: string;
+    fuel_type?: string;
+    body_type?: string;
+    auction_id?: string;
 }
 
 export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
     const isAuction = vehicle.status === 'in_auction';
+    const lotNumber = (vehicle.id || '').toString().slice(-6).toUpperCase();
 
     return (
         <div className="bg-white rounded-[2rem] overflow-hidden border border-surface-200 hover:shadow-2xl hover:shadow-black/5 hover:-translate-y-1 transition-all duration-500 group relative">
@@ -58,22 +65,37 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
             {/* Content Container */}
             <div className="p-6 relative">
                 <div className="mb-4">
+                    <div className="flex justify-between items-start mb-1">
+                        <span className="text-[10px] font-black text-burgundy/60 uppercase tracking-widest">Lot #{lotNumber}</span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">{vehicle.vin || 'VIN Shielded'}</span>
+                    </div>
                     <h3 className="text-xl font-heading font-extrabold text-content-primary truncate leading-tight group-hover:text-burgundy transition-colors tracking-tight">
                         {vehicle.year} {vehicle.make} {vehicle.model}
                     </h3>
-                    <div className="flex items-center space-x-3 mt-3">
-                        <div className="flex items-center space-x-1.5 text-content-muted text-[11px] font-bold uppercase tracking-widest bg-surface-50 px-2.5 py-1 rounded-md">
-                            <Gauge size={12} className="text-content-secondary" />
-                            <span>{vehicle.mileage_km?.toLocaleString()} km</span>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{vehicle.trim || 'Standard'}</p>
+
+                    {/* Technical Grid (Copart Style) */}
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-4 pt-4 border-t border-slate-50">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase">Odo</span>
+                            <span className="text-[10px] font-black text-slate-700">{vehicle.mileage_km?.toLocaleString()} km</span>
                         </div>
-                        <div className="flex items-center space-x-1.5 text-content-muted text-[11px] font-bold uppercase tracking-widest bg-surface-50 px-2.5 py-1 rounded-md">
-                            <MapPin size={12} className="text-content-secondary" />
-                            <span>{vehicle.location}</span>
+                        <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase">Loc</span>
+                            <span className="text-[10px] font-black text-slate-700">{vehicle.location}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase">Trans</span>
+                            <span className="text-[10px] font-black text-slate-700">{vehicle.transmission || 'Auto'}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase">Fuel</span>
+                            <span className="text-[10px] font-black text-slate-700">{vehicle.fuel_type || 'Gas'}</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex items-end justify-between pt-5 border-t border-surface-100 mt-2">
+                <div className="flex items-end justify-between pt-4 border-t border-surface-100 mt-2">
                     <div className="space-y-1">
                         <p className="text-[10px] text-content-muted uppercase font-black tracking-[0.2em]">
                             {isAuction ? 'Current Bid' : 'Ownership Price'}
@@ -88,10 +110,10 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
                 {/* Hover Action Blur Reveal */}
                 <div className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center p-6 border-t border-surface-100 translate-y-2 group-hover:translate-y-0">
                     <Link
-                        href={isAuction ? `/auctions/${(vehicle as any).auction_id}` : `/vehicles/${vehicle.id}`}
-                        className="w-full bg-surface-50 border border-surface-200 text-content-primary py-4 rounded-xl text-xs font-heading font-black uppercase tracking-widest text-center shadow-lg hover:shadow-xl hover:border-burgundy hover:text-burgundy transition-all"
+                        href={isAuction ? `/auctions/${vehicle.auction_id}` : `/vehicles/${vehicle.id}`}
+                        className="w-full bg-slate-900 border border-slate-800 text-white py-4 rounded-xl text-xs font-heading font-black uppercase tracking-widest text-center shadow-lg hover:bg-burgundy hover:border-burgundy transition-all"
                     >
-                        {isAuction ? 'Submit Bid' : 'View Spec Sheet'}
+                        {isAuction ? 'Cast Audit Bid' : 'View Spec Sheet'}
                     </Link>
                 </div>
             </div>

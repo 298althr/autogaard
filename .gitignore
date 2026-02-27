@@ -86,3 +86,4 @@ server/db/seeds/auction_seed.js
 server/db/seeds/create_user.js
 server/scripts/
 GMS/
+stitch_sentiment_and_history_dashboard/
