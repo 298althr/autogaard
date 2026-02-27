@@ -282,8 +282,8 @@ export default function PerformanceHub() {
                                     </div>
                                 </div>
 
-                                <Link href="/checkout/performance">
-                                    <PremiumButton fullWidth icon={ArrowUpRight} tooltip="Secure Slot">
+                                <Link href="/checkout/performance" className="w-full">
+                                    <PremiumButton className="w-full" icon={ArrowUpRight} tooltip="Secure Slot">
                                         Initiate Installation
                                     </PremiumButton>
                                 </Link>

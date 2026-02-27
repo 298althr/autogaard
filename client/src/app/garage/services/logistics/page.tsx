@@ -290,7 +290,7 @@ export default function LogisticsHub() {
                                     </div>
                                 </div>
 
-                                <PremiumButton fullWidth icon={BadgeCheck}>
+                                <PremiumButton className="w-full" icon={BadgeCheck}>
                                     Initiate Port Clearing
                                 </PremiumButton>
 
@@ -306,6 +306,6 @@ export default function LogisticsHub() {
     );
 }
 
-function Loader2({ className, size }: { className?: string, size?: number }) {
+function LoadingSpinner({ className, size }: { className?: string, size?: number }) {
     return <Globe className={`${className} animate-spin`} size={size} />
 }

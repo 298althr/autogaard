@@ -123,7 +123,7 @@ export default function RegistrationHub() {
                         <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 px-1">Authenticate Asset</h2>
                         {loading ? (
                             <div className="py-12 flex justify-center">
-                                <Loader2 className="animate-spin text-emerald-500" size={32} />
+                                <LoadingSpinner className="animate-spin text-emerald-500" size={32} />
                             </div>
                         ) : vehicles.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -241,6 +241,6 @@ export default function RegistrationHub() {
     );
 }
 
-function Loader2({ className, size }: { className?: string, size?: number }) {
+function LoadingSpinner({ className, size }: { className?: string, size?: number }) {
     return <RefreshCcw className={`${className} animate-spin`} size={size} />
 }

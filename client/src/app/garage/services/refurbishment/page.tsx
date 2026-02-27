@@ -286,7 +286,7 @@ export default function RefurbishmentHub() {
                                     </div>
                                 </div>
 
-                                <PremiumButton fullWidth icon={ArrowUpRight}>
+                                <PremiumButton className="w-full" icon={ArrowUpRight}>
                                     Secure Restoration Slot
                                 </PremiumButton>
                             </div>
@@ -298,6 +298,6 @@ export default function RefurbishmentHub() {
     );
 }
 
-function Loader2({ className, size }: { className?: string, size?: number }) {
+function LoadingSpinner({ className, size }: { className?: string, size?: number }) {
     return <Palette className={`${className} animate-pulse`} size={size} />
 }
