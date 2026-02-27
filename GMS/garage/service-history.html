@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Service History | Dealer360 Workshop</title>
+    <title>Service History | AutoGaard Workshop</title>
 
     <!-- CSS SYSTEM -->
     <link rel="stylesheet" href="../css/theme.css">
@@ -881,7 +881,7 @@
             const index = allServices.findIndex(s => s.id === serviceId);
             if (index !== -1) {
                 allServices[index] = service;
-                localStorage.setItem('dealer360_garage_services', JSON.stringify(allServices));
+                localStorage.setItem('AutoGaard_garage_services', JSON.stringify(allServices));
             }
 
             // Show success message

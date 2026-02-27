@@ -27,7 +27,7 @@ export default function TermsPage() {
                         <section>
                             <h2 className="text-xl font-heading font-bold text-slate-900 mb-4 tracking-tight">1. Protocol Framework & Acceptance</h2>
                             <p className="text-slate-600 font-body leading-relaxed text-sm mb-4">
-                                This document outlines the binding operating procedures ("Terms of Service," or "ToS") governing the usage of the Autogaard network ("Autogaard", "Platform", or "Network"), operated by Dealer360 ecosystem. By accessing the application, activating a digital wallet, or requesting an AI forensic valuation, you explicitly acknowledge and consent to these terms. Failure to comply grants Autogaard the right to suspend escrow wallets and freeze assets under examination.
+                                This document outlines the binding operating procedures ("Terms of Service," or "ToS") governing the usage of the Autogaard network ("Autogaard", "Platform", or "Network"), operated by AutoGaard ecosystem. By accessing the application, activating a digital wallet, or requesting an AI forensic valuation, you explicitly acknowledge and consent to these terms. Failure to comply grants Autogaard the right to suspend escrow wallets and freeze assets under examination.
                             </p>
                             <p className="text-slate-600 font-body leading-relaxed text-sm">
                                 These Terms constitute a legally enforceable agreement between you (the "Client" or "User") and the Platform regarding the utilization of proprietary high-frequency automotive trading algorithms, liquidity scoring, and real-time auction protocols.

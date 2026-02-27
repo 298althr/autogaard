@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Logistics & Customs | Dealer360 Workshop</title>
+    <title>Logistics & Customs | AutoGaard Workshop</title>
     <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/components.css">
@@ -180,7 +180,7 @@
                                 2</div>
                             <div class="flex-1">
                                 <p class="text-[9px] font-bold uppercase tracking-widest">Secured Logistics</p>
-                                <p class="text-[8px] text-text-secondary uppercase mt-1">Movement by Dealer360 certified
+                                <p class="text-[8px] text-text-secondary uppercase mt-1">Movement by AutoGaard certified
                                     haulage partners with real-time GPS tracking.</p>
                             </div>
                         </div>
@@ -222,7 +222,7 @@
 
             <h2 class="text-2xl font-[var(--font-bebas)] tracking-[0.2em] mb-2 uppercase">Customs Duty Calculator</h2>
             <p class="text-[10px] text-text-secondary uppercase tracking-widest mb-8">Determine terminal clearing costs
-                & Dealer360 commission.</p>
+                & AutoGaard commission.</p>
 
             <div class="space-y-6">
                 <div>
@@ -254,7 +254,7 @@
                 <button onclick="runCalculation()"
                     class="w-full py-4 bg-primary text-white rounded-2xl font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
                     <span class="material-symbols-outlined">model_training</span>
-                    RUN D360 ALGORITHM
+                    RUN AutoGaard ALGORITHM
                 </button>
 
                 <!-- Results -->
@@ -267,7 +267,7 @@
                         </div>
                         <div
                             class="flex justify-between items-center text-[10px] uppercase tracking-widest text-primary font-bold">
-                            <span>Dealer360 Service (15%)</span>
+                            <span>AutoGaard Service (15%)</span>
                             <span id="res-comm" class="font-bold">₦0</span>
                         </div>
                         <div class="h-px bg-white/5"></div>
@@ -349,7 +349,7 @@
                 type: 'customs',
                 title: 'Port Clearing & Customs Duty',
                 invoiceTotal: lastCalculation.grandTotal,
-                partnerName: 'Dealer360 Logistics Hub',
+                partnerName: 'AutoGaard Logistics Hub',
                 details: {
                     fob: document.getElementById('fob-input').value,
                     exchangeRate: document.getElementById('rate-input').value,
@@ -357,7 +357,7 @@
                 },
                 lineItems: [
                     { name: 'Government Customs Duty', price: lastCalculation.totalDuty },
-                    { name: 'Dealer360 Service & Handling', price: lastCalculation.commission }
+                    { name: 'AutoGaard Service & Handling', price: lastCalculation.commission }
                 ]
             });
 

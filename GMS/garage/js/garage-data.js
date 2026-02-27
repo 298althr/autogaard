@@ -1,5 +1,5 @@
 /**
- * GARAGE DATA MODULE — Dealer360
+ * GARAGE DATA MODULE — AutoGaard
  * Shared data layer for all Garage Workshop pages.
  * Uses localStorage for MVP persistence.
  */
@@ -8,12 +8,12 @@ const GarageData = (() => {
 
     // ─── KEYS ───
     const KEYS = {
-        VEHICLES: 'd360_user_vehicles',
-        ACTIVE: 'd360_active_vehicle',
-        SERVICES: 'd360_service_records',
-        INVOICES: 'd360_invoices',
-        CONCIERGE: 'd360_concierge_tasks',
-        CHAT: 'd360_chat_sessions'
+        VEHICLES: 'AutoGaard_user_vehicles',
+        ACTIVE: 'AutoGaard_active_vehicle',
+        SERVICES: 'AutoGaard_service_records',
+        INVOICES: 'AutoGaard_invoices',
+        CONCIERGE: 'AutoGaard_concierge_tasks',
+        CHAT: 'AutoGaard_chat_sessions'
     };
 
     // ─── SEED DATA ───
@@ -140,7 +140,7 @@ const GarageData = (() => {
     }
 
     // --- SYSTEM CONFIGURATION (manager controlled) ---
-    const CONFIG_KEY = 'dealer360_garage_config';
+    const CONFIG_KEY = 'AutoGaard_garage_config';
     const DEFAULT_CONFIG = {
         commissionRate: 0.15,
         exchangeRate: 1600, // NGN/USD
@@ -258,7 +258,7 @@ const GarageData = (() => {
             currentStep: 1, // 14-step workflow start
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            partnerName: data.partnerName || 'Dealer360 Operations',
+            partnerName: data.partnerName || 'AutoGaard Operations',
             invoiceTotal: data.invoiceTotal || 0,
             commission: data.commission || (data.invoiceTotal * config.commissionRate),
             paidAt: null,

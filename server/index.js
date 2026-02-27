@@ -74,6 +74,7 @@ app.use('/api/concierge', require('./routes/conciergeRoutes'));
 app.use('/api/blog', require('./routes/blogRoutes'));
 app.use('/api/escrow', require('./routes/escrowRoutes'));
 app.use('/api/registration', require('./routes/registrationRoutes'));
+app.use('/api/workshop', require('./routes/workshopRoutes'));
 
 app.get('/health', async (req, res) => {
     try {

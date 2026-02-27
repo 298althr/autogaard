@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GMS Strategic Blueprint | AutoGaard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0B6E4F', /* Emerald/Forest Green for trust and growth */
+                        secondary: '#F8F9FA',
+                        accent: '#E63946', /* Critical alerts/Logic additions */
+                        onyx: '#1A1A1A',
+                        slate: '#4A5568',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-reveal {
+            animation: slideUp 0.6s ease-out forwards;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-active {
+            color: #0B6E4F;
+            font-weight: 700;
+            border-right: 4px solid #0B6E4F;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #0B6E4F, #084C37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body class="bg-secondary text-onyx font-sans">
+
+    <div class="flex min-h-screen">
+        <!-- SIDEBAR -->
+        <aside class="w-72 bg-white border-r border-gray-100 hidden lg:flex flex-col sticky top-0 h-screen p-8">
+            <div class="mb-12">
+                <h1 class="text-2xl font-extrabold tracking-tighter gradient-text">AutoGaard</h1>
+                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Strategic Blueprint v2.1</p>
+            </div>
+
+            <nav class="space-y-6 flex-1">
+                <a href="#discovery" class="block text-sm text-gray-500 hover:text-primary transition-colors py-1">Code
+                    Discovery</a>
+                <a href="#dual-track"
+                    class="block text-sm text-gray-500 hover:text-primary transition-colors py-1">Dual-Track
+                    Architecture</a>
+                <a href="#workflow" class="block text-sm text-gray-500 hover:text-primary transition-colors py-1">The
+                    14-Step Loop</a>
+                <a href="#bottlenecks"
+                    class="block text-sm text-gray-500 hover:text-primary transition-colors py-1 text-accent">Strategic
+                    Bottlenecks</a>
+                <a href="#roadmap"
+                    class="block text-sm text-gray-500 hover:text-primary transition-colors py-1">Implementation
+                    Roadmap</a>
+                <a href="#impact" class="block text-sm text-gray-500 hover:text-primary transition-colors py-1">Business
+                    Impact</a>
+                <a href="#partnership"
+                    class="block text-sm text-gray-500 hover:text-primary transition-colors py-1">Partnership System</a>
+            </nav>
+
+            <div class="pt-8 border-t border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <span class="text-xs font-bold font-mono">AG</span>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold">Business Strategist</p>
+                        <p class="text-[10px] text-gray-400">Expert Feedback</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 p-6 lg:p-16 max-w-5xl">
+
+            <!-- HERO -->
+            <section class="mb-20 animate-reveal">
+                <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight text-onyx mb-6 leading-none">
+                    The Pulse of the <span class="gradient-text">Asset.</span>
+                </h1>
+                <p class="text-xl text-slate max-w-2xl leading-relaxed">
+                    A comprehensive technical and strategic analysis of the AutoGaard Garage Management System (GMS).
+                    Bridging mechanical health with administrative compliance for the luxury Nigerian market.
+                </p>
+            </section>
+
+            <!-- CODE DISCOVERY -->
+            <section id="discovery" class="mb-24 scroll-mt-20 animate-reveal">
+                <div class="flex items-center gap-3 mb-8">
+                    <span class="w-8 h-px bg-primary/30"></span>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-primary">Code Discovery & Analysis</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="glass-card p-8 rounded-3xl">
+                        <h3 class="text-lg font-bold mb-4">Functional Hubs</h3>
+                        <p class="text-sm text-slate mb-6">The codebase is structured around "Functional Hubs" that
+                            categorize user needs into distinct service segments.</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-4">
+                                <div
+                                    class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                                    <span class="text-[10px] font-bold">01</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold">Diagnostics Hub</p>
+                                    <p class="text-xs text-gray-400">OBD-II Scanning, Engine Health, and Symptom-based
+                                        troubleshooting.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div
+                                    class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                                    <span class="text-[10px] font-bold">02</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold">Registration Hub</p>
+                                    <p class="text-xs text-gray-400">Compliance vault for Lagos (MVAA) and Abuja (FCT
+                                        MVA).</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <div
+                                    class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                                    <span class="text-[10px] font-bold">03</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold">Aesthetic Hub</p>
+                                    <p class="text-xs text-gray-400">Detailed paint configuration with per-body-part
+                                        customization.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card p-8 rounded-3xl">
+                        <h3 class="text-lg font-bold mb-4">The Logic Engine</h3>
+                        <p class="text-sm text-slate mb-6">A pseudo-database system enabling rapid MVP development
+                            without immediate backend heavy-lifting.</p>
+                        <div class="space-y-4 font-mono text-xs">
+                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                <p class="text-primary mb-1">garage-data.js</p>
+                                <p class="text-gray-500">Source of truth for asset valuation and 14-step workflow
+                                    transitions.</p>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                <p class="text-primary mb-1">registration-services.js</p>
+                                <p class="text-gray-500">Regional compliance mapper for Nigerian state authorities.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DUAL-TRACK ARCHITECTURE -->
+            <section id="dual-track" class="mb-24 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-12">
+                    <span class="w-8 h-px bg-primary/30"></span>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-primary">Dual-Track Architecture</h2>
+                </div>
+
+                <div class="relative">
+                    <div class="absolute left-1/2 -ml-px w-px h-full bg-gray-200 hidden md:block"></div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+                        <!-- Administrative Track -->
+                        <div class="md:pr-8 text-right">
+                            <div
+                                class="inline-flex items-center justify-center p-3 rounded-2xl bg-primary text-white mb-6">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-4">The Administrative Vault</h3>
+                            <p class="text-sm text-slate mb-4">Handling the legal "DNA" of the vehicle. Identity,
+                                Customs, and Insurance.</p>
+                            <ul class="space-y-2 text-xs text-gray-500">
+                                <li>State-specific Fee Mapping (Lagos, Abuja)</li>
+                                <li>Digital Title Verification (T-Verification)</li>
+                                <li>Customs Duty ROI Calculators</li>
+                            </ul>
+                        </div>
+
+                        <!-- Mechanical Track -->
+                        <div class="md:pl-8">
+                            <div
+                                class="inline-flex items-center justify-center p-3 rounded-2xl bg-onyx text-white mb-6">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-4">The Mechanical Health Engine</h3>
+                            <p class="text-sm text-slate mb-4">The "Node-by-Node" tracking of physical components and
+                                diagnostic health.</p>
+                            <ul class="space-y-2 text-xs text-gray-500">
+                                <li>Health Scores (Beauty, Tech, Performance)</li>
+                                <li>OBD-II Real-time Diagnostic Mapping</li>
+                                <li>Maintenance Frequency (The "Service Loop")</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- THE 14-STEP WORKFLOW -->
+            <section id="workflow" class="mb-24 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-12">
+                    <span class="w-8 h-px bg-primary/30"></span>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-primary">The 14-Step Service Loop</h2>
+                </div>
+
+                <div class="bg-white rounded-3xl p-10 border border-gray-100 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32"></div>
+
+                    <h3 class="text-2xl font-bold mb-6">Ensuring Mutual Accountability</h3>
+                    <p class="text-sm text-slate mb-8 max-w-xl">
+                        The GMS enforces a rigorous workflow to bridge the trust gap between Nigerian vehicle owners and
+                        workshops. Work never begins until "Contract Signed" and "Payment Received" steps are verified.
+                    </p>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-4 bg-gray-50 rounded-2xl text-center">
+                            <p class="text-[10px] font-black uppercase text-gray-400 mb-2">Step 1-4</p>
+                            <p class="text-xs font-bold">Submission & Review</p>
+                        </div>
+                        <div class="p-4 bg-primary/5 border border-primary/20 rounded-2xl text-center">
+                            <p class="text-[10px] font-black uppercase text-primary mb-2">Step 5-7</p>
+                            <p class="text-xs font-bold font-bold">Contract & Escrow</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-2xl text-center">
+                            <p class="text-[10px] font-black uppercase text-gray-400 mb-2">Step 8-11</p>
+                            <p class="text-xs font-bold">Execution & QC</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-2xl text-center">
+                            <p class="text-[10px] font-black uppercase text-gray-400 mb-2">Step 12-14</p>
+                            <p class="text-xs font-bold">Verification & Exit</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STRATEGIC BOTTLENECKS -->
+            <section id="bottlenecks" class="mb-24 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-8">
+                    <span class="w-8 h-px bg-accent/30"></span>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-accent">Strategic Bottlenecks (The
+                        "Red" List)</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center gap-6 p-6 bg-white rounded-2xl border-l-4 border-accent">
+                        <div
+                            class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent flex-shrink-0 font-bold text-xl">
+                            !</div>
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-widest text-onyx">Persistence Instability
+                                (MVP Risk)</p>
+                            <p class="text-xs text-slate mt-1">Reliance on <code
+                                    class="bg-gray-100 px-1">localStorage</code>. Any clear-cache event wipes owner
+                                compliance data and service history. Critical priority to migrate to PostgreSQL.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-6 p-6 bg-white rounded-2xl border-l-4 border-accent">
+                        <div
+                            class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent flex-shrink-0 font-bold text-xl">
+                            !</div>
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-widest text-onyx">Static Health Scoring</p>
+                            <p class="text-xs text-slate mt-1">"Beauty" and "Performance" scores are currently visual
+                                hard-codes. They do not dynamically calculate from actual service logs or diagnostic
+                                flags.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-6 p-6 bg-white rounded-2xl border-l-4 border-accent">
+                        <div
+                            class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent flex-shrink-0 font-bold text-xl">
+                            !</div>
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-widest text-onyx">Missing "Vendor
+                                Orchestration"</p>
+                            <p class="text-xs text-slate mt-1">The system expects workshop updates but has no "Partner
+                                Portal" to collect them. AutoGaard staff currently act as a manual bridge.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ROADMAP -->
+            <section id="roadmap" class="mb-24 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-12">
+                    <span class="w-8 h-px bg-primary/30"></span>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-primary">Implementation Roadmap (Do vs.
+                        Don't)</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-8 bg-green-50 rounded-3xl border border-green-100">
+                        <h4 class="text-sm font-black uppercase tracking-widest mb-6 text-green-700">Immediate Actions
+                            (DO)</h4>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-4">
+                                <span
+                                    class="bg-green-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0">✓</span>
+                                <p class="text-[11px] text-green-900 leading-relaxed font-bold">Migrate to PG: Move all
+                                    JSON structures to relational tables (vehicles_health, compliance_vault).</p>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span
+                                    class="bg-green-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0">✓</span>
+                                <p class="text-[11px] text-green-900 leading-relaxed font-bold">Logic Unification: Map
+                                    After-Scores to REAL service categories (e.g., Engine Scan + Oil Change = +5
+                                    Performance).</p>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span
+                                    class="bg-green-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0">✓</span>
+                                <p class="text-[11px] text-green-900 leading-relaxed font-bold">Document S3 Sync:
+                                    Replace base64 strings with remote file storage URLs for compliance docs.</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="p-8 bg-red-50 rounded-3xl border border-red-100">
+                        <h4 class="text-sm font-black uppercase tracking-widest mb-6 text-red-700">Avoid (DON'T DO)</h4>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-4">
+                                <span
+                                    class="bg-red-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0">✕</span>
+                                <p class="text-[11px] text-red-900 leading-relaxed font-bold">Manual Pricing: Do not let
+                                    workshops enter prices manually. Use the pre-set Calculators to maintain brand
+                                    standard.</p>
+                            </li>
+                            <li class="flex items-start gap-4">
+                                <span
+                                    class="bg-red-700 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0">✕</span>
+                                <p class="text-[11px] text-red-900 leading-relaxed font-bold">Offline Documents: Do not
+                                    start registration flows without digital vault verification. It breaks the audit
+                                    trail.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PARTNERSHIP SYSTEM -->
+            <section id="partnership" class="mb-24 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-12">
+                    <span class="w-8 h-px bg-primary/30"></span>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-primary">Partnership Management System
+                        (PMS)</h2>
+                </div>
+
+                <div class="glass-card p-10 rounded-3xl border-2 border-primary/10">
+                    <div class="flex flex-col md:flex-row gap-12">
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold mb-4">The Workshop Side</h3>
+                            <p class="text-sm text-slate mb-6">A AutoGaard ecosystem needs a specialized portal for the
+                                workshops (Autocraft, Lagos Terminal, etc.) to acknowledge and process requests.</p>
+                            <div class="space-y-4 text-[11px]">
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                                    <p class="font-bold text-primary mb-1">Queue Management</p>
+                                    <p class="text-gray-400">Incoming service requests tagged by priority (Expedited vs
+                                        Standard).</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                                    <p class="font-bold text-primary mb-1">State Verification</p>
+                                    <p class="text-gray-400">Mechanics toggle workflow steps (Working, QC, Ready) to
+                                        update the user in real-time.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1 bg-gray-50 rounded-2xl p-6 flex items-center justify-center">
+                            <div class="text-center">
+                                <div
+                                    class="w-16 h-16 bg-white rounded-2xl shadow-lg border border-gray-100 flex items-center justify-center mx-auto mb-4">
+                                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <p class="text-xs font-bold uppercase tracking-widest">Planned Ecosystem</p>
+                                <p class="text-[10px] text-gray-400 mt-1 uppercase">Vendor API Integration</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STRATEGIC FEEDBACK -->
+            <section id="impact" class="mb-24 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-12">
+                    <span class="w-8 h-px bg-primary/30"></span>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-primary">Strategic Feedback & Business
+                        Impact</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Business Strategist View -->
+                    <div class="p-8 bg-onyx text-white rounded-3xl">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-6">Business
+                            Strategist Perspective</p>
+                        <h4 class="text-xl font-bold mb-4">Data as the New Equity</h4>
+                        <p class="text-sm text-gray-400 leading-relaxed mb-6">
+                            AutoGaard is not just fixing cars; it's building a <strong>Liquid Secondary Market</strong>.
+                            By verifying every service and document, you are removing the "Information Asymmetry" that
+                            plagues the Nigerian used car market. This data layer allows you to offer higher resale
+                            guarantees, driving customer stickiness.
+                        </p>
+                        <div
+                            class="inline-block px-4 py-2 border border-gray-700 rounded-xl text-[10px] font-bold uppercase tracking-widest opacity-60">
+                            High-Value Growth Play</div>
+                    </div>
+
+                    <!-- Dealership Manager View -->
+                    <div class="p-8 bg-white border border-gray-100 shadow-sm rounded-3xl">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6">Expert Dealer
+                            Manager Perspective</p>
+                        <h4 class="text-xl font-bold mb-4">Operational Integrity</h4>
+                        <p class="text-sm text-slate leading-relaxed mb-6">
+                            The biggest headache in Nigerian dealership management is <strong>Logistics & Legal
+                                Checkpoints</strong>. Your Registration Hub (Lagos/Abuja mapping) is a massive
+                            differentiator. It turns a 2-week bureaucratic nightmare into a 24-hour expedited concierge
+                            service. This is what luxury owners will pay a 20% premium for.
+                        </p>
+                        <div
+                            class="inline-block px-4 py-2 bg-gray-100 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                            Logistical Efficiency Play</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FOOTER -->
+            <footer class="pt-16 border-t border-gray-100 text-center pb-24">
+                <p class="text-xs text-gray-400 uppercase tracking-widest font-black">AutoGaard GMS Audit • 2026</p>
+                <p class="text-[10px] text-gray-300 mt-2 uppercase tracking-tighter">Automated Analysis Report</p>
+            </footer>
+
+        </main>
+    </div>
+
+</body>
+
+</html>
