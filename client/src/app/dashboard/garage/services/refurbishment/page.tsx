@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getAssetUrl, getVehicleImages } from '@/lib/api';
 import PremiumButton from '@/components/ui/PremiumButton';
 import PillHeader from '@/components/landing/PillHeader';
 import MotionBackground from '@/components/landing/MotionBackground';
@@ -127,7 +127,7 @@ export default function RefurbishmentHub() {
                                         className="glass-card p-4 flex items-center gap-4 cursor-pointer hover:border-violet-500/30 transition-all border border-slate-100 shadow-sm"
                                     >
                                         <div className="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0">
-                                            <img src={v.images?.[0]} className="w-full h-full object-cover" alt={v.model} />
+                                            <img src={getAssetUrl(getVehicleImages(v.images)[0])} className="w-full h-full object-cover" alt={v.model} />
                                         </div>
                                         <div className="flex-1 text-left">
                                             <h3 className="font-bold text-slate-900 text-sm">{v.year} {v.make} {v.model}</h3>
@@ -161,8 +161,8 @@ export default function RefurbishmentHub() {
                                 className="bg-slate-900 rounded-[2.5rem] p-8 text-white flex flex-col md:flex-row items-center gap-8 shadow-2xl shadow-slate-900/40 relative overflow-hidden"
                             >
                                 <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/10 blur-[100px]" />
-                                <div className="w-16 h-16 bg-violet-500 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-violet-500/20">
-                                    <Maximize size={32} />
+                                <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-white/10 shrink-0">
+                                    <img src={getAssetUrl(getVehicleImages(selectedVehicle.images)[0])} className="w-full h-full object-cover" alt="Target" />
                                 </div>
                                 <div className="flex-1 text-center md:text-left">
                                     <h3 className="text-2xl font-heading font-extrabold tracking-tight">Paint Quote Builder.</h3>

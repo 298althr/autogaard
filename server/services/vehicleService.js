@@ -9,7 +9,7 @@ class VehicleService {
       FROM vehicles v
       LEFT JOIN vehicle_catalog vc ON v.catalog_id = vc.id
       LEFT JOIN auctions a ON v.id = a.vehicle_id AND a.status = 'live'
-      WHERE 1=1
+      WHERE v.is_private = false
     `;
         const params = [];
 
@@ -127,6 +127,19 @@ class VehicleService {
         ];
 
         const result = await query(sql, params);
+    }
+
+    async updateVehiclePrivacy(id, userId, isPrivate) {
+        const sql = `
+      UPDATE vehicles 
+      SET is_private = $1, updated_at = NOW() 
+      WHERE id = $2 AND owner_id = $3
+      RETURNING *
+    `;
+        const result = await query(sql, [isPrivate, id, userId]);
+        if (result.rows.length === 0) {
+            throw { status: 404, message: 'Vehicle not found or you are not the owner' };
+        }
         return result.rows[0];
     }
 }

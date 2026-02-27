@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getAssetUrl, getVehicleImages } from '@/lib/api';
 import PremiumButton from '@/components/ui/PremiumButton';
 import PillHeader from '@/components/landing/PillHeader';
 import MotionBackground from '@/components/landing/MotionBackground';
@@ -116,7 +116,7 @@ export default function DiagnosticsHub() {
                                         className="glass-card p-4 flex items-center gap-4 cursor-pointer hover:border-blue-500/30 transition-all border border-slate-100"
                                     >
                                         <div className="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0">
-                                            <img src={v.images?.[0]} className="w-full h-full object-cover" alt={v.model} />
+                                            <img src={getAssetUrl(getVehicleImages(v.images)[0])} className="w-full h-full object-cover" alt={v.model} />
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="font-bold text-slate-900 text-sm">{v.year} {v.make} {v.model}</h3>
@@ -149,7 +149,7 @@ export default function DiagnosticsHub() {
                             {/* Target Dashboard */}
                             <div className="bg-slate-900 rounded-[2.5rem] p-6 text-white flex flex-col md:flex-row items-center gap-6 shadow-2xl shadow-slate-900/20">
                                 <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-white/10 shrink-0">
-                                    <img src={selectedVehicle.images?.[0]} className="w-full h-full object-cover" alt="Target" />
+                                    <img src={getAssetUrl(getVehicleImages(selectedVehicle.images)[0])} className="w-full h-full object-cover" alt="Target" />
                                 </div>
                                 <div className="flex-1 text-center md:text-left">
                                     <div className="flex items-center justify-center md:justify-start gap-2 mb-1">

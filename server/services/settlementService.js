@@ -63,7 +63,7 @@ class SettlementService {
 
             await client.query(`
                 UPDATE vehicles 
-                SET status = 'sold', owner_id = $1, updated_at = NOW() 
+                SET status = 'sold', owner_id = $1, is_private = true, updated_at = NOW() 
                 WHERE id = $2
             `, [winnerId, auction.vehicle_id]);
 

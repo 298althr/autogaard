@@ -53,6 +53,19 @@ class VehicleController {
             next(err);
         }
     }
+
+    async togglePrivacy(req, res, next) {
+        try {
+            const { is_private } = req.body;
+            const vehicle = await vehicleService.updateVehiclePrivacy(req.params.id, req.user.id, is_private);
+            res.status(200).json({
+                success: true,
+                data: vehicle
+            });
+        } catch (err) {
+            next(err);
+        }
+    }
 }
 
 module.exports = new VehicleController();

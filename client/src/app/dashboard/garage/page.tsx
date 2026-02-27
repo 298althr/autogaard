@@ -16,133 +16,175 @@ import {
     MapPin,
     ChevronRight,
     Search,
-    Filter
+    Filter,
+    Eye,
+    EyeOff,
+    CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useGarage, useSales } from '@/hooks/useGarage';
 import WorkshopHubs from '@/components/garage/WorkshopHubs';
 import MotionBackground from '@/components/landing/MotionBackground';
+import { getAssetUrl, apiFetch, getVehicleImages } from '@/lib/api';
 
 export default function GaragePage() {
     const { user, token } = useAuth();
     const [activeTab, setActiveTab] = useState<'vault' | 'workshop' | 'sales'>('vault');
 
-    const { vehicles, loading: garageLoading } = useGarage(token);
+    const { vehicles, loading: garageLoading, refetch } = useGarage(token);
     const { sales, loading: salesLoading } = useSales(token);
 
     if (!user) return null;
 
-    const renderVehicleCard = (v: any) => (
-        <motion.div
-            layout
-            key={v.id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300"
-        >
-            <div className="relative aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden mb-4">
-                {v.images?.[0] ? (
-                    <img src={v.images[0]} alt={`${v.make} ${v.model}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">
-                        <Car size={32} strokeWidth={1.5} />
-                        <span className="text-[10px] font-black uppercase tracking-widest mt-2 text-slate-400">No Image</span>
+    const togglePrivacy = async (id: string, current: boolean) => {
+        try {
+            await apiFetch(`/vehicles/${id}/privacy`, {
+                token,
+                method: 'PATCH',
+                body: { is_private: !current }
+            });
+            refetch();
+        } catch (err: any) {
+            console.error('Privacy update failed', err);
+        }
+    };
+
+    const renderVehicleCard = (v: any) => {
+        const images = getVehicleImages(v.images);
+        const displayImage = getAssetUrl(images[0]);
+
+        return (
+            <motion.div
+                layout
+                key={v.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300"
+            >
+                <div className="relative aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden mb-4">
+                    {images.length > 0 ? (
+                        <img src={displayImage} alt={`${v.make} ${v.model}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">
+                            <Car size={32} strokeWidth={1.5} />
+                            <span className="text-[10px] font-black uppercase tracking-widest mt-2 text-slate-400">No Image</span>
+                        </div>
+                    )}
+
+                    {/* Privacy Toggle Overlay */}
+                    <div className="absolute top-3 right-3 flex gap-2">
+                        <button
+                            onClick={(e) => { e.preventDefault(); togglePrivacy(v.id, v.is_private); }}
+                            className={`p-2 rounded-xl backdrop-blur-md transition-all shadow-lg ${v.is_private ? 'bg-slate-900/80 text-white' : 'bg-white/80 text-slate-900 hover:bg-white'}`}
+                            title={v.is_private ? 'Currently Private' : 'Currently Public'}
+                        >
+                            {v.is_private ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
                     </div>
-                )}
-                {v.active_auction_status && (
-                    <div className="absolute top-3 left-3">
-                        <span className="bg-emerald-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center shadow-lg shadow-emerald-500/20">
-                            <Activity size={10} className="mr-1.5 animate-pulse" />
-                            {v.active_auction_status}
+
+                    {v.active_auction_status && (
+                        <div className="absolute top-3 left-3">
+                            <span className="bg-emerald-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center shadow-lg shadow-emerald-500/20">
+                                <Activity size={10} className="mr-1.5 animate-pulse" />
+                                {v.active_auction_status}
+                            </span>
+                        </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                        <Link href={`/vehicles/${v.id}`} className="w-full bg-slate-900 text-white py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-center shadow-xl transform translate-y-2 group-hover:translate-y-0 transition-all">
+                            Inspect Asset
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="px-1">
+                    <div className="flex justify-between items-start mb-3">
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-heading font-extrabold text-slate-900 text-lg tracking-tight leading-tight group-hover:text-burgundy transition-colors">{v.make} {v.model}</h3>
+                                {v.is_private && <EyeOff size={12} className="text-slate-400" />}
+                            </div>
+                            <div className="flex items-center mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                <span>{v.year}</span>
+                                <span className="mx-2 text-slate-200">|</span>
+                                <span className="text-[9px]">{v.vin?.substring(0, 10) || 'NO-VIN-PROV'}</span>
+                            </div>
+                        </div>
+                        <div className="bg-slate-50 p-2 rounded-xl group-hover:bg-burgundy/5 transition-colors">
+                            <ShieldCheck size={18} className="text-emerald-500" />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                        <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em]">Market Value</span>
+                            <span className="text-sm font-heading font-extrabold text-slate-900">₦{(v.price || 0).toLocaleString()}</span>
+                        </div>
+                        <Link href={`/dashboard/garage/services/diagnostics?id=${v.id}`} className="p-2.5 bg-slate-50 hover:bg-burgundy hover:text-white text-slate-400 rounded-xl transition-all active:scale-95 shadow-sm">
+                            <Wrench size={16} />
+                        </Link>
+                    </div>
+                </div>
+            </motion.div>
+        );
+    };
+
+    const renderSaleCard = (s: any) => {
+        const images = Array.isArray(s.images) ? s.images : (typeof s.images === 'string' ? JSON.parse(s.images) : []);
+        const displayImage = getAssetUrl(images[0]);
+
+        return (
+            <motion.div
+                layout
+                key={s.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-xl transition-all duration-300"
+            >
+                <div className="relative aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden mb-4">
+                    {images.length > 0 ? (
+                        <img src={displayImage} alt={`${s.make} ${s.model}`} className="w-full h-full object-cover transition-all duration-500" />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                            <Car size={32} strokeWidth={1.5} />
+                        </div>
+                    )}
+                    <div className="absolute top-3 left-3 bg-slate-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider flex items-center shadow-lg">
+                        <ShoppingBag size={12} className="mr-1.5 text-burgundy" />
+                        {s.type === 'escrow' ? 'Escrow Lock' : 'Live Auction'}
+                    </div>
+                </div>
+
+                <div className="px-1">
+                    <div className="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 className="font-heading font-extrabold text-slate-900 text-lg tracking-tight group-hover:text-burgundy transition-colors">{s.make} {s.model}</h3>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                                {s.type === 'escrow' ? `Buyer: ${s.counterpart_name}` : 'Platform Listing'}
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-sm font-heading font-extrabold text-burgundy">₦{(s.price || 0).toLocaleString()}</div>
+                            <div className="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase rounded-full">
+                                {s.stage?.replace('_', ' ') || 'Active'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center">
+                            <Clock size={12} className="mr-1.5" />
+                            {new Date(s.updated_at).toLocaleDateString()}
                         </span>
-                    </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                    <Link href={`/vehicles/${v.id}`} className="w-full bg-slate-900 text-white py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-center shadow-xl transform translate-y-2 group-hover:translate-y-0 transition-all">
-                        Inspect Asset
-                    </Link>
-                </div>
-            </div>
-
-            <div className="px-1">
-                <div className="flex justify-between items-start mb-3">
-                    <div>
-                        <h3 className="font-heading font-extrabold text-slate-900 text-lg tracking-tight leading-tight group-hover:text-burgundy transition-colors">{v.make} {v.model}</h3>
-                        <div className="flex items-center mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                            <span>{v.year}</span>
-                            <span className="mx-2 text-slate-200">|</span>
-                            <span>{v.vin?.substring(0, 8)}...</span>
-                        </div>
-                    </div>
-                    <div className="bg-slate-50 p-2 rounded-xl group-hover:bg-burgundy/5 transition-colors">
-                        <ShieldCheck size={18} className="text-emerald-500" />
+                        <Link href={s.type === 'escrow' ? `/dashboard/escrow/${s.id}` : `/auctions/${s.id}`} className="text-[10px] font-black text-burgundy uppercase tracking-widest flex items-center hover:translate-x-1 transition-transform">
+                            Manage <ChevronRight size={14} className="ml-0.5" />
+                        </Link>
                     </div>
                 </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                    <div className="flex flex-col">
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em]">Market Value</span>
-                        <span className="text-sm font-heading font-extrabold text-slate-900">₦{(v.price || 0).toLocaleString()}</span>
-                    </div>
-                    <Link href={`/dashboard/garage/services/diagnostics?id=${v.id}`} className="p-2.5 bg-slate-50 hover:bg-burgundy hover:text-white text-slate-400 rounded-xl transition-all active:scale-95 shadow-sm">
-                        <Wrench size={16} />
-                    </Link>
-                </div>
-            </div>
-        </motion.div>
-    );
-
-    const renderSaleCard = (s: any) => (
-        <motion.div
-            layout
-            key={s.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-xl transition-all duration-300"
-        >
-            <div className="relative aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden mb-4">
-                {s.images?.[0] ? (
-                    <img src={s.images[0]} alt={`${s.make} ${s.model}`} className="w-full h-full object-cover transition-all duration-500" />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-300">
-                        <Car size={32} strokeWidth={1.5} />
-                    </div>
-                )}
-                <div className="absolute top-3 left-3 bg-slate-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider flex items-center shadow-lg">
-                    <ShoppingBag size={12} className="mr-1.5 text-burgundy" />
-                    {s.type === 'escrow' ? 'Escrow Lock' : 'Live Auction'}
-                </div>
-            </div>
-
-            <div className="px-1">
-                <div className="flex justify-between items-start mb-3">
-                    <div>
-                        <h3 className="font-heading font-extrabold text-slate-900 text-lg tracking-tight group-hover:text-burgundy transition-colors">{s.make} {s.model}</h3>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                            {s.type === 'escrow' ? `Buyer: ${s.counterpart_name}` : 'Platform Listing'}
-                        </p>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-sm font-heading font-extrabold text-burgundy">₦{(s.price || 0).toLocaleString()}</div>
-                        <div className="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase rounded-full">
-                            {s.stage?.replace('_', ' ') || 'Active'}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center">
-                        <Clock size={12} className="mr-1.5" />
-                        {new Date(s.updated_at).toLocaleDateString()}
-                    </span>
-                    <Link href={s.type === 'escrow' ? `/dashboard/escrow/${s.id}` : `/auctions/${s.id}`} className="text-[10px] font-black text-burgundy uppercase tracking-widest flex items-center hover:translate-x-1 transition-transform">
-                        Manage <ChevronRight size={14} className="ml-0.5" />
-                    </Link>
-                </div>
-            </div>
-        </motion.div>
-    );
+            </motion.div>
+        );
+    };
 
     return (
         <div className="space-y-6 max-w-6xl mx-auto pb-24 relative min-h-[80vh]">

@@ -9,6 +9,23 @@ interface ApiOptions extends RequestInit {
     body?: any;
 }
 
+export function getAssetUrl(path: string | null | undefined) {
+    if (!path) return '/logo/placeholder-car.jpg';
+    if (path.startsWith('http') || path.startsWith('data:')) return path;
+    const base = API_URL.replace(/\/api$/, '');
+    return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+}
+
+export function getVehicleImages(images: any): string[] {
+    if (!images) return [];
+    try {
+        const parsed = typeof images === 'string' ? JSON.parse(images) : images;
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        return [];
+    }
+}
+
 export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
     const { token, body, ...customConfig } = options;
     const url = `${API_URL}${endpoint}`;

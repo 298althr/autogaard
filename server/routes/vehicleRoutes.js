@@ -7,5 +7,6 @@ router.get('/', vehicleController.getVehicles);
 router.get('/:id', vehicleController.getVehicle);
 router.post('/', protect, vehicleController.createVehicle);
 router.post('/:id/certify', protect, vehicleController.certifyVehicle);
+router.patch('/:id/privacy', protect, vehicleController.togglePrivacy);
 
 module.exports = router;
