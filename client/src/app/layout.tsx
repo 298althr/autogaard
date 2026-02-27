@@ -6,6 +6,12 @@ import { ToastProvider } from "@/context/ToastContext";
 export const metadata: Metadata = {
     title: "Autogaard | Nigeria's Smartest Car Marketplace",
     description: "AI-powered vehicle valuations and real-time auctions.",
+    viewport: {
+        width: 'device-width',
+        initialScale: 1,
+        maximumScale: 1,
+        userScalable: false,
+    },
 };
 
 export default function RootLayout({

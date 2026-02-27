@@ -18,8 +18,10 @@ export default function DashboardLayout({
             <div className="min-h-screen bg-canvas pb-safe-bottom">
                 <DashboardNavbar />
 
-                <main className="max-w-7xl mx-auto md:px-8 py-6 px-4 pb-24 md:pb-6">
-                    {children}
+                <main className="max-w-7xl mx-auto md:px-8 py-4 md:py-6 px-0 md:px-4 pb-24 md:pb-6 overflow-hidden">
+                    <div className="px-4 md:px-0">
+                        {children}
+                    </div>
                 </main>
             </div>
         </ProtectedRoute>
