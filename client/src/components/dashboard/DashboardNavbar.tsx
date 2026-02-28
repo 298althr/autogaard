@@ -99,9 +99,9 @@ export default function DashboardNavbar() {
                             <Image
                                 src="/autogaard-logo.png"
                                 alt="Autogaard"
-                                width={240}
-                                height={60}
-                                className="h-10 w-auto object-contain"
+                                width={320}
+                                height={80}
+                                className="h-16 w-auto object-contain"
                                 priority
                             />
                         </Link>

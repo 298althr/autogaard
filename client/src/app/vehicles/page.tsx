@@ -5,6 +5,8 @@ import { apiFetch } from '@/lib/api';
 import VehicleCard from '@/components/VehicleCard';
 import { Search, SlidersHorizontal, AlertCircle, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import MotionBackground from '@/components/landing/MotionBackground';
 import PillHeader from '@/components/landing/PillHeader';
 import PremiumButton from '@/components/ui/PremiumButton';
@@ -12,6 +14,8 @@ import PremiumButton from '@/components/ui/PremiumButton';
 export default function BrowseVehicles() {
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { user, isLoading: authLoading } = useAuth();
+    const router = useRouter();
     const [error, setError] = useState('');
     const [showFilters, setShowFilters] = useState(false);
     const [search, setSearch] = useState('');
@@ -33,6 +37,11 @@ export default function BrowseVehicles() {
     });
 
     useEffect(() => {
+        if (!authLoading && user) {
+            router.replace('/dashboard/market');
+            return;
+        }
+
         const params = new URLSearchParams(window.location.search);
         const status = params.get('status');
         const defaultSort = status === 'in_auction' ? 'popularity' : 'recommended';

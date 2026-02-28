@@ -10,6 +10,7 @@ import { BidFeed } from '@/components/auction/BidFeed';
 import { BidPanel } from '@/components/auction/BidPanel';
 import { BidHistoryModal } from '@/components/auction/BidHistoryModal';
 import PillHeader from '@/components/landing/PillHeader';
+import DashboardNavbar from '@/components/dashboard/DashboardNavbar';
 import MotionBackground from '@/components/landing/MotionBackground';
 import PremiumButton from '@/components/ui/PremiumButton';
 import {
@@ -67,7 +68,7 @@ export default function AuctionRoomPage() {
                 </div>
                 <h1 className="text-2xl font-heading font-extrabold text-slate-900 mb-3 tracking-tight">Market Unavailable.</h1>
                 <p className="text-sm font-subheading text-slate-500 mb-10 leading-relaxed">{error || 'This asset may have been removed or the auction has concluded.'}</p>
-                <Link href="/vehicles">
+                <Link href={user ? "/dashboard/market" : "/vehicles"}>
                     <PremiumButton className="w-full">Return to Markets</PremiumButton>
                 </Link>
             </motion.div>
@@ -75,7 +76,7 @@ export default function AuctionRoomPage() {
     );
 
     return (
-        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-32 pb-20 px-6">
+        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-32 pb-40 px-6">
             <MotionBackground />
             <AnimatePresence>
                 {buyNowSuccess && (
@@ -106,12 +107,12 @@ export default function AuctionRoomPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
-            <PillHeader />
+            {user ? <DashboardNavbar /> : <PillHeader />}
 
             <div className="max-w-7xl mx-auto relative z-10">
                 {/* Back Link */}
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-                    <Link href="/vehicles" className="inline-flex items-center space-x-2 text-slate-400 hover:text-slate-900 transition-colors mb-8 group">
+                    <Link href={user ? "/dashboard/market" : "/vehicles"} className="inline-flex items-center space-x-2 text-slate-400 hover:text-slate-900 transition-colors mb-8 group">
                         <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] font-subheading">Back to Markets</span>
                     </Link>

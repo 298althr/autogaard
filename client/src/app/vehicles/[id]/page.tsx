@@ -6,9 +6,13 @@ import { apiFetch } from '@/lib/api';
 import Image from 'next/image';
 import { ShieldCheck, Gauge, MapPin, Calendar, Fuel, Zap, ArrowLeft, Heart, Share2 } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import DashboardNavbar from '@/components/dashboard/DashboardNavbar';
+import PillHeader from '@/components/landing/PillHeader';
 
 export default function VehicleDetail() {
     const { id } = useParams();
+    const { user } = useAuth();
     const [vehicle, setVehicle] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -29,15 +33,16 @@ export default function VehicleDetail() {
     }
 
     if (loading) return <div className="min-h-screen flex items-center justify-center bg-canvas"><div className="w-12 h-12 border-4 border-burgundy border-t-transparent rounded-full animate-spin"></div></div>;
-    if (error || !vehicle) return <div className="min-h-screen p-20 text-center"><p className="text-red-500 mb-4">{error || 'Vehicle not found'}</p><Link href="/vehicles" className="btn-primary">Back to Browse</Link></div>;
+    if (error || !vehicle) return <div className="min-h-screen p-20 text-center"><p className="text-red-500 mb-4">{error || 'Vehicle not found'}</p><Link href={user ? "/dashboard/market" : "/vehicles"} className="btn-primary">Back to Browse</Link></div>;
 
     const isAuction = vehicle.status === 'in_auction';
 
     return (
-        <div className="min-h-screen bg-canvas pb-20">
+        <div className="min-h-screen bg-canvas pb-40">
+            {user ? <DashboardNavbar /> : <PillHeader />}
             {/* Top Nav / Actions */}
             <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
-                <Link href="/vehicles" className="flex items-center space-x-2 text-onyx-light hover:text-onyx transition-colors">
+                <Link href={user ? "/dashboard/market" : "/vehicles"} className="flex items-center space-x-2 text-onyx-light hover:text-onyx transition-colors">
                     <ArrowLeft size={20} />
                     <span className="font-bold">Back to Inventory</span>
                 </Link>
