@@ -10,7 +10,7 @@ interface ApiOptions extends RequestInit {
 }
 
 export function getAssetUrl(path: string | null | undefined) {
-    if (!path) return '/logo/placeholder-car.jpg';
+    if (!path) return 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2070&auto=format&fit=crop';
     if (path.startsWith('http') || path.startsWith('data:')) return path;
     const base = API_URL.replace(/\/api$/, '');
     return `${base}${path.startsWith('/') ? '' : '/'}${path}`;

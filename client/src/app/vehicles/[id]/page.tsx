@@ -59,7 +59,7 @@ export default function VehicleDetail() {
                     {/* Gallery Placeholder */}
                     <div className="relative h-[500px] w-full bg-onyx rounded-3xl overflow-hidden shadow-2xl">
                         <Image
-                            src={vehicle.images[0] || '/logo/placeholder-car.jpg'}
+                            src={vehicle.images?.[0] || 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2070&auto=format&fit=crop'}
                             alt={vehicle.model}
                             fill
                             className="object-cover"
