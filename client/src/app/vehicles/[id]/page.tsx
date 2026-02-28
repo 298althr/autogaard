@@ -38,7 +38,7 @@ export default function VehicleDetail() {
     const isAuction = vehicle.status === 'in_auction';
 
     return (
-        <div className="min-h-screen bg-canvas pb-40 pt-32">
+        <div className="min-h-screen bg-canvas pb-40 pt-8">
             {user ? <DashboardNavbar /> : <PillHeader />}
             {/* Top Actions */}
             <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-end">
