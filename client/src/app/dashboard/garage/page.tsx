@@ -70,7 +70,7 @@ export default function GaragePage() {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="max-w-6xl mx-auto space-y-8 pb-32"
+            className="max-w-6xl mx-auto space-y-8 pb-32 pt-32"
         >
             {/* Immersive Premium Header */}
             <motion.div variants={itemVariants} className="relative h-60 md:h-80 rounded-[3rem] overflow-hidden bg-onyx shadow-2xl shadow-onyx/30 group">

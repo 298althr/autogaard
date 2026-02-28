@@ -124,8 +124,8 @@ export default function LoginPage() {
                         <Image
                             src="/logo.png"
                             alt="Autogaard Logo"
-                            width={240}
-                            height={60}
+                            width={480}
+                            height={120}
                             className="mb-8"
                         />
                     </Link>

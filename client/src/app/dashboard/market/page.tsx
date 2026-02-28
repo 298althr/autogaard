@@ -82,7 +82,7 @@ export default function BrowseVehicles() {
     };
 
     return (
-        <div className="relative selection:bg-burgundy selection:text-white bg-[#F8FAFC]">
+        <div className="relative selection:bg-burgundy selection:text-white bg-[#F8FAFC] pt-36">
 
             {/* Header & Main Controls */}
             <div className="relative z-30 mb-12">
