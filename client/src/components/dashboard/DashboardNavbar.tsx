@@ -27,7 +27,7 @@ export default function DashboardNavbar() {
         <>
             {/* Desktop Top Navbar & Mobile Top Header */}
             <header className="fixed top-0 left-0 w-full bg-white/40 backdrop-blur-2xl border-b border-white/10 z-[999] md:sticky">
-                <div className="max-w-7xl mx-auto px-4 md:px-8 h-32 flex items-center justify-center relative">
+                <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-center relative">
                     {/* Desktop: Integrated Logo & Nav */}
                     <div className="hidden md:flex items-center bg-white/60 backdrop-blur-md rounded-full px-6 py-1.5 border border-white/40 shadow-xl shadow-slate-900/5">
                         <div className="flex items-center gap-1">
@@ -64,7 +64,7 @@ export default function DashboardNavbar() {
                                 alt="Autogaard"
                                 width={320}
                                 height={80}
-                                className="h-20 w-auto object-contain"
+                                className="h-12 w-auto object-contain"
                                 priority
                             />
                         </Link>
@@ -116,7 +116,7 @@ export default function DashboardNavbar() {
                                 alt="Autogaard"
                                 width={320}
                                 height={80}
-                                className="h-32 w-auto object-contain"
+                                className="h-16 w-auto object-contain"
                                 priority
                             />
                         </Link>
@@ -168,7 +168,7 @@ export default function DashboardNavbar() {
             </nav>
 
             {/* Spacer for fixed top header on mobile */}
-            <div className="h-32 md:hidden" />
+            <div className="h-20 md:hidden" />
         </>
     );
 }
