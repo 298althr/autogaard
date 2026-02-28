@@ -64,7 +64,7 @@ export default function DashboardNavbar() {
                                 alt="Autogaard"
                                 width={320}
                                 height={80}
-                                className="h-12 w-auto object-contain"
+                                className="h-16 w-auto object-contain"
                                 priority
                             />
                         </Link>
@@ -116,7 +116,7 @@ export default function DashboardNavbar() {
                                 alt="Autogaard"
                                 width={320}
                                 height={80}
-                                className="h-16 w-auto object-contain"
+                                className="h-20 w-auto object-contain"
                                 priority
                             />
                         </Link>
