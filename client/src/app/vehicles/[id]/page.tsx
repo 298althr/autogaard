@@ -38,14 +38,10 @@ export default function VehicleDetail() {
     const isAuction = vehicle.status === 'in_auction';
 
     return (
-        <div className="min-h-screen bg-canvas pb-40">
+        <div className="min-h-screen bg-canvas pb-40 pt-32">
             {user ? <DashboardNavbar /> : <PillHeader />}
-            {/* Top Nav / Actions */}
-            <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
-                <Link href={user ? "/dashboard/market" : "/vehicles"} className="flex items-center space-x-2 text-onyx-light hover:text-onyx transition-colors">
-                    <ArrowLeft size={20} />
-                    <span className="font-bold">Back to Inventory</span>
-                </Link>
+            {/* Top Actions */}
+            <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-end">
                 <div className="flex items-center space-x-4">
                     <button className="p-3 bg-white rounded-full shadow-sm hover:text-burgundy transition-colors"><Heart size={20} /></button>
                     <button className="p-3 bg-white rounded-full shadow-sm hover:text-burgundy transition-colors"><Share2 size={20} /></button>

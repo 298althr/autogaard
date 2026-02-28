@@ -252,12 +252,8 @@ export default function ValuationWizard() {
 
     return (
         <div className="max-w-4xl mx-auto py-12">
-            {/* Header Navigation */}
-            <div className="flex items-center justify-between mb-12">
-                <Link href="/dashboard/garage" className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-black uppercase tracking-widest text-[10px] transition-colors group">
-                    <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                    <span>Exit Protocol</span>
-                </Link>
+            {/* Header Navigation - Progress Only */}
+            <div className="flex items-center justify-end mb-12">
                 <div className="flex items-center gap-4">
                     <div className="hidden md:flex gap-1">
                         {STEPS.map((s, i) => (

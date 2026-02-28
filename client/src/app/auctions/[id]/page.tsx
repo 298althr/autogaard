@@ -110,14 +110,6 @@ export default function AuctionRoomPage() {
             {user ? <DashboardNavbar /> : <PillHeader />}
 
             <div className="max-w-7xl mx-auto relative z-10">
-                {/* Back Link */}
-                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-                    <Link href={user ? "/dashboard/market" : "/vehicles"} className="inline-flex items-center space-x-2 text-slate-400 hover:text-slate-900 transition-colors mb-8 group">
-                        <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] font-subheading">Back to Markets</span>
-                    </Link>
-                </motion.div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* LEFT COLUMN: Vehicle Details (8 cols) */}
                     <div className="lg:col-span-8 space-y-8">

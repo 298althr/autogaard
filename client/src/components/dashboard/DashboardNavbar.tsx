@@ -3,13 +3,17 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Car, Warehouse, Wallet, User, Gavel } from 'lucide-react';
+import { Home, Car, Warehouse, Wallet, User, Gavel, ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import NotificationBell from './NotificationBell';
 
 export default function DashboardNavbar() {
     const pathname = usePathname();
+    const router = useRouter();
+
+    const isRoot = pathname === '/dashboard';
 
     const navItems = [
         { label: 'Home', href: '/dashboard', icon: Home, exact: true },
@@ -93,6 +97,17 @@ export default function DashboardNavbar() {
                         </div>
                     </div>
 
+                    {/* Mobile Back Button - Far Left */}
+                    {!isRoot && (
+                        <button
+                            onClick={() => router.back()}
+                            className="md:hidden absolute left-4 w-10 h-10 flex items-center justify-center bg-white/60 backdrop-blur-md rounded-full border border-white/40 shadow-sm text-onyx hover:bg-white transition-all active:scale-90"
+                            aria-label="Go back"
+                        >
+                            <ChevronLeft size={20} />
+                        </button>
+                    )}
+
                     {/* Mobile: Centered Logo Layout */}
                     <div className="md:hidden flex-1 flex justify-center">
                         <Link href="/dashboard">
@@ -106,6 +121,17 @@ export default function DashboardNavbar() {
                             />
                         </Link>
                     </div>
+
+                    {/* Desktop Back Button - integrated or separate? Let's put it separate on the left */}
+                    {!isRoot && (
+                        <button
+                            onClick={() => router.back()}
+                            className="hidden md:flex absolute left-8 items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-md rounded-full border border-white/40 shadow-sm text-onyx hover:bg-white hover:text-burgundy transition-all active:scale-95 group"
+                        >
+                            <ChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Back</span>
+                        </button>
+                    )}
 
                     {/* Notification Alert Area - Far Right */}
                     <div className="absolute right-4 md:right-8">
