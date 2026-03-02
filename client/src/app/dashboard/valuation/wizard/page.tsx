@@ -515,7 +515,7 @@ export default function ValuationWizard() {
                                         </button>
                                     </div>
                                 ))}
-                                {formData.images.length < 5 && (
+                                {formData.images.length < 12 && (
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
                                         className="aspect-square rounded-[2rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-3 text-slate-400 hover:border-burgundy hover:text-burgundy transition-all bg-slate-50/50 group"
@@ -620,48 +620,63 @@ export default function ValuationWizard() {
                                     />
                                 </div>
 
-                                {!valuation ? (
-                                    <button
-                                        onClick={handlePredictValuation}
-                                        disabled={isValuing}
-                                        className="w-full py-12 bg-slate-900 rounded-[3rem] text-white flex flex-col items-center gap-4 group transition-all hover:bg-black"
-                                    >
-                                        <div className="w-20 h-20 bg-white/10 rounded-[1.5rem] flex items-center justify-center group-hover:rotate-12 transition-transform">
-                                            {isValuing ? <Loader2 className="animate-spin" size={32} /> : <Sparkles size={32} />}
+                                <div className="space-y-8">
+                                    <div className="bg-slate-50 p-8 rounded-[3rem] border border-slate-100">
+                                        <div className="flex justify-between items-center mb-6">
+                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Vault Entry Valuation</p>
+                                            <button
+                                                onClick={handlePredictValuation}
+                                                disabled={isValuing}
+                                                className="flex items-center gap-2 px-4 py-2 bg-burgundy/10 text-burgundy rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-burgundy hover:text-white transition-all disabled:opacity-50"
+                                            >
+                                                {isValuing ? <Loader2 className="animate-spin" size={12} /> : <Sparkles size={12} />}
+                                                <span>{isValuing ? 'Analyzing...' : 'Get AI Recommendation'}</span>
+                                            </button>
                                         </div>
-                                        <div className="text-center">
-                                            <h4 className="text-xl font-heading font-extrabold italic tracking-tight">Generate AI Valuation.</h4>
-                                            <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Runs Llama 3.3 Liquidity Scan</p>
-                                        </div>
-                                    </button>
-                                ) : (
-                                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-burgundy text-white p-12 rounded-[3.5rem] shadow-2xl shadow-burgundy/20 relative overflow-hidden">
-                                        <div className="absolute top-0 right-0 p-12 opacity-10">
-                                            <Zap size={180} />
-                                        </div>
-                                        <div className="relative z-10 text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 mb-4">Baseline Market Anchor</p>
-                                            <h3 className="text-6xl font-heading font-extrabold italic tracking-tighter mb-4">₦{valuation.estimated_value.toLocaleString()}</h3>
-                                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-[9px] font-black uppercase tracking-widest backdrop-blur-md">
-                                                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                                                Confidence: {Math.round(valuation.confidence * 100)}%
-                                            </div>
 
-                                            <div className="mt-12 space-y-4">
-                                                <label className="text-[10px] font-black uppercase tracking-widest text-white/50">Your Portfolio Asset Valuation</label>
-                                                <div className="flex items-center justify-center gap-4">
-                                                    <span className="text-2xl font-heading font-extrabold">₦</span>
-                                                    <input
-                                                        type="number"
-                                                        value={formData.price}
-                                                        onChange={e => setFormData(prev => ({ ...prev, price: parseInt(e.target.value) }))}
-                                                        className="bg-transparent border-b-2 border-white/20 focus:border-white outline-none w-48 text-3xl font-heading font-extrabold text-center transition-colors"
-                                                    />
-                                                </div>
-                                            </div>
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-4xl font-heading font-extrabold text-slate-900 italic">₦</span>
+                                            <input
+                                                type="number"
+                                                value={formData.price}
+                                                onChange={e => setFormData(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
+                                                className="bg-transparent border-b-4 border-slate-200 focus:border-burgundy outline-none flex-1 text-5xl font-heading font-extrabold text-slate-900 transition-colors placeholder:text-slate-200"
+                                                placeholder="0.00"
+                                            />
                                         </div>
-                                    </motion.div>
-                                )}
+                                        <p className="text-[10px] font-medium text-slate-400 mt-4 leading-relaxed">
+                                            This is your "Vault Reserve Price". It determines your starting bid or direct sale value.
+                                            Use the AI tool if you're unsure of current liquidity data.
+                                        </p>
+                                    </div>
+
+                                    {valuation && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            className="bg-burgundy/5 border border-burgundy/10 p-6 rounded-[2rem] flex items-center gap-6"
+                                        >
+                                            <div className="w-12 h-12 bg-burgundy text-white rounded-2xl flex items-center justify-center shrink-0">
+                                                <Zap size={20} />
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-burgundy">AI Baseline Anchor</p>
+                                                    <span className="px-2 py-0.5 bg-emerald/10 text-emerald text-[8px] font-black uppercase rounded-full">
+                                                        Confidence: {Math.round(valuation.confidence * 100)}%
+                                                    </span>
+                                                </div>
+                                                <p className="text-xl font-heading font-extrabold text-slate-900 italic">₦{valuation.estimated_value.toLocaleString()}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setFormData(prev => ({ ...prev, price: valuation.estimated_value }))}
+                                                className="ml-auto px-4 py-2 bg-white border border-slate-200 rounded-xl text-[9px] font-black uppercase tracking-widest hover:border-burgundy hover:text-burgundy transition-all shadow-sm"
+                                            >
+                                                Apply AI Price
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="pt-8 flex justify-between">
