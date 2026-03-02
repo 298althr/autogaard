@@ -192,9 +192,13 @@ export default function ValuationWizard() {
         setError('');
         try {
             // 1. Create vehicle (Initiate Registration)
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
             const sanitizedData = {
                 ...formData,
                 vin: formData.vin.trim().toUpperCase(),
+                catalog_id: (formData.catalog_id && uuidRegex.test(formData.catalog_id.toString()))
+                    ? formData.catalog_id
+                    : null,
                 owner_id: user?.id,
                 status: 'available'
             };

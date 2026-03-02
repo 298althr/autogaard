@@ -107,6 +107,14 @@ class VehicleService {
     async createVehicle(data) {
         // Find catalog_id if not provided
         let catalogId = data.catalog_id;
+
+        // If catalogId is provided but looks like an integer (from valuation dataset) 
+        // OR it is not a valid UUID, we treat it as null so the backend can lookup the real UUID
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (catalogId && !uuidRegex.test(catalogId)) {
+            catalogId = null;
+        }
+
         if (!catalogId) {
             const catRes = await query(
                 'SELECT id FROM vehicle_catalog WHERE make ILIKE $1 AND model ILIKE $2 LIMIT 1',
