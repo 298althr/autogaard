@@ -26,7 +26,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { apiFetch, getAssetUrl } from '@/lib/api';
+import { apiFetch, getAssetUrl, getOptimizedImageUrl, getThumbnailUrl } from '@/lib/api';
 import PremiumButton from '@/components/ui/PremiumButton';
 import DashboardNavbar from '@/components/dashboard/DashboardNavbar';
 import DocumentUploadZone from '@/components/vehicle/DocumentUploadZone';
@@ -506,7 +506,7 @@ export default function ValuationWizard() {
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {formData.images.map((url, i) => (
                                     <div key={i} className="relative aspect-square rounded-[2rem] overflow-hidden group">
-                                        <img src={url} className="w-full h-full object-cover" alt={`Upload ${i}`} />
+                                        <img src={getOptimizedImageUrl(url)} className="w-full h-full object-cover" alt={`Upload ${i}`} />
                                         <button
                                             onClick={() => setFormData(prev => ({ ...prev, images: prev.images.filter((_, idx) => idx !== i) }))}
                                             className="absolute top-4 right-4 p-3 bg-red-500 text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
@@ -703,12 +703,12 @@ export default function ValuationWizard() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                                 <div className="space-y-6">
                                     <div className="aspect-[4/3] rounded-[2.5rem] overflow-hidden shadow-2xl">
-                                        {formData.images.length > 0 && <img src={formData.images[0]} className="w-full h-full object-cover" alt="Primary" />}
+                                        {formData.images.length > 0 && <img src={getOptimizedImageUrl(formData.images[0])} className="w-full h-full object-cover" alt="Primary" />}
                                     </div>
                                     <div className="grid grid-cols-4 gap-2">
                                         {formData.images.slice(1).map((link, i) => (
                                             <div key={i} className="aspect-square rounded-xl overflow-hidden grayscale hover:grayscale-0 transition-all border border-slate-100">
-                                                <img src={link} className="w-full h-full object-cover" alt="Extra" />
+                                                <img src={getThumbnailUrl(link)} className="w-full h-full object-cover" alt="Extra" />
                                             </div>
                                         ))}
                                     </div>

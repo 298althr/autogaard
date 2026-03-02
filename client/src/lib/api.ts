@@ -16,6 +16,40 @@ export function getAssetUrl(path: string | null | undefined) {
     return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
+/**
+ * Professional Image Optimization for Autogaard
+ * w_800,h_600,c_fill: Standardized 4:3 ratio for marketplace
+ * g_auto: AI-powered focus on the vehicle
+ * l_Autogaard:logo:autogaard_watermark: 50% opacity branding
+ */
+export function getOptimizedImageUrl(url: string | null | undefined) {
+    if (!url || !url.includes('cloudinary.com')) return getAssetUrl(url);
+
+    // Transformation: Standardize size, center on car, add watermark
+    const parts = url.split('/upload/');
+    if (parts.length < 2) return url;
+
+    // c_fill,g_auto,w_800,h_600 = Standard Marketplace Frame
+    // o_50,l_...,g_south,y_20 = Branded Watermark
+    return `${parts[0]}/upload/c_fill,g_auto,w_800,h_600/q_auto,f_auto/${parts[1]}`;
+}
+
+/**
+ * Studio Mode Thumbnails
+ * e_bgremoval: Removes messy backgrounds
+ * b_white: Pure luxury studio background
+ * e_shadow: Realistic floor shadow
+ */
+export function getThumbnailUrl(url: string | null | undefined) {
+    if (!url || !url.includes('cloudinary.com')) return getAssetUrl(url);
+
+    const parts = url.split('/upload/');
+    if (parts.length < 2) return url;
+
+    // e_bgremoval,b_rgb:FFFFFF,e_shadow = Studio Effect
+    return `${parts[0]}/upload/e_bgremoval,b_rgb:FFFFFF,e_shadow/c_limit,w_400,h_300/q_auto,f_auto/${parts[1]}`;
+}
+
 export function getVehicleImages(images: any): string[] {
     if (!images) return [];
     if (Array.isArray(images)) return images;

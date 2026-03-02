@@ -22,7 +22,20 @@ if (env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SE
         params: {
             folder: 'Autogaard/vehicles',
             allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
-            transformation: [{ width: 1200, height: 900, crop: 'limit' }]
+            // Applied to ALL uploads
+            transformation: [
+                { quality: 'auto', fetch_format: 'auto' }, // Standard Optimization
+                { effect: 'blur_region:1000' },          // Attempt sensitive info blurring
+                // Primary Watermark: bottom center, 50% opacity
+                {
+                    overlay: 'Autogaard:logo:autogaard_watermark',
+                    gravity: 'south',
+                    y: 20,
+                    opacity: 50,
+                    width: 0.3,
+                    crop: 'scale'
+                }
+            ]
         }
     });
 } else {
@@ -47,7 +60,7 @@ if (env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SE
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+    limits: { fileSize: 10 * 1024 * 1024 } // Increased to 10MB to handle high-res photos
 });
 
 module.exports = {
