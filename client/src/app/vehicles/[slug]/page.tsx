@@ -165,9 +165,9 @@ export default function VehicleDetail() {
 
                 <div>
                     <div className="mb-12">
-                        <div className="flex items-center gap-4 mb-4">
-                            <h1 className="type-h1">{vehicle.make} {vehicle.model}</h1>
-                            <div className="bg-burgundy/10 text-burgundy px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
+                        <div className="flex items-center gap-3 mb-3">
+                            <h1 className="text-2xl md:text-5xl font-black leading-tight">{vehicle.make} {vehicle.model}</h1>
+                            <div className="bg-burgundy/10 text-burgundy px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shrink-0">
                                 Expert Pick
                             </div>
                         </div>
@@ -186,58 +186,58 @@ export default function VehicleDetail() {
                             </div>
                         </div>
 
-                        <div className="flex gap-4">
+                        <div className="flex flex-col sm:flex-row gap-3">
                             <button 
                                 onClick={() => isInComparison(vehicle.id) ? removeFromComparison(vehicle.id) : addToComparison(vehicle.id)}
-                                className={`flex-1 py-5 rounded-full font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 transition-all ${isInComparison(vehicle.id) ? 'bg-burgundy text-white shadow-xl shadow-burgundy/20' : 'bg-page border border-border-subtle text-secondary hover:border-burgundy'}`}
+                                className={`flex-1 py-4 rounded-xl font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-3 transition-all active:scale-95 ${isInComparison(vehicle.id) ? 'bg-burgundy text-white shadow-lg' : 'bg-page border border-border-subtle text-secondary'}`}
                             >
-                                {isInComparison(vehicle.id) ? <Check size={16} /> : <ArrowLeftRight size={16} />}
-                                {isInComparison(vehicle.id) ? 'Added to Compare' : 'Add to Compare'}
+                                {isInComparison(vehicle.id) ? <Check size={14} /> : <ArrowLeftRight size={14} />}
+                                {isInComparison(vehicle.id) ? 'In Comparison' : 'Compare Unit'}
                             </button>
                             <Link 
                                 href={`/valuation?make=${vehicle.make}&model=${vehicle.model}`}
-                                className="flex-1 py-5 bg-cinema text-white rounded-full font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:bg-black transition-all"
+                                className="flex-1 py-4 bg-cinema text-white rounded-xl font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-3 hover:bg-black transition-all active:scale-95 shadow-lg"
                             >
-                                <TrendingUp size={16} />
-                                Get Valuation
+                                <TrendingUp size={14} />
+                                Local Valuation
                             </Link>
                         </div>
                     </div>
 
-                    <div className="p-10 rounded-[3rem] bg-surface border border-border-subtle">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-burgundy mb-8 flex items-center gap-3">
-                            <MessageCircle size={16} /> Expert Consultation
+                    <div className="p-6 md:p-10 rounded-2xl bg-surface border border-border-subtle shadow-lg">
+                        <h4 className="text-[9px] font-black uppercase tracking-widest text-burgundy mb-6 flex items-center gap-3">
+                            <MessageCircle size={14} /> Request Professional Brief
                         </h4>
                         {status === 'done' ? (
-                            <div className="text-center py-10 bg-emerald-50 rounded-3xl border border-emerald-100">
-                                <CheckCircle2 size={40} className="text-emerald-500 mx-auto mb-4" />
-                                <p className="text-sm font-bold text-emerald-900">Inquiry Sent Successfully</p>
+                            <div className="text-center py-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                <CheckCircle2 size={32} className="text-emerald-500 mx-auto mb-3" />
+                                <p className="text-xs font-bold text-emerald-900">Brief Sent Successfully</p>
                             </div>
                         ) : (
-                            <form onSubmit={handleInquiry} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
+                            <form onSubmit={handleInquiry} className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
                                     <input 
-                                        className="w-full bg-page border border-border-subtle rounded-2xl px-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-burgundy/20"
-                                        placeholder="Your Name" required
+                                        className="w-full bg-page border border-border-subtle rounded-xl px-4 py-3 text-xs focus:outline-none focus:ring-2 focus:ring-burgundy/20"
+                                        placeholder="Name" required
                                         value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})}
                                     />
                                     <input 
-                                        className="w-full bg-page border border-border-subtle rounded-2xl px-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-burgundy/20"
-                                        placeholder="Phone" required
+                                        className="w-full bg-page border border-border-subtle rounded-xl px-4 py-3 text-xs focus:outline-none focus:ring-2 focus:ring-burgundy/20"
+                                        placeholder="WhatsApp" required
                                         value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})}
                                     />
                                 </div>
                                 <textarea 
-                                    className="w-full bg-page border border-border-subtle rounded-2xl px-6 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-burgundy/20 min-h-[100px]"
-                                    placeholder="Any specific questions about this model?"
+                                    className="w-full bg-page border border-border-subtle rounded-xl px-4 py-3 text-xs focus:outline-none focus:ring-2 focus:ring-burgundy/20 min-h-[80px]"
+                                    placeholder="Any specific questions?"
                                     value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})}
                                 />
                                 <button 
                                     type="submit" 
                                     disabled={status === 'loading'}
-                                    className="w-full bg-burgundy text-white py-5 rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-burgundy-dark transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                                    className="w-full bg-burgundy text-white py-4 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3 disabled:opacity-50"
                                 >
-                                    {status === 'loading' ? <LoadingSpinner size="sm" color="white" /> : 'Request Expert Brief'}
+                                    {status === 'loading' ? <LoadingSpinner size="sm" color="white" /> : 'Get Expert Callback'}
                                 </button>
                             </form>
                         )}
@@ -381,6 +381,26 @@ export default function VehicleDetail() {
                     </div>
                 </section>
             )}
+
+            {/* Conversion Footer */}
+            <section className="py-20 px-6 bg-cinema text-white relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+                <div className="max-w-4xl mx-auto relative z-10 text-center">
+                    <h2 className="text-3xl md:text-5xl font-black mb-6">Found your match?</h2>
+                    <p className="text-white/60 mb-12 text-sm md:text-lg max-w-2xl mx-auto">
+                        Request a professional inspection or reserve a high-quality unit now. 
+                        Our advisors are standing by to guide your investment.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button className="px-10 py-5 bg-white text-cinema rounded-xl font-black uppercase tracking-widest text-[10px] shadow-2xl active:scale-95 transition-transform">
+                            Speak to an Advisor
+                        </button>
+                        <a href="https://wa.me/2348029933575" className="px-10 py-5 border border-white/20 rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:bg-white/10 active:scale-95 transition-transform">
+                            <MessageCircle size={16} className="text-[#25D366]" /> WhatsApp Now
+                        </a>
+                    </div>
+                </div>
+            </section>
 
             <Footer />
         </main>

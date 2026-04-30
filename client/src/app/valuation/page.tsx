@@ -19,10 +19,9 @@ import Footer from '@/components/Footer';
 import { LoadingSpinner } from '@/components/Loading';
 
 const STEPS = [
-    { id: 'vehicle', title: 'Vehicle Details' },
+    { id: 'vehicle', title: 'Vehicle' },
     { id: 'condition', title: 'Condition' },
-    { id: 'contact', title: 'Contact Info' },
-    { id: 'done', title: 'Request Sent' }
+    { id: 'results', title: 'Value' }
 ];
 
 function ValuationContent() {
@@ -73,8 +72,7 @@ function ValuationContent() {
     useEffect(() => {
         if (!selectedMakeId) return;
         setModels([]);
-        setEngines([]);
-        setFormData(prev => ({ ...prev, model: '', trim: '' }));
+        setFormData(prev => ({ ...prev, model: '' }));
         setSelectedModelId(null);
         setLoadingModels(true);
         apiFetch(`/catalog/models?makeId=${selectedMakeId}`).then(res => {
@@ -84,12 +82,12 @@ function ValuationContent() {
 
     useEffect(() => {
         if (!selectedModelId) return;
-        setEngines([]);
-        setFormData(prev => ({ ...prev, trim: '' }));
-        setLoadingEngines(true);
-        apiFetch(`/catalog/engines?modelId=${selectedModelId}`).then(res => {
-            if (res.data) setEngines(res.data);
-        }).catch(console.error).finally(() => setLoadingEngines(false));
+        // Fast-track: automatically proceed when model is picked
+        const model = models.find(m => m.id === selectedModelId);
+        if (model) {
+            setFormData(prev => ({ ...prev, model: model.name }));
+            setTimeout(() => setStep(1), 300);
+        }
     }, [selectedModelId]);
 
     const nextStep = () => {
@@ -162,10 +160,10 @@ function ValuationContent() {
                 </div>
 
                 {/* Form Content */}
-                <div className="bg-surface border border-border-subtle rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5">
+                <div className="bg-surface border border-border-subtle rounded-3xl p-6 md:p-12 shadow-xl shadow-black/5">
                     {step === 0 && (
-                        <div className="space-y-8">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="premium-label">Make</label>
                                     <select
@@ -176,255 +174,165 @@ function ValuationContent() {
                                             const bName = brands.find(b => b.id.toString() === val)?.name || '';
                                             setFormData({ ...formData, make: bName });
                                         }}
-                                        className="premium-input"
+                                        className="premium-input h-12 py-0 text-xs"
                                     >
-                                        <option value="">Select Make</option>
+                                        <option value="">Brand</option>
                                         {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                                     </select>
-                                </div>
-                                <div>
-                                    <label className="premium-label">Model</label>
-                                    <input 
-                                        type="text"
-                                        placeholder="Search model..."
-                                        value={modelSearch}
-                                        onChange={e => setModelSearch(e.target.value)}
-                                        className="premium-input mb-4"
-                                    />
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                        {loadingModels ? (
-                                            Array.from({ length: 6 }).map((_, i) => (
-                                                <div key={i} className="h-16 bg-slate-100 animate-pulse rounded-2xl" />
-                                            ))
-                                        ) : models.filter(m => m.name.toLowerCase().includes(modelSearch.toLowerCase())).map((m) => (
-                                            <button
-                                                key={m.id}
-                                                type="button"
-                                                onClick={() => {
-                                                    setFormData({ ...formData, model: m.name });
-                                                    setSelectedModelId(m.id);
-                                                }}
-                                                className={`p-4 rounded-2xl border text-sm font-semibold transition-all ${
-                                                    formData.model === m.name 
-                                                        ? 'bg-burgundy border-burgundy text-white shadow-lg shadow-burgundy/20' 
-                                                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-white'
-                                                }`}
-                                            >
-                                                {m.name}
-                                            </button>
-                                        ))}
-                                    </div>
                                 </div>
                                 <div>
                                     <label className="premium-label">Year</label>
                                     <select 
                                         value={formData.year} 
                                         onChange={e => setFormData({ ...formData, year: parseInt(e.target.value) })} 
-                                        className="premium-input"
+                                        className="premium-input h-12 py-0 text-xs"
                                     >
                                         {Array.from({ length: 25 }, (_, i) => 2026 - i).map(y => <option key={y} value={y}>{y}</option>)}
                                     </select>
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="premium-label">Select Model</label>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
+                                    {loadingModels ? (
+                                        Array.from({ length: 4 }).map((_, i) => (
+                                            <div key={i} className="h-12 bg-slate-100 animate-pulse rounded-xl" />
+                                        ))
+                                    ) : models.map((m) => (
+                                        <button
+                                            key={m.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setFormData({ ...formData, model: m.name });
+                                                setSelectedModelId(m.id);
+                                            }}
+                                            className={`p-3 rounded-xl border text-[11px] font-bold transition-all ${
+                                                formData.model === m.name 
+                                                    ? 'bg-burgundy border-burgundy text-white shadow-md' 
+                                                    : 'bg-slate-50 border-slate-200 text-slate-700'
+                                            }`}
+                                        >
+                                            {m.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => nextStep()}
+                                disabled={!formData.model}
+                                className="w-full bg-burgundy text-white py-4 rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg shadow-burgundy/20 disabled:opacity-50 active:scale-95 transition-transform"
+                            >
+                                Continue to Condition
+                            </button>
+                        </div>
+                    )}
+
+                    {step === 1 && (
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="premium-label">Mileage (KM)</label>
                                     <input 
                                         type="number" 
                                         value={formData.mileage_km} 
                                         onChange={e => setFormData({ ...formData, mileage_km: parseInt(e.target.value) })} 
-                                        className="premium-input" 
+                                        className="premium-input h-12"
+                                        placeholder="e.g. 50000"
                                     />
                                 </div>
                                 <div>
-                                    <label className="premium-label">Transmission</label>
+                                    <label className="premium-label">Condition</label>
                                     <select 
-                                        value={formData.transmission} 
-                                        onChange={e => setFormData({ ...formData, transmission: e.target.value })} 
-                                        className="premium-input"
+                                        value={formData.condition} 
+                                        onChange={e => setFormData({ ...formData, condition: e.target.value })} 
+                                        className="premium-input h-12"
                                     >
-                                        <option value="automatic">Automatic</option>
-                                        <option value="manual">Manual</option>
+                                        <option value="excellent">Excellent</option>
+                                        <option value="good">Good</option>
+                                        <option value="fair">Fair</option>
+                                        <option value="poor">Poor</option>
                                     </select>
                                 </div>
-                                <div className="flex items-center gap-3 pt-6 px-4">
-                                    <input 
-                                        type="checkbox" 
-                                        id="accident" 
-                                        checked={formData.accident_history} 
-                                        onChange={e => setFormData({ ...formData, accident_history: e.target.checked })} 
-                                        className="w-5 h-5 accent-burgundy" 
-                                    />
-                                    <label htmlFor="accident" className="text-[10px] font-bold uppercase tracking-widest text-muted">Accident History?</label>
-                                </div>
-                                <div>
-                                    <label className="premium-label">Trim / Variant</label>
-                                    <input 
-                                        type="text"
-                                        placeholder="Search trim..."
-                                        value={engineSearch}
-                                        onChange={e => setEngineSearch(e.target.value)}
-                                        className="premium-input mb-4"
-                                    />
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                        {loadingEngines ? (
-                                            Array.from({ length: 4 }).map((_, i) => (
-                                                <div key={i} className="h-20 bg-slate-100 animate-pulse rounded-2xl" />
-                                            ))
-                                        ) : engines.filter(e => e.name.toLowerCase().includes(engineSearch.toLowerCase())).map((e) => (
-                                            <button
-                                                key={e.id}
-                                                type="button"
-                                                onClick={() => setFormData({ ...formData, trim: e.name })}
-                                                className={`p-6 rounded-2xl border text-left transition-all ${
-                                                    formData.trim === e.name 
-                                                        ? 'bg-burgundy border-burgundy text-white shadow-lg shadow-burgundy/20' 
-                                                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-white'
-                                                }`}
-                                            >
-                                                <div className="font-bold mb-1">{e.name}</div>
-                                                <div className="text-[10px] uppercase tracking-widest opacity-60">
-                                                    {e.specs?.name || 'Standard Variant'}
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
                             </div>
 
-                            <div className="flex justify-end pt-6">
-                                <button 
-                                    onClick={nextStep} 
-                                    disabled={!formData.make || !formData.model}
-                                    className="bg-burgundy text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-burgundy-dark transition-all disabled:opacity-50"
-                                >
-                                    Next Step <ArrowRight size={14} />
+                            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                <input 
+                                    type="checkbox" 
+                                    id="acc-history"
+                                    checked={formData.accident_history}
+                                    onChange={e => setFormData({ ...formData, accident_history: e.target.checked })}
+                                    className="w-5 h-5 rounded border-slate-300 text-burgundy focus:ring-burgundy"
+                                />
+                                <label htmlFor="acc-history" className="text-[10px] font-black uppercase tracking-widest text-slate-500">Accident History?</label>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button onClick={prevStep} className="flex-1 py-4 border border-border-subtle text-secondary rounded-xl font-black uppercase tracking-widest text-[10px]">
+                                    Back
                                 </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {step === 1 && (
-                        <div className="space-y-8">
-                            <div className="text-center mb-10">
-                                <h2 className="type-h2 mb-2">How is the condition?</h2>
-                                <p className="text-muted text-sm">Be honest for the most accurate market price.</p>
-                            </div>
-
-                            <div className="grid grid-cols-1 gap-4">
-                                {['excellent', 'good', 'fair', 'poor'].map((c) => (
-                                    <button
-                                        key={c}
-                                        onClick={() => setFormData({ ...formData, condition: c })}
-                                        className={`flex items-center justify-between p-6 rounded-2xl border transition-all text-left ${formData.condition === c ? 'border-burgundy bg-burgundy/5' : 'border-border-subtle hover:border-burgundy/20'}`}
-                                    >
-                                        <div>
-                                            <p className="font-bold capitalize text-lg">{c}</p>
-                                            <p className="text-xs text-muted mt-1">
-                                                {c === 'excellent' && 'Like new, no mechanical or visual defects.'}
-                                                {c === 'good' && 'Minor wear, well-maintained.'}
-                                                {c === 'fair' && 'Visible wear, might need minor repairs.'}
-                                                {c === 'poor' && 'Significant wear or mechanical issues.'}
-                                            </p>
-                                        </div>
-                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.condition === c ? 'border-burgundy bg-burgundy' : 'border-border-subtle'}`}>
-                                            {formData.condition === c && <div className="w-2 h-2 bg-white rounded-full" />}
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="flex justify-between pt-6">
-                                <button onClick={prevStep} className="text-xs font-bold uppercase tracking-widest text-muted hover:text-primary flex items-center gap-2">
-                                    <ArrowLeft size={14} /> Back
-                                </button>
-                                <button 
-                                    onClick={nextStep} 
-                                    className="bg-burgundy text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-burgundy-dark transition-all"
-                                >
-                                    Next Step <ArrowRight size={14} />
+                                <button onClick={nextStep} className="flex-[2] bg-burgundy text-white py-4 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg">
+                                    Next: Get Report
                                 </button>
                             </div>
                         </div>
                     )}
 
                     {step === 2 && (
-                        <div className="space-y-8">
-                            <div className="text-center mb-10">
-                                <h2 className="type-h2 mb-2">Almost there!</h2>
-                                <p className="text-muted text-sm">Where should we send your professional valuation?</p>
+                        <div className="space-y-6">
+                            <div className="text-center mb-6">
+                                <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <CheckCircle2 className="text-emerald-500" size={32} />
+                                </div>
+                                <h3 className="text-lg font-black">Data Confirmed.</h3>
+                                <p className="text-xs text-muted mt-1">Where should we send your valuation report?</p>
                             </div>
 
-                            <div className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="premium-label">Full Name</label>
-                                        <input 
-                                            type="text"
-                                            placeholder="Your Name"
-                                            value={leadData.name}
-                                            onChange={e => setLeadData({ ...leadData, name: e.target.value })}
-                                            className="premium-input"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="premium-label">WhatsApp Number</label>
-                                        <input 
-                                            type="tel"
-                                            placeholder="+234 ..."
-                                            value={leadData.whatsapp}
-                                            onChange={e => setLeadData({ ...leadData, whatsapp: e.target.value })}
-                                            className="premium-input"
-                                        />
-                                    </div>
-                                </div>
+                            <div className="space-y-4">
                                 <div>
-                                    <label className="premium-label">Email Address</label>
+                                    <label className="premium-label">Name</label>
                                     <input 
-                                        type="email"
-                                        placeholder="email@example.com"
-                                        value={leadData.email}
-                                        onChange={e => setLeadData({ ...leadData, email: e.target.value })}
-                                        className="premium-input"
+                                        className="premium-input h-12"
+                                        placeholder="Full Name"
+                                        value={leadData.name}
+                                        onChange={e => setLeadData({ ...leadData, name: e.target.value })}
                                     />
                                 </div>
-                            </div>
-
-                            {error && (
-                                <div className="p-4 bg-red-50 text-red-500 rounded-2xl text-xs flex items-center gap-2">
-                                    <AlertCircle size={14} /> {error}
+                                <div>
+                                    <label className="premium-label">WhatsApp Number</label>
+                                    <input 
+                                        className="premium-input h-12"
+                                        placeholder="+234..."
+                                        value={leadData.whatsapp}
+                                        onChange={e => setLeadData({ ...leadData, whatsapp: e.target.value })}
+                                    />
                                 </div>
-                            )}
-
-                            <div className="flex justify-between pt-6">
-                                <button onClick={prevStep} className="text-xs font-bold uppercase tracking-widest text-muted hover:text-primary flex items-center gap-2">
-                                    <ArrowLeft size={14} /> Back
-                                </button>
                                 <button 
-                                    onClick={handleSubmitRequest} 
-                                    disabled={loading || !leadData.name || !leadData.whatsapp}
-                                    className="bg-burgundy text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-burgundy-dark transition-all disabled:opacity-50"
+                                    onClick={handleSubmitRequest}
+                                    disabled={loading || !leadData.whatsapp}
+                                    className="w-full bg-cinema text-white py-5 rounded-xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 active:scale-95 transition-transform"
                                 >
-                                    {loading ? 'Submitting...' : 'Request Valuation'} <Send size={14} />
+                                    {loading ? <LoadingSpinner size="sm" color="white" /> : <><Send size={16} /> Send My Valuation</>}
                                 </button>
                             </div>
                         </div>
                     )}
 
                     {step === 3 && (
-                        <div className="text-center py-12">
-                            <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-8">
-                                <CheckCircle2 size={40} className="text-emerald-500" />
+                        <div className="text-center py-10">
+                            <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <Sparkles size={40} className="text-emerald-500" />
                             </div>
-                            <h2 className="type-h2 mb-4">Request Received.</h2>
-                            <p className="type-body text-secondary mb-12 max-w-sm mx-auto">
-                                Our advisors are now reviewing your vehicle details. 
-                                You will receive your professional market valuation via <strong>WhatsApp</strong> and <strong>Email</strong> shortly.
+                            <h2 className="text-2xl font-black mb-2">Request Sent.</h2>
+                            <p className="text-xs text-secondary leading-relaxed mb-10 max-w-[240px] mx-auto">
+                                Our experts are reviewing your <strong>{formData.make} {formData.model}</strong>. Watch your WhatsApp for the report.
                             </p>
-
                             <button 
                                 onClick={() => window.location.href = '/'}
-                                className="bg-cinema text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-page hover:text-primary transition-all border border-transparent hover:border-border-subtle"
+                                className="w-full py-4 border border-border-subtle text-secondary rounded-xl font-black uppercase tracking-widest text-[10px]"
                             >
-                                Return to Homepage
+                                Done
                             </button>
                         </div>
                     )}

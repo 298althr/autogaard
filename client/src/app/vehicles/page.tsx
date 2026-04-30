@@ -139,10 +139,16 @@ export default function VehicleCatalog() {
                         animate={{ opacity: 1, x: 0 }}
                     >
                         <h1 className="type-display mb-6">Expert Insight.<br/>Market Mastery.</h1>
-                        <p className="type-body-lg text-white/60 max-w-2xl leading-relaxed">
-                            Navigate the Nigerian automotive landscape with professional data on 
-                            resale value, maintenance reliability, and direct import pricing.
-                        </p>
+                        <div className="flex flex-col md:flex-row md:items-center gap-4">
+                            <p className="type-body text-white/60 max-w-2xl leading-relaxed">
+                                Navigate the Nigerian automotive landscape with professional data on 
+                                resale value, maintenance reliability, and direct import pricing.
+                            </p>
+                            <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 flex items-center gap-3">
+                                <ShieldCheck className="text-emerald-400" size={16} />
+                                <span className="text-[9px] font-black uppercase tracking-widest text-white/80">Expert Verified Data</span>
+                            </div>
+                        </div>
                     </motion.div>
                 </div>
             </section>

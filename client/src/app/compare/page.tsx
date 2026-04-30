@@ -329,6 +329,18 @@ export default function ComparePage() {
                     </div>
                 </div>
 
+                {/* Advisor Guidance Tip */}
+                <div className="max-w-7xl mx-auto px-6 mb-8">
+                    <div className="p-4 rounded-2xl bg-burgundy/5 border border-burgundy/10 flex items-center gap-4">
+                        <div className="w-8 h-8 rounded-full bg-burgundy flex items-center justify-center shrink-0">
+                            <Zap className="text-white" size={16} />
+                        </div>
+                        <p className="text-[10px] md:text-[11px] text-burgundy font-bold leading-relaxed">
+                            <span className="uppercase">Elite Tip:</span> Our Expert Matrix analyzes over 50 data points per vehicle. The "Reliability" score reflects Nigerian road maintenance data, while "Resale" indicates market liquidity in Lagos/Abuja.
+                        </p>
+                    </div>
+                </div>
+
                 {/* Comparison Grid */}
                 {isDataLoading ? (
                     <ComparisonSkeleton />
@@ -337,9 +349,9 @@ export default function ComparePage() {
                         <div className="overflow-x-auto no-scrollbar">
                             <div className="min-w-[1000px]">
                                 {/* Header Row */}
-                                <div className="grid grid-cols-[160px_1fr] border-b border-border-subtle bg-page/50">
-                                    <div className="p-8 flex items-center justify-center border-r border-border-subtle bg-page sticky left-0 z-20">
-                                        <div className="text-[10px] font-black uppercase tracking-[0.3em] text-muted rotate-180 [writing-mode:vertical-lr]">Expert Matrix</div>
+                                <div className="grid grid-cols-[60px_1fr] md:grid-cols-[160px_1fr] border-b border-border-subtle bg-page/50">
+                                    <div className="p-4 md:p-8 flex items-center justify-center border-r border-border-subtle bg-page sticky left-0 z-20">
+                                        <div className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] text-muted rotate-180 [writing-mode:vertical-lr]">Expert Matrix</div>
                                     </div>
                                     <div className="grid grid-cols-4">
                                         {vehicles.map(v => (
@@ -397,10 +409,10 @@ export default function ComparePage() {
                                 {renderSpecRow('Body Style', 'body_type', <Gauge size={14} />)}
                                 {renderSpecRow('Fuel System', 'fuel_type', <Zap size={14} />)}
                                 
-                                <div className="grid grid-cols-[160px_1fr] border-b border-border-subtle group/row hover:bg-page transition-all">
-                                    <div className="p-8 border-r border-border-subtle bg-surface/50 sticky left-0 z-10 flex items-center gap-3">
+                                <div className="grid grid-cols-[60px_1fr] md:grid-cols-[160px_1fr] border-b border-border-subtle group/row hover:bg-page transition-all">
+                                    <div className="p-4 md:p-8 border-r border-border-subtle bg-surface/50 sticky left-0 z-10 flex flex-col md:flex-row items-center gap-2 md:gap-3">
                                         <MessageCircle size={14} className="text-burgundy opacity-50" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted">Expert Verdict</span>
+                                        <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-muted text-center md:text-left">Verdict</span>
                                     </div>
                                     <div className="grid grid-cols-4 items-stretch">
                                         {vehicles.map((v) => (

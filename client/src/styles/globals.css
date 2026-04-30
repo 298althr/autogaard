@@ -189,8 +189,8 @@
     color: var(--text-secondary); margin-bottom: 0.375rem;
   }
 
-  .section-padding { padding-top: clamp(4rem, 10vh, 8rem); padding-bottom: clamp(4rem, 10vh, 8rem); }
-  .section-x { padding-left: clamp(1.25rem, 5vw, 1.5rem); padding-right: clamp(1.25rem, 5vw, 1.5rem); }
+  .section-padding { padding-top: clamp(2rem, 6vh, 6rem); padding-bottom: clamp(2rem, 6vh, 6rem); }
+  .section-x { padding-left: clamp(1rem, 4vw, 1.5rem); padding-right: clamp(1rem, 4vw, 1.5rem); }
   .container-xl { max-width: 80rem; margin-left: auto; margin-right: auto; width: 100%; }
 
   .glass-card {
@@ -199,7 +199,7 @@
   }
 
   .premium-input {
-    @apply w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 focus:outline-none focus:ring-4 transition-all font-body text-sm;
+    @apply w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3 md:px-6 md:py-4 text-slate-900 focus:outline-none focus:ring-4 transition-all font-body text-sm;
 
     &:focus {
       --tw-ring-color: rgba(128, 0, 32, 0.05);
@@ -208,7 +208,7 @@
   }
 
   .premium-label {
-    @apply block text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-6;
+    @apply block text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1.5 ml-4 md:ml-6;
   }
 
   .premium-pill {
