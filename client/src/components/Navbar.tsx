@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
-import { Menu, X, MessageCircle, User, LogOut } from 'lucide-react';
+import { Menu, X, MessageCircle, User, LogOut, ShieldCheck, XCircle } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useTheme } from 'next-themes';
+import { apiFetch } from '@/lib/api';
 
 export const navLinks = [
     { name: 'Services', href: '/services' },
@@ -24,12 +25,36 @@ const Navbar = () => {
     const { theme } = useTheme();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [showCookieBanner, setShowCookieBanner] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 60);
         window.addEventListener('scroll', handleScroll, { passive: true });
+        
+        // Check for cookie consent
+        const consent = localStorage.getItem('autogaard_cookie_consent');
+        if (!consent) {
+            setTimeout(() => setShowCookieBanner(true), 2000);
+        }
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const acceptCookies = () => {
+        localStorage.setItem('autogaard_cookie_consent', 'true');
+        setShowCookieBanner(false);
+    };
+
+    const trackWhatsApp = async () => {
+        try {
+            await apiFetch('/leads/track-click', {
+                method: 'POST',
+                body: { type: 'whatsapp', label: 'navbar_chat_button' }
+            });
+        } catch (e) {
+            // Silently fail, don't block the user
+        }
+    };
 
     // Logo: always white over hero, then white in dark / original in light
     const logoFilter = !isScrolled
@@ -81,6 +106,7 @@ const Navbar = () => {
                         href="https://wa.me/2348029933575"
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={trackWhatsApp}
                         className="flex items-center gap-2 bg-[#25D366] text-white px-5 py-2.5 rounded-full text-[12px] font-bold uppercase tracking-wider hover:bg-[#1ea855] transition-all hover:scale-105 shadow-lg shadow-green-500/20 active:scale-95"
                     >
                         <MessageCircle size={16} />
@@ -164,6 +190,46 @@ const Navbar = () => {
                                 <MessageCircle size={18} />
                                 Chat With Us on WhatsApp
                             </a>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Cinematic Cookie Banner */}
+            <AnimatePresence>
+                {showCookieBanner && (
+                    <motion.div
+                        initial={{ y: 100, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 100, opacity: 0 }}
+                        className="fixed bottom-6 left-6 right-6 md:left-auto md:max-w-sm z-[1000]"
+                    >
+                        <div className="bg-cinema/95 backdrop-blur-xl border border-white/10 p-6 rounded-[2rem] shadow-2xl">
+                            <div className="flex items-start gap-4 mb-4">
+                                <div className="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center shrink-0">
+                                    <ShieldCheck className="text-white" size={20} />
+                                </div>
+                                <div>
+                                    <h4 className="text-white font-bold text-sm mb-1">Privacy & Experience</h4>
+                                    <p className="text-white/60 text-[11px] leading-relaxed">
+                                        We use cookies to ensure you get the most elite automotive advisory experience on AutoGaard.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={acceptCookies}
+                                    className="flex-1 bg-white text-cinema py-3 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
+                                >
+                                    Accept All
+                                </button>
+                                <button
+                                    onClick={() => setShowCookieBanner(false)}
+                                    className="p-3 text-white/40 hover:text-white transition-colors"
+                                >
+                                    <XCircle size={20} />
+                                </button>
+                            </div>
                         </div>
                     </motion.div>
                 )}

@@ -80,6 +80,38 @@ const createLead = async (req, res) => {
     }
 };
 
+/**
+ * Track generic clicks (e.g. WhatsApp clicks) for analytics
+ */
+const trackClick = async (req, res) => {
+    try {
+        const { type, label } = req.body;
+        if (!type || !label) {
+            return res.status(400).json({ success: false, message: 'Type and label required' });
+        }
+
+        const sql = `
+            INSERT INTO analytics_clicks (type, label, count, last_clicked_at)
+            VALUES ($1, $2, 1, NOW())
+            ON CONFLICT (type, label) 
+            DO UPDATE SET 
+                count = analytics_clicks.count + 1,
+                last_clicked_at = EXCLUDED.last_clicked_at
+            RETURNING *
+        `;
+        const result = await query(sql, [type, label]);
+
+        res.status(200).json({
+            success: true,
+            data: result.rows[0]
+        });
+    } catch (error) {
+        console.error('TrackClick Error:', error.message);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
 module.exports = {
-    createLead
+    createLead,
+    trackClick
 };

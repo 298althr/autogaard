@@ -6,7 +6,13 @@ class CatalogController {
      */
     async getBrands(req, res, next) {
         try {
-            const result = await pool.query('SELECT DISTINCT make as name FROM vehicle_catalog ORDER BY make ASC');
+            // Prefer the expert 'brands' table for valuation/trim flows
+            const result = await pool.query('SELECT id, name FROM brands ORDER BY name ASC');
+            // If brands table is empty, fallback to vehicle_catalog
+            if (result.rows.length === 0) {
+                const fallback = await pool.query('SELECT DISTINCT make as name FROM vehicle_catalog ORDER BY make ASC');
+                return res.status(200).json({ success: true, data: fallback.rows });
+            }
             res.status(200).json({
                 success: true,
                 data: result.rows
@@ -21,27 +27,40 @@ class CatalogController {
      */
     async getModels(req, res, next) {
         try {
-            const { q, make } = req.query;
+            const { q, make, makeId } = req.query;
             let result;
-            if (q) {
+            
+            if (makeId) {
+                // Query automobiles (expert catalog) to ensure integer IDs for engines
+                result = await pool.query(`
+                    SELECT id, name, photos 
+                    FROM automobiles 
+                    WHERE brand_id = $1 
+                    ORDER BY name ASC
+                `, [makeId]);
+            } else if (make) {
+                // Fallback search by name
+                result = await pool.query(`
+                    SELECT a.id, b.name as brand_name, a.name, a.photos 
+                    FROM automobiles a
+                    JOIN brands b ON a.brand_id = b.id
+                    WHERE b.name ILIKE $1 
+                    ORDER BY a.name ASC
+                `, [make]);
+            } else if (q) {
                 const term = `%${q}%`;
                 result = await pool.query(`
-                    SELECT id, make as brand_name, model as name, image_url as photos
-                    FROM vehicle_catalog 
-                    WHERE make ILIKE $1 OR model ILIKE $1
-                    ORDER BY make ASC, model ASC 
+                    SELECT a.id, b.name as brand_name, a.name, a.photos
+                    FROM automobiles a
+                    JOIN brands b ON a.brand_id = b.id
+                    WHERE b.name ILIKE $1 OR a.name ILIKE $1
+                    ORDER BY b.name ASC, a.name ASC 
                     LIMIT 20
                 `, [term]);
-            } else if (make) {
-                result = await pool.query(`
-                    SELECT id, make as brand_name, model as name, image_url as photos 
-                    FROM vehicle_catalog 
-                    WHERE make = $1 
-                    ORDER BY model ASC
-                `, [make]);
             } else {
-                result = await pool.query('SELECT id, make as brand_name, model as name, image_url as photos FROM vehicle_catalog ORDER BY model ASC');
+                result = await pool.query('SELECT id, name, photos FROM automobiles ORDER BY name ASC LIMIT 100');
             }
+
             res.status(200).json({
                 success: true,
                 data: result.rows
@@ -58,10 +77,15 @@ class CatalogController {
         try {
             const { modelId } = req.query;
             let result;
-            if (modelId) {
-                result = await pool.query('SELECT id, name FROM engines WHERE automobile_id = $1 ORDER BY name ASC', [modelId]);
+            
+            // Safety: Check if modelId is a valid integer string before querying
+            if (modelId && !isNaN(parseInt(modelId))) {
+                result = await pool.query('SELECT id, name, specs FROM engines WHERE automobile_id = $1 ORDER BY name ASC', [modelId]);
+            } else if (modelId) {
+                // If it's a UUID or other string, return empty (graceful failure)
+                return res.status(200).json({ success: true, data: [] });
             } else {
-                result = await pool.query('SELECT id, name, specs FROM engines ORDER BY name ASC');
+                result = await pool.query('SELECT id, name, specs FROM engines ORDER BY name ASC LIMIT 100');
             }
             const data = result.rows.map(row => {
                 let parsedSpecs = row.specs;
