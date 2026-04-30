@@ -1,0 +1,13 @@
+npm-debug.log
+.env
+.git
+.github
+Dockerfile
+Dockerfile.dev
+docker-compose.yml
+Presentation
+svg-logos
+migrations
+seeds
+tests
+.DS_Store

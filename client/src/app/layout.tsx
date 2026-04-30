@@ -10,12 +10,13 @@ import { ComparisonProvider } from "@/context/ComparisonContext";
 export const metadata: Metadata = {
     title: "Autogaard | Trusted Car Advisory",
     description: "Buy better. Maintain smarter. Drive with peace of mind. Autogaard helps you make better decisions at every stage of car ownership.",
-    viewport: {
-        width: 'device-width',
-        initialScale: 1,
-        maximumScale: 1,
-        userScalable: false,
-    },
+};
+
+export const viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
 };
 
 export default function RootLayout({

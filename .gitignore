@@ -1,110 +1,42 @@
-# Dependencies
-node_modules/
-.pnp
-.pnp.js
+# AutoGaard Production Git Policy
+# ONLY core application code is allowed on GitHub.
 
-# Environment variables (NEVER commit)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# 1. Ignore everything by default
+/*
 
-# Next.js
-.next/
-out/
+# 2. Allow specific project files and core directories
+!/client/
+!/server/
+!/package.json
+!/package-lock.json
+!/README.md
+!/.gitignore
 
-# Production builds
-build/
-dist/
+# 3. CRITICAL: Explicitly ignore all secrets and local artifacts everywhere
+# This overrides the directory allowance above for sensitive files.
+**/.env
+**/.env.*
+**/.prod_key.md
+**/.DS_Store
+**/node_modules/
+**/.next/
+**/dist/
+**/build/
+**/*.log
 
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
-
-# OS files
-.DS_Store
-Thumbs.db
-.directory
-
-# IDE files
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-
-# Cache
-.eslintcache
-.stylelintcache
-.cache/
-
-# Testing
-coverage/
-.nyc_output/
-
-# Docker
-.dockerignore
-
-# Misc
-.vercel
-*.pem
-report.json
-report.txt
-*.zip
-load-test.yml
-docker_logs.txt
-
-# Project Specific (Inconsequential to Production)
-docs/
-Presentation/
-svg-logos/
-tests/
-server/tests/
-debug_auctions.js
-test-Autogaard.ps1
-investor-docs-*.html
-ui standard.html
-*.backup.zip
-*.ps1
-server/reset_admin.js
-
-# Database Seeds 
-server/db/seeds/demo_seed.js
-server/db/seeds/auction_seed.js
-server/db/seeds/create_user.js
-server/scripts/
-GMS/
-stitch_sentiment_and_history_dashboard/
-VPD/
-
-# Secrets and Production Keys
-.prod_key.md
-railway_vars.txt
-.env*
-!.env.example
-
-# Documents and Assets
-*.pdf
-*.docx
-*.sql
-*.txt
-*.md
-!README.md
-!client/README.md
-!server/README.md
-
-# Media
-client/public/uploads/
-server/uploads/
+# 4. Explicitly ignore all research, planning, and documentation folders
+/refactor/
+/docs/
+/property/
+/logo/
+/scratch/
+/scripts/
+/docx_temp/
+/VPD/
+/GMS/
+/stitch_sentiment_and_history_dashboard/
+/svg-logos/
+/gemini-code-*.json
+/report.txt
+/final_api_results.txt
+/test_output.txt

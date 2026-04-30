@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { apiFetch } from '@/lib/api';
 import { useSearchParams } from 'next/navigation';
 import { 
@@ -16,6 +16,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { LoadingSpinner } from '@/components/Loading';
 
 const STEPS = [
     { id: 'vehicle', title: 'Vehicle Details' },
@@ -24,7 +25,7 @@ const STEPS = [
     { id: 'done', title: 'Request Sent' }
 ];
 
-export default function ValuationPage() {
+function ValuationContent() {
     const searchParams = useSearchParams();
     const [step, setStep] = useState(0);
     const [formData, setFormData] = useState({
@@ -104,7 +105,12 @@ export default function ValuationPage() {
         setLoading(true);
         setError('');
         try {
-            const { type, ...dataToSend } = { ...formData, ...leadData };
+            const dataToSend = { 
+                ...formData, 
+                ...leadData,
+                vehicle_make: formData.make,
+                vehicle_model: formData.model
+            };
             await apiFetch('/leads/valuation', {
                 method: 'POST',
                 body: dataToSend
@@ -114,27 +120,6 @@ export default function ValuationPage() {
             setError(err.message);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleLeadSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLeadStatus('loading');
-        try {
-            await apiFetch('/leads/valuation', {
-                method: 'POST',
-                body: {
-                    ...leadData,
-                    vehicle_make: formData.make,
-                    vehicle_model: formData.model,
-                    year: formData.year,
-                    estimated_value: result?.estimated_value,
-                    notes: `Condition: ${formData.condition}. Reasoning: ${result?.reasoning}`
-                },
-            });
-            setLeadStatus('done');
-        } catch (err) {
-            setLeadStatus('idle');
         }
     };
 
@@ -448,5 +433,17 @@ export default function ValuationPage() {
 
             <Footer />
         </main>
+    );
+}
+
+export default function ValuationPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <LoadingSpinner size="lg" />
+            </div>
+        }>
+            <ValuationContent />
+        </Suspense>
     );
 }
