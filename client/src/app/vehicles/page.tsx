@@ -153,6 +153,57 @@ export default function VehicleCatalog() {
                 </div>
             </section>
 
+            {/* Pro Advisory Workflow */}
+            <section className="py-16 px-6 bg-surface border-b border-border-subtle">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-12">
+                        <div>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-burgundy mb-4">Navigating AutoGaard</h4>
+                            <h2 className="type-h2">The Expert Workflow</h2>
+                        </div>
+                        <p className="text-muted text-sm max-w-md leading-relaxed">
+                            Follow our professional sequence to ensure your automotive investment is backed by real-time Nigerian market data.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {[
+                            { 
+                                step: "01", title: "Learn", 
+                                desc: "Dive into model-specific reliability rankings and maintenance costs.",
+                                icon: <Star size={20} />
+                            },
+                            { 
+                                step: "02", title: "Compare", 
+                                desc: "Side-by-side analysis of resale value and parts availability.",
+                                icon: <ArrowLeftRight size={20} />
+                            },
+                            { 
+                                step: "03", title: "Value", 
+                                desc: "Get fair-market Tokunbo and local estimates in seconds.",
+                                icon: <TrendingUp size={20} />
+                            },
+                            { 
+                                step: "04", title: "Acquire", 
+                                desc: "Request a professional inspection brief for your chosen unit.",
+                                icon: <ShieldCheck size={20} />
+                            }
+                        ].map((item, i) => (
+                            <div key={i} className="p-8 rounded-[2rem] bg-page border border-border-subtle hover:border-burgundy/30 transition-all group">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="text-burgundy group-hover:scale-110 transition-transform">
+                                        {item.icon}
+                                    </div>
+                                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{item.step}</span>
+                                </div>
+                                <h4 className="text-sm font-black uppercase tracking-widest mb-3">{item.title}</h4>
+                                <p className="text-xs text-muted leading-relaxed font-bold">{item.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* Market Intelligence Tools */}
             <section className="py-20 px-6 bg-page">
                 <div className="max-w-7xl mx-auto">

@@ -177,7 +177,7 @@ export default function VehicleDetail() {
 
                         <div className="grid grid-cols-2 gap-4 mb-10">
                             <div className="p-6 rounded-[2rem] bg-cinema text-white">
-                                <div className="text-[9px] font-black uppercase tracking-widest text-burgundy mb-2">Foreign Used</div>
+                                <div className="text-[9px] font-black uppercase tracking-widest text-burgundy mb-2">Tokunbo (Foreign)</div>
                                 <div className="text-xl font-bold">N{vehicle.price_tokunbo_min}M - N{vehicle.price_tokunbo_max}M</div>
                             </div>
                             <div className="p-6 rounded-[2rem] bg-surface border border-border-subtle">
@@ -317,16 +317,23 @@ export default function VehicleDetail() {
                                 <div className="relative z-10">
                                     <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-burgundy mb-6">Common Issues</h4>
                                     <div className="space-y-4 mb-8">
-                                        {(vehicle.common_issues || []).map((issue: string, i: number) => (
-                                            <div key={i} className="flex items-start gap-3 text-white/70 text-[10px] font-bold">
-                                                <div className="w-1 h-1 rounded-full bg-burgundy mt-1.5" />
-                                                {issue}
-                                            </div>
-                                        ))}
+                                        {(vehicle.common_issues || []).length > 0 ? (
+                                            vehicle.common_issues.map((issue: string, i: number) => (
+                                                <div key={i} className="flex items-start gap-3 text-white/70 text-[10px] font-bold">
+                                                    <div className="w-1 h-1 rounded-full bg-burgundy mt-1.5" />
+                                                    {issue}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-[10px] text-white/40 italic">No critical issues reported for this era.</p>
+                                        )}
                                     </div>
-                                    <button className="w-full py-4 bg-white text-cinema rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-burgundy hover:text-white transition-all">
+                                    <Link 
+                                        href="/about#contact"
+                                        className="w-full py-4 bg-white text-cinema rounded-full text-center block text-[10px] font-black uppercase tracking-widest hover:bg-burgundy hover:text-white transition-all active:scale-95"
+                                    >
                                         Full Repair Guide
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>

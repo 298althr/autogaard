@@ -129,25 +129,23 @@ exports.getVehicleBySlug = async (req, res) => {
             common_issues: ['Standard wear and tear', 'Battery maintenance']
         };
 
-        // 1. Expert Insight Template
+        // 1. Expert Insight - Use DB if available, else template
         if (!vehicle.expert_insight) {
             vehicle.expert_insight = `${vehicle.make} ${vehicle.model} is a prominent choice in the Nigerian ${vehicle.body_type} segment. Known for its ${archetype.brand_traits[0].toLowerCase()} and ${archetype.brand_traits[1].toLowerCase()}, it remains a strong contender for those prioritizing ${archetype.brand_traits[2] ? archetype.brand_traits[2].toLowerCase() : 'reliability'}.`;
         }
 
-        // 2. Strengths & Trade-offs
+        // 2. Strengths & Trade-offs - Use DB if available
         if (!vehicle.key_strengths || vehicle.key_strengths.length === 0) {
             vehicle.key_strengths = [...archetype.brand_traits];
             if (vehicle.body_type === 'SUV') vehicle.key_strengths.push('High ground clearance');
-            if (vehicle.body_type === 'Sedan') vehicle.key_strengths.push('Better fuel economy');
         }
         
         if (!vehicle.trade_offs || vehicle.trade_offs.length === 0) {
             vehicle.trade_offs = [archetype.common_issues[0]];
             if (vehicle.make === 'Mercedes-Benz' || vehicle.make === 'BMW') vehicle.trade_offs.push('Higher maintenance cost');
-            if (vehicle.body_type === 'SUV') vehicle.trade_offs.push('Higher fuel consumption');
         }
 
-        // 3. Maintenance & Common Issues
+        // 3. Maintenance & Common Issues - Use DB if available (Hydrated)
         if (!vehicle.maintenance_tips || vehicle.maintenance_tips.length === 0) {
             vehicle.maintenance_tips = [archetype.maintenance_profile, 'Check suspension bushings regularly on Nigerian roads'];
         }
@@ -161,23 +159,18 @@ exports.getVehicleBySlug = async (req, res) => {
         vehicle.resell_rank = vehicle.resell_rank || archetype.resale_velocity;
         vehicle.parts_availability = vehicle.parts_availability || archetype.parts_availability;
 
-        // 5. Dynamic Era Calculation
-        if (!vehicle.era_text) {
-            vehicle.era_text = `${vehicle.year_start} — ${vehicle.year_end || 'Present'}`;
-        }
-
-        // 6. Algorithmic Price Estimation (If missing)
-        // Heuristic: Base price for Tokunbo is ~N15M for 10yr old luxury SUV, N8M for economy
+        // 5. Pricing - Use DB Ranges (Hydrated with 5% margin)
         if (!vehicle.price_tokunbo_min) {
+            // Absolute fallback for missing data
             const age = new Date().getFullYear() - (vehicle.year_start || 2015);
             const base = vehicle.make === 'Toyota' || vehicle.make === 'Lexus' || vehicle.make === 'Mercedes-Benz' ? 25 : 12;
             const dep = vehicle.make === 'Toyota' || vehicle.make === 'Lexus' ? 0.92 : 0.85;
             const estimatedTokunbo = base * Math.pow(dep, age);
             
-            vehicle.price_tokunbo_min = Math.max(3, Math.round(estimatedTokunbo));
-            vehicle.price_tokunbo_max = Math.max(5, Math.round(estimatedTokunbo * 1.5));
-            vehicle.price_nigerian_min = Math.max(2, Math.round(estimatedTokunbo * 0.6));
-            vehicle.price_nigerian_max = Math.max(3, Math.round(estimatedTokunbo * 0.9));
+            vehicle.price_tokunbo_min = (estimatedTokunbo * 0.95).toFixed(1);
+            vehicle.price_tokunbo_max = (estimatedTokunbo * 1.05).toFixed(1);
+            vehicle.price_nigerian_min = (estimatedTokunbo * 0.6).toFixed(1);
+            vehicle.price_nigerian_max = (estimatedTokunbo * 0.8).toFixed(1);
         }
 
         // 7. Alternatives Suggestion Algorithm

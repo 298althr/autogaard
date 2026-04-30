@@ -30,7 +30,6 @@ function ValuationContent() {
     const [formData, setFormData] = useState({
         make: searchParams.get('make') || '',
         model: searchParams.get('model') || '',
-        trim: '',
         year: 2020,
         transmission: 'automatic',
         mileage_km: 50000,

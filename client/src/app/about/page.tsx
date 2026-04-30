@@ -128,7 +128,7 @@ export default function AboutPage() {
                     </div>
                     <div className="space-y-4">
                         {FAQS.map((faq, idx) => (
-                            <div key={idx} className="bg-surface border border-border-subtle rounded-3xl overflow-hidden shadow-sm">
+                            <div key={idx} className="bg-surface border border-border-subtle rounded-2xl overflow-hidden shadow-sm">
                                 <button 
                                     onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
                                     className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-page transition-colors"
