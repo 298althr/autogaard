@@ -77,8 +77,12 @@ export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
     const url = `${API_URL}${endpoint}`;
 
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) {
-        headers.Authorization = `Bearer ${token}`;
+    
+    // Auto-attach token if available in localStorage and not provided
+    const authToken = token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null);
+    
+    if (authToken) {
+        headers.Authorization = `Bearer ${authToken}`;
     }
 
     const config: RequestInit = {
@@ -106,8 +110,42 @@ export async function apiFetch(endpoint: string, options: ApiOptions = {}) {
     } catch (err: any) {
         console.error(`[apiFetch Error] ${endpoint}:`, err.message);
         if (err.message === 'Failed to fetch') {
-            throw new Error(`API Connection Failed: Attempted to reach [${url}]. Ensure NEXT_PUBLIC_API_URL is set in Railway for the frontend service and you have RE-DEPLOYED after setting it.`);
+            throw new Error(`API Connection Failed: Could not reach [${url}]. Check if your backend server is running on port 4000 and CORS is configured correctly.`);
         }
+        throw err;
+    }
+}
+
+/**
+ * Handles authenticated file downloads
+ */
+export async function downloadFile(endpoint: string, filename: string) {
+    const url = `${API_URL}${endpoint}`;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Download failed with status ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+    } catch (err: any) {
+        console.error(`[Download Error] ${endpoint}:`, err.message);
         throw err;
     }
 }

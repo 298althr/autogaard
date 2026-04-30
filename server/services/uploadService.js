@@ -62,7 +62,22 @@ const upload = multer({
     limits: { fileSize: 10 * 1024 * 1024 } // Increased to 10MB to handle high-res photos
 });
 
+const csvUpload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+            const dir = path.join(__dirname, '../uploads');
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+            cb(null, dir);
+        },
+        filename: (req, file, cb) => {
+            cb(null, `import-${Date.now()}.csv`);
+        }
+    }),
+    limits: { fileSize: 2 * 1024 * 1024 }
+});
+
 module.exports = {
     cloudinary,
-    upload
+    upload,
+    csvUpload
 };

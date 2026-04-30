@@ -30,9 +30,83 @@
   --emerald: #10B981;
 }
 
+/* ================================================================
+   AUTOGAARD DESIGN SYSTEM v1
+   Theme tokens managed by next-themes (.dark class on <html>).
+   Never hardcode hex values in components — use these vars.
+   ================================================================ */
+
+:root {
+  --bg-page:     #FFFFFF;
+  --bg-surface:  #F8FAFC;
+  --bg-elevated: #F1F5F9;
+  --bg-cinema:   #0F172A;
+
+  --text-on-cinema:        #F8FAFC;
+  --text-on-cinema-muted:  rgba(248, 250, 252, 0.65);
+
+  --border:        #E2E8F0;
+  --border-subtle: rgba(15, 23, 42, 0.06);
+
+  --card-bg:     #FFFFFF;
+  --card-border: #E2E8F0;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+
+  --input-bg:     #FFFFFF;
+  --input-border: #CBD5E1;
+
+  --nav-bg:       rgba(255, 255, 255, 0.92);
+  --nav-border:   rgba(15, 23, 42, 0.08);
+  --nav-text:     #0F172A;
+  --hero-overlay: rgba(15, 23, 42, 0.60);
+
+  --burgundy-hover:  #600018;
+  --burgundy-subtle: rgba(128, 0, 32, 0.08);
+  --whatsapp:        #25D366;
+}
+
+.dark {
+  --bg-page:     #0F172A;
+  --bg-surface:  #1E293B;
+  --bg-elevated: #263347;
+  --bg-cinema:   #060A12;
+
+  --text-primary:          #F8FAFC;
+  --text-secondary:        #CBD5E1;
+  --text-muted:            #64748B;
+  --text-on-cinema:        #F8FAFC;
+  --text-on-cinema-muted:  rgba(248, 250, 252, 0.60);
+
+  --border:        rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+
+  --card-bg:     #1E293B;
+  --card-border: rgba(255, 255, 255, 0.07);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+
+  --input-bg:     #1E293B;
+  --input-border: rgba(255, 255, 255, 0.12);
+
+  --nav-bg:       rgba(10, 15, 26, 0.92);
+  --nav-border:   rgba(255, 255, 255, 0.06);
+  --nav-text:     #F8FAFC;
+  --hero-overlay: rgba(6, 10, 18, 0.70);
+
+  --burgundy-subtle: rgba(128, 0, 32, 0.20);
+
+  --surface:     #0F172A;
+  --surface-50:  #1E293B;
+  --surface-100: #263347;
+  --surface-200: rgba(255, 255, 255, 0.08);
+}
+
 @layer base {
   body {
-    @apply bg-[var(--surface)] text-slate-900 font-body antialiased;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1,
@@ -47,8 +121,77 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-[var(--burgundy)] text-white px-6 py-3 rounded-full hover:bg-[var(--burgundy-light)] transition-all font-semibold active:scale-95;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background-color: var(--burgundy);
+    color: #FFFFFF;
+    padding: 0.75rem 1.75rem;
+    border-radius: 0.5rem;
+    font-weight: 700; font-size: 0.875rem;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    border: none; cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
   }
+  .btn-primary:hover { background-color: var(--burgundy-hover); transform: translateY(-1px); }
+  .bg-cinema .btn-primary { background-color: #FFFFFF; color: var(--bg-cinema); }
+  .bg-cinema .btn-primary:hover { background-color: var(--burgundy-light); color: #FFFFFF; }
+
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background-color: transparent;
+    color: var(--burgundy); border: 1.5px solid var(--burgundy);
+    padding: 0.75rem 1.75rem; border-radius: 0.5rem;
+    font-weight: 700; font-size: 0.875rem;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s ease;
+  }
+  .btn-outline:hover { background-color: var(--burgundy); color: #FFFFFF; }
+  .bg-cinema .btn-outline { color: #FFFFFF; border-color: rgba(255,255,255,0.4); }
+  .bg-cinema .btn-outline:hover { background-color: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.7); }
+
+  .card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    border-radius: 1rem;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+  .dark .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+
+  .nav-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background-color: transparent;
+    border-bottom: 1px solid transparent;
+    color: #F8FAFC;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+  .nav-bar.nav-scrolled {
+    background-color: var(--nav-bg);
+    border-color: var(--nav-border);
+    color: var(--nav-text);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .form-input, .form-select, .form-textarea {
+    background-color: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    color: var(--text-primary);
+    border-radius: 0.5rem; padding: 0.75rem 1rem; width: 100%; font-size: 1rem;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--burgundy); }
+  .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
+
+  .form-label {
+    display: block; font-size: 0.75rem; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-secondary); margin-bottom: 0.375rem;
+  }
+
+  .section-padding { padding-top: clamp(4rem, 10vh, 8rem); padding-bottom: clamp(4rem, 10vh, 8rem); }
+  .section-x { padding-left: clamp(1.25rem, 5vw, 1.5rem); padding-right: clamp(1.25rem, 5vw, 1.5rem); }
+  .container-xl { max-width: 80rem; margin-left: auto; margin-right: auto; width: 100%; }
 
   .glass-card {
     @apply bg-white/80 backdrop-blur-md border border-white/20 rounded-[2.5rem];
@@ -71,4 +214,22 @@
   .premium-pill {
     @apply bg-white/40 backdrop-blur-xl border border-white/40 rounded-full px-4 py-2 shadow-sm transition-all;
   }
+}
+
+@layer utilities {
+  .bg-page    { background-color: var(--bg-page); }
+  .bg-surface { background-color: var(--bg-surface); }
+  .bg-cinema  { background-color: var(--bg-cinema); color: var(--text-on-cinema); }
+
+  .text-primary   { color: var(--text-primary); }
+  .text-secondary { color: var(--text-secondary); }
+  .text-muted     { color: var(--text-muted); }
+  .text-on-cinema { color: var(--text-on-cinema); }
+
+  .type-display { font-size: clamp(2.5rem, 5vw + 1rem, 5rem); line-height: 1.1; letter-spacing: -0.02em; font-weight: 800; }
+  .type-h1      { font-size: clamp(2rem, 4vw + 0.5rem, 3.75rem); line-height: 1.15; letter-spacing: -0.02em; font-weight: 800; }
+  .type-h2      { font-size: clamp(1.5rem, 3vw + 0.25rem, 2.5rem); line-height: 1.2; letter-spacing: -0.015em; font-weight: 700; }
+  .type-h3      { font-size: clamp(1.125rem, 1.5vw + 0.25rem, 1.5rem); line-height: 1.35; font-weight: 700; }
+  .type-body-lg { font-size: clamp(1rem, 1.2vw + 0.1rem, 1.25rem); line-height: 1.7; }
+  .type-caption { font-size: 0.75rem; letter-spacing: 0.07em; text-transform: uppercase; font-weight: 600; }
 }

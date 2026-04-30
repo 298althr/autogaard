@@ -3,10 +3,13 @@ import "../styles/globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+
+import { ComparisonProvider } from "@/context/ComparisonContext";
 
 export const metadata: Metadata = {
-    title: "Autogaard | Nigeria's Smartest Car Marketplace",
-    description: "AI-powered vehicle valuations and real-time auctions.",
+    title: "Autogaard | Trusted Car Advisory",
+    description: "Buy better. Maintain smarter. Drive with peace of mind. Autogaard helps you make better decisions at every stage of car ownership.",
     viewport: {
         width: 'device-width',
         initialScale: 1,
@@ -21,15 +24,19 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <body className="antialiased">
-                <ToastProvider>
-                    <AuthProvider>
-                        <NotificationProvider>
-                            {children}
-                        </NotificationProvider>
-                    </AuthProvider>
-                </ToastProvider>
+                <ThemeProvider>
+                    <ToastProvider>
+                        <AuthProvider>
+                            <NotificationProvider>
+                                <ComparisonProvider>
+                                    {children}
+                                </ComparisonProvider>
+                            </NotificationProvider>
+                        </AuthProvider>
+                    </ToastProvider>
+                </ThemeProvider>
             </body>
         </html>
     );

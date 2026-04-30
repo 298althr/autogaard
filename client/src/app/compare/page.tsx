@@ -1,99 +1,110 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { apiFetch, getVehicleImages } from '@/lib/api';
-import { Plus, X, ArrowRight, Zap, Info, ArrowLeftRight, Trash2, Share2, Search } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { apiFetch, getOptimizedImageUrl } from '@/lib/api';
+import { useComparison } from '@/context/ComparisonContext';
+import { 
+    Plus, 
+    X, 
+    Search, 
+    ArrowLeftRight, 
+    Trash2, 
+    Share2, 
+    MessageCircle,
+    CheckCircle2,
+    Send,
+    Star,
+    ShieldCheck,
+    ChevronRight,
+    ChevronDown,
+    Filter,
+    Zap,
+    Gauge,
+    Trophy,
+    Crown,
+    Lock
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import MotionBackground from '@/components/landing/MotionBackground';
-import PillHeader from '@/components/landing/PillHeader';
-import PremiumButton from '@/components/ui/PremiumButton';
 import Image from 'next/image';
 import Link from 'next/link';
-
-interface Vehicle {
-    id: number;
-    make: string;
-    model: string;
-    year_start: number;
-    year_end: number;
-    photos: string[];
-    engines: any[];
-    description?: string;
-    press_release?: string;
-}
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import { ComparisonSkeleton, LoadingSpinner } from '@/components/Loading';
 
 export default function ComparePage() {
-    const [selectedIds, setSelectedIds] = useState<number[]>([]);
-    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-    const [loading, setLoading] = useState(false);
+    const { comparisonIds: selectedIds, addToComparison, removeFromComparison, clearComparison } = useComparison();
+    const [vehicles, setVehicles] = useState<any[]>([]);
+    const [isDataLoading, setIsDataLoading] = useState(false);
+    
+    // Selection Flow State
+    const [step, setStep] = useState<'search' | 'selector'>('search');
+    const [makes, setMakes] = useState<any[]>([]);
+    const [models, setModels] = useState<any[]>([]);
+    const [selection, setSelection] = useState({ make: '', model: '' });
+    
+    // Search state
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
-    const [isSearching, setIsSearching] = useState(false);
-    const [brands, setBrands] = useState<any[]>([]);
-    const [selectingBrand, setSelectingBrand] = useState<any>(null);
-    const [availableModels, setAvailableModels] = useState<any[]>([]);
-    const [isLoadingModels, setIsLoadingModels] = useState(false);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+    
+    // Lead form state
+    const [leadData, setLeadData] = useState({ name: '', phone: '', location: '', preferred: '' });
+    const [leadStatus, setLeadStatus] = useState<'idle' | 'loading' | 'done'>('idle');
 
+    // Winner Calculation
+    const getWinner = () => {
+        if (vehicles.length < 2) return null;
+        return [...vehicles].sort((a, b) => 
+            ((b.reliability_score || 0) + (b.resell_rank || 0)) - 
+            ((a.reliability_score || 0) + (a.resell_rank || 0))
+        )[0];
+    };
+    const winner = getWinner();
+
+    // Initial load for makes
     useEffect(() => {
-        // Load initial comparison IDs from URL if any
-        const params = new URLSearchParams(window.location.search);
-        const ids = params.get('ids');
-        if (ids) {
-            setSelectedIds(ids.split(',').map(Number));
-        }
-
-        // Fetch brands for structured picker
-        apiFetch('/catalog/brands').then(res => {
-            if (res.data) setBrands(res.data);
-        });
+        const loadMakes = async () => {
+            try {
+                const res = await apiFetch('/catalog/brands');
+                if (res.success) setMakes(res.data);
+            } catch (e) { console.error(e); }
+        };
+        loadMakes();
     }, []);
 
-    const fetchModels = async (brandId: number) => {
-        setIsLoadingModels(true);
-        try {
-            const res = await apiFetch(`/catalog/models?makeId=${brandId}`);
-            if (res.data) setAvailableModels(res.data);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setIsLoadingModels(false);
-        }
-    };
-
-    useEffect(() => {
-        if (selectedIds.length > 0) {
-            fetchComparisonData();
-        } else {
+    // Fetch comparison data whenever IDs change
+    const fetchComparisonData = useCallback(async (ids: string[]) => {
+        if (ids.length === 0) {
             setVehicles([]);
+            return;
         }
-
-        // Update URL
-        const url = new URL(window.location.href);
-        if (selectedIds.length > 0) {
-            url.searchParams.set('ids', selectedIds.join(','));
-        } else {
-            url.searchParams.delete('ids');
-        }
-        window.history.replaceState({}, '', url.toString());
-    }, [selectedIds]);
-
-    const fetchComparisonData = async () => {
-        setLoading(true);
+        setIsDataLoading(true);
         try {
-            const res = await apiFetch(`/catalog/compare?ids=${selectedIds.join(',')}`);
-            if (res.data) {
+            const res = await apiFetch(`/catalog/compare?ids=${ids.join(',')}`);
+            if (res.success && Array.isArray(res.data)) {
                 setVehicles(res.data);
-                // Sync selectedIds with found vehicles to remove dead IDs from URL
-                const foundIds = res.data.map((v: Vehicle) => v.id);
-                if (foundIds.length !== selectedIds.length) {
-                    setSelectedIds(foundIds);
-                }
             }
         } catch (err) {
-            console.error(err);
+            console.error('Fetch error:', err);
         } finally {
-            setLoading(false);
+            setIsDataLoading(false);
         }
+    }, []);
+
+    useEffect(() => {
+        fetchComparisonData(selectedIds);
+    }, [selectedIds, fetchComparisonData]);
+
+    const handleMakeSelect = async (make: string) => {
+        setSelection({ make, model: '' });
+        if (!make) {
+            setModels([]);
+            return;
+        }
+        try {
+            const res = await apiFetch(`/catalog/models?make=${make}`);
+            if (res.success) setModels(res.data);
+        } catch (e) { console.error(e); }
     };
 
     const handleSearch = async (query: string) => {
@@ -102,543 +113,394 @@ export default function ComparePage() {
             setSearchResults([]);
             return;
         }
-
-        setIsSearching(true);
         try {
             const res = await apiFetch(`/catalog/models?q=${query}`);
-            if (res.data) setSearchResults(res.data.slice(0, 10));
+            if (res.success) setSearchResults(res.data);
         } catch (err) {
             console.error(err);
-        } finally {
-            setIsSearching(false);
         }
     };
 
-    const addVehicle = (id: number) => {
-        if (selectedIds.length >= 4) return;
-        if (selectedIds.includes(id)) return;
-        setSelectedIds([...selectedIds, id]);
-        setSearchQuery('');
-        setSearchResults([]);
-        setSelectingBrand(null);
-        setAvailableModels([]);
+    const handleAddFromSelector = () => {
+        if (selection.model) {
+            addToComparison(selection.model);
+            setSelection({ make: '', model: '' });
+            setModels([]);
+        }
     };
 
-    const removeVehicle = (id: number) => {
-        setSelectedIds(selectedIds.filter(v => v !== id));
+    const handleEmptySlotClick = () => {
+        setStep('search');
+        setTimeout(() => {
+            searchInputRef.current?.focus();
+            window.scrollTo({ top: 200, behavior: 'smooth' });
+        }, 100);
     };
 
-    const clearMatrix = () => {
-        setSelectedIds([]);
+    const handleLeadSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLeadStatus('loading');
+        try {
+            await apiFetch('/leads/comparison', {
+                method: 'POST',
+                body: {
+                    ...leadData,
+                    vehicles_compared: vehicles.map(v => `${v.make} ${v.model}`).join(', '),
+                    preferred_choice: leadData.preferred || 'None selected'
+                },
+            });
+            setLeadStatus('done');
+        } catch (err) {
+            setLeadStatus('idle');
+        }
     };
 
-    const shareComparison = () => {
-        const url = window.location.href;
-        navigator.clipboard.writeText(url);
-        // Could use a toast here if available
-        alert('Comparison link copied to clipboard!');
-    };
-
-    const parseMetric = (val: string): number | null => {
-        if (!val || val === '—') return null;
-        const match = val.match(/([0-9.]+)/);
-        return match ? parseFloat(match[1]) : null;
-    };
-
-    const determineWinner = (field: string, values: any[]) => {
-        if (values.length < 2) return null;
-        const parsed = values.map(v => parseMetric(v));
-        if (parsed.every(p => p === null)) return null;
-
-        const nonNulls = parsed.filter((p): p is number => p !== null);
-        if (nonNulls.length < 2) return null;
-
-        // Better is lower for some metrics
-        const lowerIsBetter = ['Acceleration', '0-62', '0-60', '0-100', 'Consumption', 'Weight'].some(k => field.includes(k));
-
-        const bestValue = lowerIsBetter ? Math.min(...nonNulls) : Math.max(...nonNulls);
-        return parsed.indexOf(bestValue);
-    };
-
-    const renderSpecRow = (label: string, field: string, engineIdx: number = 0) => {
-        const values = vehicles.map(v => {
-            const engine = v.engines[engineIdx] || {};
-            const specs = engine.specs || {};
-            return field.split('.').reduce((o, i) => o?.[i], specs) || '—';
-        });
-
-        const winnerIdx = determineWinner(label, values);
-
+    const renderSpecRow = (label: string, field: string, icon?: React.ReactNode) => {
         return (
-            <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] border-b border-slate-100/50 items-center group/row hover:bg-slate-50/50 transition-colors">
-                <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-slate-400 pl-4 py-4 sticky left-0 bg-white/90 backdrop-blur-sm z-20 border-r border-slate-100 md:border-none shadow-[2px_0_10px_rgba(0,0,0,0.02)] md:shadow-none min-h-full flex items-center">
-                    {label}
+            <div className="grid grid-cols-[160px_1fr] border-b border-border-subtle group/row hover:bg-page transition-all">
+                <div className="p-8 border-r border-border-subtle bg-surface/50 sticky left-0 z-10 flex items-center gap-3">
+                    {icon && <span className="text-burgundy opacity-50 group-hover/row:opacity-100 transition-opacity">{icon}</span>}
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted">{label}</span>
                 </div>
-                <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-4 gap-0 items-stretch h-full">
-                    {vehicles.map((v, idx) => (
-                        <div
-                            key={v.id}
-                            className={`min-w-[140px] md:min-w-0 flex-1 text-[13px] md:text-sm font-subheading font-semibold px-4 py-4 md:py-5 border-l border-slate-50 first:border-l-0 group-hover/row:bg-white transition-all flex items-center justify-between ${idx === winnerIdx ? 'text-burgundy bg-burgundy/[0.02]' : 'text-slate-700'}`}
-                        >
-                            <span className="truncate">{values[idx]}</span>
-                            {idx === winnerIdx && (
-                                <div className="ml-2 bg-burgundy/10 p-1 rounded-full text-burgundy">
-                                    <Zap size={10} fill="currentColor" />
+                <div className="grid grid-cols-4 items-stretch">
+                    {vehicles.map((v) => (
+                        <div key={v.id} className={`p-8 text-sm font-bold border-r border-border-subtle last:border-r-0 flex items-center justify-center text-center transition-all ${winner?.id === v.id ? 'bg-burgundy/5' : ''}`}>
+                            {field === 'reliability_score' || field === 'resell_rank' ? (
+                                <div className="flex flex-col items-center gap-1">
+                                    <span className={`text-lg ${winner?.id === v.id ? 'text-burgundy' : 'text-primary'}`}>{v[field] || 0}/10</span>
+                                    <div className="w-12 h-1 bg-page rounded-full overflow-hidden">
+                                        <div 
+                                            className="h-full bg-burgundy" 
+                                            style={{ width: `${(v[field] || 0) * 10}%` }}
+                                        />
+                                    </div>
                                 </div>
+                            ) : (
+                                <span className={winner?.id === v.id ? 'text-burgundy' : 'text-secondary'}>{v[field] || '—'}</span>
                             )}
                         </div>
                     ))}
-                    {Array.from({ length: Math.max(0, 4 - vehicles.length) }).map((_, i) => (
-                        <div key={i} className="hidden md:flex flex-1 border-l border-slate-50 bg-slate-50/10 italic text-slate-300 text-[10px] items-center justify-center">
-                            N/A
-                        </div>
+                    {Array.from({ length: 4 - vehicles.length }).map((_, i) => (
+                        <div key={i} className="bg-surface/10 border-r border-border-subtle last:border-r-0" />
                     ))}
                 </div>
-            </div>
-        );
-    };
-
-    const renderQuickStats = () => {
-        if (vehicles.length < 2) return null;
-
-        const metrics = [
-            { label: 'Power', field: 'Engine Specs.Power:', suffix: 'Bhp' },
-            { label: 'Top Speed', field: 'Performance Specs.Top Speed:', suffix: 'Mph' },
-            { label: 'Acceleration', field: 'Performance Specs.Acceleration 0-62 Mph (0-100 Kph):', suffix: 's' },
-            { label: 'Displacement', field: 'Engine Specs.Displacement:', suffix: 'cc' }
-        ];
-
-        return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-burgundy/5 rounded-bl-[100%] -mr-10 -mt-10" />
-                {metrics.map(m => {
-                    const values = vehicles.map(v => {
-                        const val = m.field.split('.').reduce((o, i) => o?.[i], v.engines[0]?.specs) || '—';
-                        return parseMetric(val);
-                    });
-
-                    const winnerIdx = determineWinner(m.label, values.map(v => v?.toString() || '—'));
-                    const maxVal = Math.max(...values.filter((v): v is number => v !== null), 1);
-
-                    return (
-                        <div key={m.label} className="space-y-4">
-                            <div className="flex justify-between items-end">
-                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{m.label}</h4>
-                                <span className="text-[9px] font-bold text-burgundy bg-burgundy/5 px-2 py-0.5 rounded-full">Comparative Analytics</span>
-                            </div>
-                            <div className="space-y-3">
-                                {vehicles.map((v, idx) => {
-                                    const val = values[idx];
-                                    const percent = val ? (val / maxVal) * 100 : 0;
-                                    return (
-                                        <div key={v.id} className="space-y-1">
-                                            <div className="flex justify-between text-[10px] font-bold">
-                                                <span className="text-slate-500 truncate max-w-[100px]">{v.model}</span>
-                                                <span className={idx === winnerIdx ? 'text-burgundy' : 'text-slate-700'}>
-                                                    {val || '—'} {val ? m.suffix : ''}
-                                                </span>
-                                            </div>
-                                            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${percent}%` }}
-                                                    className={`h-full rounded-full ${idx === winnerIdx ? 'bg-burgundy' : 'bg-slate-300'}`}
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    );
-                })}
             </div>
         );
     };
 
     return (
-        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-24 md:pt-32 pb-20">
-            <MotionBackground />
-            <PillHeader />
+        <main className="bg-page min-h-screen pb-20">
+            <Navbar />
 
-            <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10 text-pretty">
-                <div className="text-center mb-10 md:mb-16 px-2">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="inline-flex items-center space-x-2 bg-burgundy/10 px-4 py-2 rounded-full mb-4 md:mb-6 shadow-glow shadow-burgundy/20"
-                    >
-                        <ArrowLeftRight size={14} className="text-burgundy" />
-                        <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-burgundy">Forensic Analysis Matrix</span>
-                    </motion.div>
-                    <h1 className="text-4xl sm:text-5xl md:text-7xl font-heading font-extrabold tracking-tight text-slate-900 mb-4 leading-tight">
-                        Side-by-Side <br className="hidden md:block" /> <span className="text-burgundy">Comparison.</span>
-                    </h1>
-                    <p className="text-slate-500 text-sm md:text-base max-w-2xl mx-auto font-subheading leading-relaxed">
-                        Execute technical due diligence between up to 4 forensic profiles. Higher fidelity yardsticks for professional automotive acquisition.
+            {/* Hero */}
+            <section className="pt-32 pb-24 px-6 bg-cinema text-white relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+                <div className="max-w-7xl mx-auto relative z-10">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-12 h-12 rounded-2xl bg-burgundy/20 flex items-center justify-center border border-burgundy/30">
+                            <ArrowLeftRight className="text-burgundy" size={24} />
+                        </div>
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-burgundy">Expert Comparison</h4>
+                    </div>
+                    <h1 className="type-display mb-6">Objective Analysis.</h1>
+                    <p className="type-body-lg text-white/50 max-w-2xl leading-relaxed">
+                        Contrast performance, reliability, and resale metrics side-by-side to make 
+                        an informed decision for the Nigerian market.
                     </p>
                 </div>
+            </section>
 
-                {/* Selection Bar */}
-                <div className="flex flex-wrap gap-3 md:gap-4 mb-12 justify-center items-center">
-                    {vehicles.length > 0 && (
-                        <div className="flex flex-row md:flex-col gap-2 order-last md:order-none w-full md:w-auto mt-4 md:mt-0 justify-center">
-                            <button
-                                onClick={shareComparison}
-                                className="flex-1 md:h-10 px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-burgundy hover:border-burgundy/20 transition-all flex items-center justify-center shadow-sm"
-                                title="Share Comparison"
+            <div className="max-w-7xl mx-auto px-6 -mt-12 relative z-20">
+                {/* Selection Tray */}
+                <div className="bg-surface border border-border-subtle rounded-[3.5rem] p-6 shadow-3xl flex flex-col gap-8 mb-12">
+                    <div className="flex items-center justify-between border-b border-border-subtle pb-6 px-4">
+                        <div className="flex gap-8">
+                            <button 
+                                onClick={() => setStep('search')}
+                                className={`text-[10px] font-black uppercase tracking-widest pb-4 border-b-2 transition-all ${step === 'search' ? 'border-burgundy text-primary' : 'border-transparent text-muted hover:text-primary'}`}
                             >
-                                <Share2 size={16} className="mr-2 md:mr-0" />
-                                <span className="md:hidden text-xs font-bold uppercase tracking-wider">Share Matrix</span>
+                                Quick Search
                             </button>
-                            <button
-                                onClick={clearMatrix}
-                                className="flex-1 md:h-10 px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-red-500 hover:border-red-100 transition-all flex items-center justify-center shadow-sm"
-                                title="Clear All"
+                            <button 
+                                onClick={() => setStep('selector')}
+                                className={`text-[10px] font-black uppercase tracking-widest pb-4 border-b-2 transition-all ${step === 'selector' ? 'border-burgundy text-primary' : 'border-transparent text-muted hover:text-primary'}`}
                             >
-                                <Trash2 size={16} className="mr-2 md:mr-0" />
-                                <span className="md:hidden text-xs font-bold uppercase tracking-wider">Flush Data</span>
+                                Smart Selector
                             </button>
                         </div>
-                    )}
+                        <div className="flex gap-2">
+                            <button onClick={clearComparison} className="p-4 rounded-full hover:bg-red-50 text-muted hover:text-red-500 transition-all border border-border-subtle" title="Clear All">
+                                <Trash2 size={16} />
+                            </button>
+                            <button className="p-4 rounded-full hover:bg-page text-muted hover:text-burgundy transition-all border border-border-subtle">
+                                <Share2 size={16} />
+                            </button>
+                        </div>
+                    </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap items-center gap-3 md:gap-4 w-full lg:w-auto">
-                        {vehicles.map(v => (
-                            <motion.div
-                                key={v.id}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="bg-white border-2 border-burgundy/10 hover:border-burgundy/40 rounded-2xl p-3 md:p-4 flex items-center space-x-3 md:space-x-4 shadow-sm transition-colors group"
-                            >
-                                <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-100 rounded-xl overflow-hidden relative border border-slate-200 shrink-0 shadow-inner">
-                                    {v.photos && v.photos.length > 0 ? (
-                                        <Image src={getVehicleImages(v.photos)[0]} alt={v.model} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                            <Zap size={16} />
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-burgundy/80 truncate">{v.make}</p>
-                                    <p className="text-xs md:text-sm font-heading font-extrabold text-slate-900 truncate">{v.model}</p>
-                                </div>
-                                <button
-                                    onClick={() => removeVehicle(v.id)}
-                                    className="p-1.5 hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-lg transition-colors"
-                                >
-                                    <X size={14} />
-                                </button>
-                            </motion.div>
-                        ))}
-
-                        {selectedIds.length < 4 && (
-                            <div className="relative group w-full lg:min-w-[400px]">
-                                <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 items-center">
-                                    <div className="flex bg-white border-2 border-dashed border-slate-200 focus-within:border-burgundy/40 focus-within:bg-white rounded-2xl transition-all h-full shadow-sm hover:border-slate-300">
-                                        <input
-                                            type="text"
-                                            placeholder="Forensic Search (Model Name)..."
-                                            value={searchQuery}
-                                            onChange={(e) => {
-                                                handleSearch(e.target.value);
-                                                if (selectingBrand) setSelectingBrand(null);
-                                            }}
-                                            className="bg-transparent px-5 py-3 md:py-4 outline-none w-full text-xs md:text-sm font-subheading font-medium"
-                                        />
-                                        <div className="px-4 flex items-center text-slate-300 group-focus-within:text-burgundy">
-                                            <Search size={18} />
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => {
-                                            setSelectingBrand(selectingBrand === 'open' ? null : 'open');
-                                            setSearchQuery('');
-                                            setSearchResults([]);
-                                        }}
-                                        className={`px-6 py-3 md:py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 ${selectingBrand ? 'bg-burgundy text-white shadow-burgundy/20' : 'bg-slate-900 text-white hover:bg-burgundy'}`}
-                                    >
-                                        {selectingBrand ? 'Dismiss Browser' : 'Browse Catalog'}
-                                    </button>
-                                </div>
-
+                    <div className="px-4 pb-4">
+                        {step === 'search' ? (
+                            <div className="relative">
+                                <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-muted" size={20} />
+                                <input 
+                                    ref={searchInputRef}
+                                    type="text"
+                                    placeholder="Type vehicle make or model (e.g. Toyota Camry)..."
+                                    className="w-full bg-page border border-border-subtle rounded-[2rem] pl-16 pr-8 py-5 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-burgundy/5 transition-all"
+                                    value={searchQuery}
+                                    onChange={(e) => handleSearch(e.target.value)}
+                                />
+                                
                                 <AnimatePresence>
-                                    {(searchResults.length > 0 || selectingBrand) && (
-                                        <motion.div
+                                    {searchResults.length > 0 && (
+                                        <motion.div 
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: 10 }}
-                                            className="absolute top-full left-0 right-0 mt-3 bg-white rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 z-50 overflow-hidden min-h-[300px] flex flex-col"
+                                            className="absolute top-full left-0 right-0 mt-4 bg-surface border border-border-subtle rounded-[2.5rem] shadow-3xl z-50 p-4 max-h-[400px] overflow-y-auto no-scrollbar"
                                         >
-                                            <div className="p-6 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between">
-                                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                                    {searchQuery ? 'Heuristic Match Engine' : selectingBrand && selectingBrand !== 'open' ? `Models for ${selectingBrand.name}` : 'Select Manufacturer Protocol'}
-                                                </h4>
-                                                {selectingBrand && selectingBrand !== 'open' && (
-                                                    <button onClick={() => setSelectingBrand('open')} className="text-[10px] font-black text-burgundy uppercase tracking-[0.2em] flex items-center gap-2 hover:translate-x-1 transition-transform">
-                                                        <ArrowRight size={14} className="rotate-180" /> Back to Brands
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            <div className="flex-1 overflow-y-auto max-h-[400px] custom-scrollbar p-3">
-                                                {searchQuery ? (
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                                        {searchResults.map((res: any) => (
-                                                            <button
-                                                                key={res.id}
-                                                                onClick={() => addVehicle(res.id)}
-                                                                className="w-full text-left p-3 hover:bg-slate-50 flex items-center space-x-4 transition-all rounded-xl border border-transparent hover:border-slate-100 group"
-                                                            >
-                                                                <div className="w-14 h-9 bg-slate-100 rounded-lg overflow-hidden relative shrink-0 border border-slate-200 group-hover:border-burgundy/20">
-                                                                    {res.photos ? (
-                                                                        <Image
-                                                                            src={getVehicleImages(res.photos)[0]}
-                                                                            alt={res.name}
-                                                                            fill
-                                                                            sizes="56px"
-                                                                            quality={40}
-                                                                            className="object-cover"
-                                                                        />
-                                                                    ) : <Zap size={10} className="m-auto text-slate-300" />}
-                                                                </div>
-                                                                <div className="flex flex-col min-w-0">
-                                                                    <span className="text-[8px] font-black uppercase tracking-widest text-burgundy/60">{res.brand_name}</span>
-                                                                    <span className="text-sm font-heading font-extrabold text-slate-900 truncate">{res.name}</span>
-                                                                </div>
-                                                            </button>
-                                                        ))}
+                                            {searchResults.map(res => (
+                                                <button 
+                                                    key={res.id}
+                                                    onClick={() => { addToComparison(res.id); setSearchQuery(''); setSearchResults([]); }}
+                                                    className="w-full text-left p-4 hover:bg-page rounded-2xl flex items-center justify-between group transition-all"
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-20 h-12 bg-page rounded-xl overflow-hidden relative">
+                                                            <Image src={getOptimizedImageUrl(res.photos)} alt={res.name} fill className="object-cover" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-black uppercase text-burgundy tracking-widest">{res.brand_name}</p>
+                                                            <p className="font-bold text-sm">{res.name}</p>
+                                                        </div>
                                                     </div>
-                                                ) : selectingBrand === 'open' ? (
-                                                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-                                                        {brands.map(b => (
-                                                            <button
-                                                                key={b.id}
-                                                                onClick={() => {
-                                                                    setSelectingBrand(b);
-                                                                    fetchModels(b.id);
-                                                                }}
-                                                                className="p-4 rounded-xl border border-slate-100 hover:border-burgundy/20 hover:bg-burgundy/[0.02] transition-all text-center group"
-                                                            >
-                                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 group-hover:text-burgundy transition-colors">{b.name}</p>
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                ) : selectingBrand ? (
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                                        {isLoadingModels ? (
-                                                            <div className="col-span-full py-20 text-center space-y-3">
-                                                                <div className="w-8 h-8 border-2 border-burgundy/20 border-t-burgundy rounded-full animate-spin mx-auto" />
-                                                                <p className="italic text-slate-400 text-xs font-black uppercase tracking-widest">Hydrating Catalog...</p>
-                                                            </div>
-                                                        ) : availableModels.length > 0 ? (
-                                                            availableModels.map(m => (
-                                                                <button
-                                                                    key={m.id}
-                                                                    onClick={() => addVehicle(m.id)}
-                                                                    className="w-full text-left p-3 hover:bg-slate-50 flex items-center justify-between transition-all rounded-xl border border-transparent hover:border-slate-100 group"
-                                                                >
-                                                                    <div className="flex items-center gap-4">
-                                                                        <div className="w-16 h-10 bg-slate-100 rounded-lg overflow-hidden relative border border-slate-100 group-hover:border-burgundy/20 shadow-sm">
-                                                                            {m.photos ? (
-                                                                                <Image
-                                                                                    src={getVehicleImages(m.photos)[0]}
-                                                                                    alt={m.name}
-                                                                                    fill
-                                                                                    sizes="64px"
-                                                                                    quality={40}
-                                                                                    className="object-cover"
-                                                                                />
-                                                                            ) : <Zap size={10} className="m-auto text-slate-300" />}
-                                                                        </div>
-                                                                        <span className="text-sm font-heading font-extrabold text-slate-900 uppercase tracking-tight">{m.name}</span>
-                                                                    </div>
-                                                                    <Plus size={16} className="text-slate-200 group-hover:text-burgundy group-hover:translate-x-1 transition-all" />
-                                                                </button>
-                                                            ))
-                                                        ) : (
-                                                            <div className="col-span-full py-20 text-center text-slate-400 text-[10px] font-black uppercase tracking-widest">Inventory Gap Detected.</div>
-                                                        )}
-                                                    </div>
-                                                ) : null}
-                                            </div>
+                                                    <Plus size={20} className="text-muted group-hover:text-burgundy transition-colors" />
+                                                </button>
+                                            ))}
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="space-y-3">
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-muted px-2">1. Choose Make</label>
+                                    <div className="relative">
+                                        <Filter className="absolute left-6 top-1/2 -translate-y-1/2 text-burgundy" size={16} />
+                                        <select 
+                                            className="w-full bg-page border border-border-subtle rounded-2xl pl-14 pr-6 py-4 text-sm font-bold appearance-none focus:outline-none focus:ring-4 focus:ring-burgundy/5"
+                                            value={selection.make}
+                                            onChange={(e) => handleMakeSelect(e.target.value)}
+                                        >
+                                            <option value="">Select Brand</option>
+                                            {makes.map(m => <option key={m.name} value={m.name}>{m.name}</option>)}
+                                        </select>
+                                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={16} />
+                                    </div>
+                                </div>
+
+                                <div className={`space-y-3 transition-opacity ${!selection.make ? 'opacity-30' : ''}`}>
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-muted px-2">2. Choose Model</label>
+                                    <div className="relative">
+                                        <Zap className="absolute left-6 top-1/2 -translate-y-1/2 text-burgundy" size={16} />
+                                        <select 
+                                            className="w-full bg-page border border-border-subtle rounded-2xl pl-14 pr-6 py-4 text-sm font-bold appearance-none focus:outline-none focus:ring-4 focus:ring-burgundy/5"
+                                            value={selection.model}
+                                            onChange={(e) => setSelection({ ...selection, model: e.target.value })}
+                                        >
+                                            <option value="">Select Model</option>
+                                            {models.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                                        </select>
+                                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-muted pointer-events-none" size={16} />
+                                    </div>
+                                </div>
+
+                                <div className="flex items-end">
+                                    <button 
+                                        type="button"
+                                        onClick={handleAddFromSelector}
+                                        className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-3 ${selection.model ? 'bg-cinema text-white shadow-xl shadow-black/20 hover:scale-[1.02]' : 'bg-page border border-border-subtle text-muted opacity-50 cursor-not-allowed'}`}
+                                    >
+                                        <Plus size={16} /> Add to Analysis
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Quick Stats Yardstick */}
-                {renderQuickStats()}
-
-                {/* Comparison Matrix */}
-                {vehicles.length > 0 ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="bg-white rounded-[3rem] overflow-hidden border border-slate-200 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)]"
-                    >
-                        {/* Static Header Identity Row */}
-                        <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] bg-slate-100/30 items-stretch border-b border-slate-200">
-                            <div className="p-6 md:p-10 flex flex-col justify-end sticky left-0 bg-white/95 backdrop-blur-md z-30 border-r border-slate-100">
-                                <h3 className="text-slate-900 font-heading font-black text-xs md:text-sm uppercase tracking-widest">Forensic Profile</h3>
-                            </div>
-                            <div className="flex overflow-x-auto md:grid md:grid-cols-4 no-scrollbar items-stretch bg-white/40">
-                                {vehicles.map(v => (
-                                    <div key={v.id} className="min-w-[170px] md:min-w-0 flex-1 p-6 md:p-10 border-l border-slate-100 relative group">
-                                        <div className="aspect-[4/3] bg-slate-100 rounded-[1.5rem] mb-6 overflow-hidden relative border border-slate-200 shadow-md group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-500">
-                                            {v.photos && v.photos.length > 0 ? (
-                                                <Image src={getVehicleImages(v.photos)[0]} alt={v.model} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                    <Zap size={24} />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-burgundy">{v.make}</p>
-                                            <h4 className="text-base md:text-2xl font-heading font-black text-slate-900 tracking-tight leading-tight line-clamp-2">{v.model}</h4>
-                                            <div className="flex items-center gap-2 pt-1">
-                                                <span className="text-[10px] font-bold text-slate-400">{v.year_start} — {v.year_end || 'Present'}</span>
-                                                <span className="w-1 h-1 rounded-full bg-slate-300" />
-                                                <span className="text-[9px] font-black text-emerald uppercase tracking-widest">Active ID</span>
-                                            </div>
-                                        </div>
+                {/* Comparison Grid */}
+                {isDataLoading ? (
+                    <ComparisonSkeleton />
+                ) : vehicles.length > 0 ? (
+                    <div className="bg-surface border border-border-subtle rounded-[3.5rem] overflow-hidden shadow-2xl">
+                        <div className="overflow-x-auto no-scrollbar">
+                            <div className="min-w-[1000px]">
+                                {/* Header Row */}
+                                <div className="grid grid-cols-[160px_1fr] border-b border-border-subtle bg-page/50">
+                                    <div className="p-8 flex items-center justify-center border-r border-border-subtle bg-page sticky left-0 z-20">
+                                        <div className="text-[10px] font-black uppercase tracking-[0.3em] text-muted rotate-180 [writing-mode:vertical-lr]">Expert Matrix</div>
                                     </div>
-                                ))}
-                                {Array.from({ length: Math.max(0, 4 - vehicles.length) }).map((_, i) => (
-                                    <div key={i} className="hidden md:flex flex-1 border-l border-slate-100 bg-slate-50/20 items-center justify-center">
-                                        <div className="text-center opacity-20">
-                                            <Plus size={24} className="mx-auto mb-2 text-slate-400" />
-                                            <span className="text-[9px] font-black uppercase tracking-widest">Awaiting Capture</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Specifications Yardstick Grid */}
-                        <div className="p-0 md:p-10 bg-white">
-                            <div className="space-y-10">
-                                {/* Performance Block */}
-                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                                    <h5 className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 px-6 md:px-0">
-                                        <div className="w-6 h-[1px] bg-burgundy/30" />
-                                        <Zap size={14} className="text-burgundy" />
-                                        <span>Drivetrain & Performance Architecture</span>
-                                    </h5>
-                                    {renderSpecRow('Propulsion Engine', 'name')}
-                                    {renderSpecRow('Cylinders / Layout', 'Engine Specs.Cylinders:')}
-                                    {renderSpecRow('Displacement (cc)', 'Engine Specs.Displacement:')}
-                                    {renderSpecRow('Power Output (HP)', 'Engine Specs.Power:')}
-                                    {renderSpecRow('Peak Torque (Nm)', 'Engine Specs.Torque:')}
-                                    {renderSpecRow('Acceleration (0-62)', 'Performance Specs.Acceleration 0-62 Mph (0-100 Kph):')}
-                                    {renderSpecRow('Maximum Velocity', 'Performance Specs.Top Speed:')}
-                                </div>
-
-                                {/* Transmission Block */}
-                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-150">
-                                    <h5 className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 px-6 md:px-0">
-                                        <div className="w-6 h-[1px] bg-burgundy/30" />
-                                        <ArrowLeftRight size={14} className="text-burgundy" />
-                                        <span>Transmission & Power Transfer</span>
-                                    </h5>
-                                    {renderSpecRow('Gearbox Config', 'Transmission Specs.Gearbox:')}
-                                    {renderSpecRow('Traction / Drive', 'Transmission Specs.Drive Type:')}
-                                </div>
-
-                                {/* Efficiency Block */}
-                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-                                    <h5 className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 px-6 md:px-0">
-                                        <div className="w-6 h-[1px] bg-burgundy/30" />
-                                        <Info size={14} className="text-burgundy" />
-                                        <span>Fuel Economics (NEDC)</span>
-                                    </h5>
-                                    {renderSpecRow('City Economics', 'Fuel Economy (Nedc).City:')}
-                                    {renderSpecRow('Highway Economics', 'Fuel Economy (Nedc).Highway:')}
-                                </div>
-
-                                {/* Narrative Block */}
-                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500 pb-10">
-                                    <h5 className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 px-6 md:px-0">
-                                        <div className="w-6 h-[1px] bg-burgundy/30" />
-                                        <Share2 size={14} className="text-burgundy" />
-                                        <span>Forensic Narrative & Context</span>
-                                    </h5>
-                                    <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] border-b border-slate-100 items-start group/row hover:bg-slate-50 transition-colors">
-                                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-4 py-8 sticky left-0 bg-white/95 backdrop-blur-md z-20 border-r border-slate-100 text-center">
-                                            Description
-                                        </div>
-                                        <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-4 gap-0 items-start">
-                                            {vehicles.map(v => (
-                                                <div key={v.id} className="min-w-[220px] md:min-w-0 flex-1 text-[11px] md:text-xs leading-relaxed font-subheading text-slate-500 px-6 py-8 border-l border-slate-50 first:border-l-0 group-hover/row:bg-white max-h-[300px] overflow-y-auto custom-scrollbar italic">
-                                                    {v.description || 'Forensic description awaiting synchronization.'}
-                                                </div>
-                                            ))}
-                                            {Array.from({ length: Math.max(0, 4 - vehicles.length) }).map((_, i) => (
-                                                <div key={i} className="hidden md:flex flex-1 border-l border-slate-50 bg-slate-50/10" />
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] border-b border-slate-100 items-start group/row hover:bg-slate-50 transition-colors">
-                                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-4 py-8 sticky left-0 bg-white/95 backdrop-blur-md z-20 border-r border-slate-100 text-center">
-                                            Sentiment
-                                        </div>
-                                        <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-4 gap-0 items-start">
-                                            {vehicles.map(v => (
-                                                <div key={v.id} className="min-w-[220px] md:min-w-0 flex-1 text-[11px] md:text-xs leading-relaxed font-subheading text-slate-400 px-6 py-8 border-l border-slate-50 first:border-l-0 group-hover/row:bg-white max-h-[300px] overflow-y-auto custom-scrollbar">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <div className="flex text-amber-400">
-                                                            {[1, 2, 3, 4, 5].map(s => <Zap key={s} size={10} fill="currentColor" />)}
-                                                        </div>
-                                                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">High Reliability</span>
+                                    <div className="grid grid-cols-4">
+                                        {vehicles.map(v => (
+                                            <div key={v.id} className={`p-8 border-r border-border-subtle last:border-r-0 relative group transition-all ${winner?.id === v.id ? 'bg-burgundy/5 ring-2 ring-inset ring-burgundy/20' : ''}`}>
+                                                {winner?.id === v.id && (
+                                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-burgundy text-white px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-2 z-30 shadow-lg shadow-burgundy/20">
+                                                        <Trophy size={12} /> Expert Winner
                                                     </div>
-                                                    {v.press_release || 'Sentiment data under forensic review.'}
+                                                )}
+                                                <button 
+                                                    onClick={() => removeFromComparison(v.id)}
+                                                    className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-500 shadow-sm z-30"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                                <div className="aspect-[16/9] relative rounded-[2rem] overflow-hidden mb-6 border border-border-subtle shadow-lg bg-page">
+                                                    <Image src={getOptimizedImageUrl(v.image_url)} alt={v.model} fill className="object-cover" />
                                                 </div>
-                                            ))}
-                                            {Array.from({ length: Math.max(0, 4 - vehicles.length) }).map((_, i) => (
-                                                <div key={i} className="hidden md:flex flex-1 border-l border-slate-50 bg-slate-50/10" />
-                                            ))}
-                                        </div>
+                                                <p className="text-[9px] font-black uppercase text-burgundy tracking-widest mb-1">{v.make}</p>
+                                                <h3 className="text-lg font-black truncate mb-6">{v.model}</h3>
+                                                <div className="flex flex-col gap-2">
+                                                    <Link 
+                                                        href={`/vehicles/${v.slug || `${v.make.toLowerCase()}-${v.model.toLowerCase()}`}`}
+                                                        className={`w-full py-3 rounded-full text-[9px] font-black uppercase tracking-widest text-center flex items-center justify-center gap-2 transition-all ${winner?.id === v.id ? 'bg-burgundy text-white shadow-xl shadow-burgundy/20' : 'bg-cinema text-white hover:bg-black'}`}
+                                                    >
+                                                        Deep Dive <ChevronRight size={12} />
+                                                    </Link>
+                                                    <Link 
+                                                        href={`/leads?type=reservation&make=${v.make}&model=${v.model}`}
+                                                        className="w-full py-3 border border-border-subtle text-secondary rounded-full text-[9px] font-black uppercase tracking-widest text-center flex items-center justify-center gap-2 hover:bg-page transition-all"
+                                                    >
+                                                        <Lock size={12} className="text-burgundy" /> Reserve Unit
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {Array.from({ length: 4 - vehicles.length }).map((_, i) => (
+                                            <button 
+                                                key={i} 
+                                                onClick={handleEmptySlotClick}
+                                                className="flex flex-col items-center justify-center border-r border-border-subtle last:border-r-0 bg-page/30 opacity-40 hover:opacity-100 hover:bg-page transition-all group"
+                                            >
+                                                <div className="w-16 h-16 rounded-full border-2 border-dashed border-muted flex items-center justify-center mb-4 group-hover:border-burgundy group-hover:bg-burgundy/5 transition-all">
+                                                    <Plus size={32} className="text-muted group-hover:text-burgundy" />
+                                                </div>
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-muted group-hover:text-burgundy">Add Vehicle</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Body Rows */}
+                                {renderSpecRow('Reliability', 'reliability_score', <ShieldCheck size={14} />)}
+                                {renderSpecRow('Resale Ranking', 'resell_rank', <Star size={14} />)}
+                                {renderSpecRow('Body Style', 'body_type', <Gauge size={14} />)}
+                                {renderSpecRow('Fuel System', 'fuel_type', <Zap size={14} />)}
+                                
+                                <div className="grid grid-cols-[160px_1fr] border-b border-border-subtle group/row hover:bg-page transition-all">
+                                    <div className="p-8 border-r border-border-subtle bg-surface/50 sticky left-0 z-10 flex items-center gap-3">
+                                        <MessageCircle size={14} className="text-burgundy opacity-50" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted">Expert Verdict</span>
+                                    </div>
+                                    <div className="grid grid-cols-4 items-stretch">
+                                        {vehicles.map((v) => (
+                                            <div key={v.id} className={`p-8 text-[11px] font-medium border-r border-border-subtle last:border-r-0 italic leading-relaxed transition-all ${winner?.id === v.id ? 'bg-burgundy/5 text-burgundy font-bold' : 'text-secondary/70'}`}>
+                                                {winner?.id === v.id && <Crown size={12} className="inline mr-2 mb-1" />}
+                                                {v.expert_insight || v.description || 'Expert brief not available.'}
+                                            </div>
+                                        ))}
+                                        {Array.from({ length: 4 - vehicles.length }).map((_, i) => (
+                                            <div key={i} className="bg-surface/10 border-r border-border-subtle last:border-r-0" />
+                                        ))}
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Recommendation Footer */}
-                        <div className="p-8 md:p-16 bg-slate-900 border-t border-slate-800 text-center relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-burgundy to-transparent" />
-                            <div className="relative z-10 max-w-2xl mx-auto">
-                                <h4 className="text-white font-heading font-black text-xl mb-3">Forensic Verdict</h4>
-                                <p className="text-slate-400 text-sm font-subheading leading-relaxed mb-10 italic">
-                                    "Based on the side-by-side technical evaluation, the <span className="text-white font-black">{vehicles[0]?.model || 'Selected Vehicle'}</span> provides the superior architecture for long-term liquidity and performance stability in the Nigerian market."
-                                </p>
-                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                    {vehicles.slice(0, 2).map(v => (
-                                        <Link key={v.id} href={`/valuation?make=${v.make}&model=${v.model}`} className="w-full sm:w-auto">
-                                            <PremiumButton className="w-full border-slate-700 bg-white/5 hover:bg-white/10 text-white" icon={Zap}>
-                                                Pulse Check: {v.model}
-                                            </PremiumButton>
-                                        </Link>
-                                    ))}
+                        {/* Conversion Footer */}
+                        <div className="p-16 md:p-24 bg-cinema text-white relative overflow-hidden">
+                            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+                            <div className="max-w-4xl mx-auto relative z-10">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                                    <div>
+                                        <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/10 border border-white/20 mb-8">
+                                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-white/80">Winner Identified</span>
+                                        </div>
+                                        <h2 className="type-h2 mb-6">Found your match?</h2>
+                                        <p className="text-white/70 mb-10 leading-relaxed">
+                                            Our algorithmic analysis suggests {winner ? `the ${winner.make} ${winner.model}` : 'one of these models'} is the best choice for reliability and resale value in Nigeria today. 
+                                            Request a professional inspection or reserve a high-quality Tokunbo unit now.
+                                        </p>
+                                        <div className="flex gap-4">
+                                            <button className="flex-1 py-5 bg-white text-[#0F172A] rounded-full font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-white/5 hover:bg-burgundy-light hover:text-white transition-all">
+                                                Speak to an Advisor
+                                            </button>
+                                            <a href="https://wa.me/2348029933575" className="flex-1 py-5 border border-white/20 rounded-full font-black uppercase tracking-widest text-[10px] text-center flex items-center justify-center gap-3 hover:bg-white/10 transition-all">
+                                                <MessageCircle size={16} className="text-[#25D366]" /> WhatsApp Now
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-10 rounded-[3rem] bg-white/5 backdrop-blur-3xl border border-white/10">
+                                        {leadStatus === 'done' ? (
+                                            <div className="py-12 text-center">
+                                                <CheckCircle2 size={48} className="text-emerald-500 mx-auto mb-4" />
+                                                <h3 className="type-h3">Consultation Booked</h3>
+                                                <p className="text-white/60 text-sm mt-2">An expert will review your comparison and call you shortly.</p>
+                                            </div>
+                                        ) : (
+                                            <form onSubmit={handleLeadSubmit} className="space-y-6">
+                                                <h4 className="text-xs font-black uppercase tracking-widest text-white mb-4">Request Professional Brief</h4>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <input 
+                                                        className="w-full bg-black/20 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-burgundy transition-all"
+                                                        placeholder="Name" required
+                                                        value={leadData.name} onChange={e => setLeadData({...leadData, name: e.target.value})}
+                                                    />
+                                                    <input 
+                                                        className="w-full bg-black/20 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-burgundy transition-all"
+                                                        placeholder="Phone" required
+                                                        value={leadData.phone} onChange={e => setLeadData({...leadData, phone: e.target.value})}
+                                                    />
+                                                </div>
+                                                <select 
+                                                    className="w-full bg-black/20 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-burgundy appearance-none"
+                                                    value={leadData.preferred} onChange={e => setLeadData({...leadData, preferred: e.target.value})}
+                                                >
+                                                    <option value="" className="bg-cinema">Which car are you leaning towards?</option>
+                                                    {vehicles.map(v => <option key={v.id} value={`${v.make} ${v.model}`} className="bg-cinema">{v.make} {v.model}</option>)}
+                                                </select>
+                                                <button 
+                                                    type="submit"
+                                                    disabled={leadStatus === 'loading'}
+                                                    className="w-full h-[60px] bg-white text-[#0F172A] rounded-full font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:bg-burgundy-light hover:text-white transition-all shadow-xl disabled:opacity-50"
+                                                >
+                                                    {leadStatus === 'loading' ? <LoadingSpinner size="sm" /> : 'Get Expert Callback'}
+                                                    {leadStatus !== 'loading' && <Send size={14} />}
+                                                </button>
+                                            </form>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 ) : (
-                    <div className="py-32 text-center bg-white rounded-[3rem] border border-dashed border-slate-300 shadow-inner">
-                        <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-300">
-                            <ArrowLeftRight size={40} className="animate-pulse" />
+                    <div className="py-40 text-center bg-surface border-2 border-dashed border-border-subtle rounded-[4rem] shadow-inner">
+                        <div className="w-28 h-28 bg-page rounded-full flex items-center justify-center mx-auto mb-10 text-muted shadow-lg">
+                            <ArrowLeftRight size={40} className="animate-pulse opacity-10" />
                         </div>
-                        <h2 className="text-2xl font-heading font-black text-slate-900 mb-2">Protocol Idle.</h2>
-                        <p className="text-slate-400 font-subheading max-w-xs mx-auto">Input up to 4 vehicle profiles above to initiate comparative forensic metrics.</p>
+                        <h2 className="type-h3 mb-4">Select Vehicles to Compare</h2>
+                        <p className="text-muted text-sm max-w-sm mx-auto leading-relaxed">
+                            Use the Search or Smart Selector above to add up to 4 vehicles for 
+                            a professional side-by-side analysis.
+                        </p>
                     </div>
                 )}
             </div>
+
+            <Footer />
         </main>
     );
 }
-
-

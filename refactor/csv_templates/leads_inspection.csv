@@ -1,0 +1,3 @@
+name,phone,location,vehicle_make,vehicle_model,year,service_type,notes,status
+Eve,08000000005,Lekki,Toyota,RAV4,2019,120-Point Audit,Pre-purchase inspection,new
+Frank,08000000006,Ajah,Honda,Civic,2017,Engine Scan,Check engine light is on,new

@@ -1,0 +1,3 @@
+name,phone,location,vehicle_make,vehicle_model,year,route_from,route_to,service_type,notes,status
+Mike,08000000013,Lagos,Toyota,Hilux,2020,Lagos,Abuja,Haulage,Need to move vehicle to Abuja,new
+Nancy,08000000014,Lagos,Honda,Crosstour,2015,Port,Lekki,Clearing,Clearing from Tincan port,new

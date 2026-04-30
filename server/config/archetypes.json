@@ -1,0 +1,74 @@
+{
+    "Toyota": {
+        "reliability": 9,
+        "parts_availability": "High",
+        "resale_velocity": 10,
+        "maintenance_profile": "Standard (5,000km)",
+        "brand_traits": ["Reliability", "Parts Everywhere", "High Resale"],
+        "common_issues": ["Suspension wear on bad roads", "Oil sludge in older V6s", "Dashboard cracking (Heat)"]
+    },
+    "Lexus": {
+        "reliability": 9,
+        "parts_availability": "High",
+        "resale_velocity": 9,
+        "maintenance_profile": "Premium (5,000km)",
+        "brand_traits": ["Luxury", "Toyota Mechanicals", "Prestige"],
+        "common_issues": ["Air suspension (Older Luxury SUVs)", "Dashboard cracking", "Power steering leaks"]
+    },
+    "Honda": {
+        "reliability": 8,
+        "parts_availability": "Moderate",
+        "resale_velocity": 7,
+        "maintenance_profile": "Strict (5,000km)",
+        "brand_traits": ["Engine Performance", "Fuel Efficiency", "Modern Design"],
+        "common_issues": ["Ball joint failure", "Transmission shudder (Older models)", "Sensitive suspension"]
+    },
+    "Mercedes-Benz": {
+        "reliability": 7,
+        "parts_availability": "Moderate",
+        "resale_velocity": 7,
+        "maintenance_profile": "Specialized (8,000km)",
+        "brand_traits": ["Luxury", "German Engineering", "Status"],
+        "common_issues": ["Electrical sensors", "Air suspension failure", "Turbocharger wear"]
+    },
+    "BMW": {
+        "reliability": 7,
+        "parts_availability": "Moderate",
+        "resale_velocity": 6,
+        "maintenance_profile": "High (8,000km)",
+        "brand_traits": ["Driving Dynamics", "Technology", "Performance"],
+        "common_issues": ["Cooling system leaks", "Oil leaks", "Electronic glitches"]
+    },
+    "Land Rover": {
+        "reliability": 6,
+        "parts_availability": "Low",
+        "resale_velocity": 5,
+        "maintenance_profile": "High-Care (5,000km)",
+        "brand_traits": ["Off-road Capability", "Luxury", "Presence"],
+        "common_issues": ["Air suspension failure", "Engine cooling", "Electrical gremlins"]
+    },
+    "Nissan": {
+        "reliability": 7,
+        "parts_availability": "Moderate",
+        "resale_velocity": 6,
+        "maintenance_profile": "Standard (5,000km)",
+        "brand_traits": ["Value for Money", "Practicality", "Comfort"],
+        "common_issues": ["CVT Transmission (Certain eras)", "Suspension bushings", "Electrical sensors"]
+    },
+    "Kia": {
+        "reliability": 8,
+        "parts_availability": "High",
+        "resale_velocity": 8,
+        "maintenance_profile": "Modern (7,000km)",
+        "brand_traits": ["Affordability", "Tech-Forward", "Efficiency"],
+        "common_issues": ["Engine knock (Older Theta II)", "Interior trim wear", "Electrical accessories"]
+    },
+    "Hyundai": {
+        "reliability": 8,
+        "parts_availability": "High",
+        "resale_velocity": 8,
+        "maintenance_profile": "Modern (7,000km)",
+        "brand_traits": ["Reliability", "Modern Features", "Value"],
+        "common_issues": ["Steering rack noise", "Paint peeling (Older white models)", "Engine sensors"]
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "name": "Curl Test",
+    "email": "curl@test.com",
+    "phone": "08000000000",
+    "subject": "Telegram Test",
+    "message": "This is a test from Curl"
+}

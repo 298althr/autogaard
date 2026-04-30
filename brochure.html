@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoGaard — Trusted Car Advisory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Outfit:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --burgundy: #800020;
+            --onyx: #0F172A;
+            --white: #FFFFFF;
+            --surface: #F8FAFC;
+            --slate: #475569;
+            --accent: #10B981;
+            --rule: rgba(15, 23, 42, 0.08);
+            --sheet-width: 297mm;
+            --sheet-height: 210mm;
+            --panel-width: 148.5mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+        }
+
+        body {
+            background-color: #F1F5F9;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+            padding: 60px 0;
+        }
+
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        .sheet {
+            width: var(--sheet-width);
+            height: var(--sheet-height);
+            background-color: var(--white);
+            display: flex;
+            position: relative;
+            box-shadow: 0 40px 100px rgba(15, 23, 42, 0.12);
+            overflow: hidden;
+            page-break-after: always;
+        }
+
+        /* Continuous Background for Sheet 1 (Outer) */
+        .sheet-outer {
+            background-image: url('https://images.unsplash.com/photo-1624880056139-d1212d7ff347?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .sheet-outer::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.75);
+            /* 50% overlay for balance */
+            z-index: 0;
+        }
+
+        /* Fold Indicator */
+        .fold-line {
+            position: absolute;
+            left: 50%;
+            top: 20mm;
+            bottom: 20mm;
+            width: 1px;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .panel {
+            width: var(--panel-width);
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 56px;
+            z-index: 1;
+            /* Above sheet overlay */
+        }
+
+        /* TYPOGRAPHY */
+        h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            color: var(--onyx);
+            line-height: 1;
+            letter-spacing: -0.04em;
+        }
+
+        h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            color: var(--onyx);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .tag-label {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--burgundy);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .body-text {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--slate);
+            font-weight: 400;
+        }
+
+        .feature-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--onyx);
+            margin-bottom: 6px;
+        }
+
+        /* COMPONENTS */
+        .card-photo {
+            position: relative;
+            border-radius: 28px;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--rule);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-photo-overlay {
+            width: 100%;
+            height: 100%;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Rectangular Glass Card */
+        .apple-glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 4px;
+            padding: 20px 24px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+        }
+
+        .minimalist-body {
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--onyx);
+            opacity: 0.9;
+        }
+
+        .icon-box {
+            width: 44px;
+            height: 44px;
+            background: var(--white);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--rule);
+            color: var(--burgundy);
+        }
+
+        .service-row {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 32px;
+            align-items: flex-start;
+        }
+
+        .benefit-bullet {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            color: var(--onyx);
+            font-size: 13px;
+        }
+
+        .benefit-bullet i {
+            color: var(--accent);
+        }
+
+        /* ══ PAGE STYLES ═════════════════════════════ */
+        .page-3 {
+            background-color: var(--surface);
+        }
+
+        .p1-logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            margin-bottom: 60px;
+        }
+
+        .p1-headline {
+            font-size: 52px;
+            margin-bottom: 24px;
+        }
+
+        .p1-subtitle {
+            font-size: 18px;
+            color: var(--onyx);
+            margin-bottom: 48px;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .p1-footer-tags {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .p1-footer-tags p {
+            background: #800020;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            font-family: 'Outfit';
+            font-weight: 800;
+            font-size: 10px;
+            letter-spacing: 2px;
+            padding: 10px 20px;
+            border-radius: 40px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .p2-header-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 28px;
+            margin-bottom: 40px;
+        }
+
+        .soon-card {
+            background: rgba(128, 0, 32, 0.05);
+            background-image: radial-gradient(rgba(128, 0, 32, 0.1) 1px, transparent 0);
+            background-size: 16px 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(128, 0, 32, 0.15);
+            border-radius: 24px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .contact-box {
+            margin-top: auto;
+            padding-top: 40px;
+            border-top: 1px solid var(--rule);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .qr-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 16px;
+            border-radius: 24px;
+            margin-top: 32px;
+            border: 1px solid var(--rule);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+        }
+
+        .qr-code {
+            width: 80px;
+            height: 80px;
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: none;
+            }
+
+            .sheet {
+                box-shadow: none;
+                border: 1px solid #EEE;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SHEET 1: OUTER (Page 4 | Page 1) -->
+    <div class="sheet sheet-outer">
+        <div class="fold-line"></div>
+
+        <!-- PAGE 4 -->
+        <div class="panel page-4">
+            <span class="tag-label">Support Beyond Buying</span>
+            <h2 style="font-size: 32px; margin-bottom: 12px;">Your Long-Term Car Partner</h2>
+            <p class="body-text" style="margin-bottom: 32px; color: var(--onyx);">We support owners beyond purchase,
+                from sourcing to resale.</p>
+
+            <div class="service-row">
+                <div class="icon-box"><i data-lucide="search"></i></div>
+                <div>
+                    <p class="feature-title" style="font-size: 15px;">Car Sourcing</p>
+                    <p class="body-text" style="color: var(--onyx);">Need a specific car? We help source options and
+                        reduce search risk.</p>
+                </div>
+            </div>
+
+            <div class="service-row" style="margin-bottom: 20px;">
+                <div class="icon-box"><i data-lucide="trending-up"></i></div>
+                <div>
+                    <p class="feature-title" style="font-size: 15px;">Resale Support</p>
+                    <p class="body-text" style="color: var(--onyx);">When it is time to sell, we help position and
+                        prepare your car better.</p>
+                </div>
+            </div>
+
+            <div class="soon-card">
+                <p
+                    style="font-family: 'Outfit'; font-weight: 800; font-size: 11px; color: var(--burgundy); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+                    Coming Soon</p>
+                <p class="body-text" style="color: var(--burgundy); font-size: 13px; opacity: 0.8;">Contactless vehicle
+                    management system, including
+                    our AutoGaard chip, are in development.</p>
+            </div>
+
+            <div class="qr-section">
+                <img src="qrcode.svg" class="qr-code" alt="QR Code">
+                <div style="flex: 1;">
+                    <p style="font-weight: 800; font-size: 14px; color: var(--onyx);">Talk to us today</p>
+                    <p class="body-text" style="font-size: 12px; color: var(--onyx);">Scan to request an inspection or
+                        advisory session.</p>
+                </div>
+            </div>
+
+            <div class="contact-box">
+                <div>
+                    <p style="font-size: 12px; font-weight: 700; color: var(--onyx); margin-bottom: 4px;">Ikorodu,
+                        Lagos</p>
+                    <p style="font-size: 12px; color: var(--onyx);">www.autogaard.com</p>
+                </div>
+                <p style="font-size: 10px; font-weight: 800; color: var(--onyx); opacity: 0.4;">POWERED BY VIVIOUR •
+                    2026</p>
+            </div>
+        </div>
+
+        <!-- PAGE 1 (Front Cover) -->
+        <div class="panel page-1">
+            <img src="https://res.cloudinary.com/dt6n4pnjb/image/upload/v1772623984/autogaard-png_-_Copy_o0hsnr.png"
+                class="p1-logo" alt="AutoGaard">
+            <h1 class="p1-headline">Buy Better. <br>Maintain Smarter. <br>Drive With <br><span
+                    style="color:var(--burgundy)">Peace of Mind.</span></h1>
+            <p class="p1-subtitle">Avoid costly mistakes, stay ahead of repairs, and enjoy more confidence at every
+                stage of car ownership.</p>
+
+            <div class="apple-glass-card" style="margin-top: auto;">
+                <p class="feature-title" style="margin-bottom: 12px;">Why AutoGaard</p>
+                <p class="minimalist-body">From inspecting used cars before you buy, to helping you keep your car in
+                    good shape, we help you make better decisions at every stage of ownership.</p>
+            </div>
+
+            <div class="p1-footer-tags">
+                <p>BUY RIGHT</p>
+                <p>DRIVE WELL</p>
+                <p>SELL BETTER</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHEET 2: INNER (Page 2 | Page 3) -->
+    <div class="sheet">
+        <!-- PAGE 2 -->
+        <div class="panel">
+            <img src="https://images.unsplash.com/photo-1768401658109-a4dc907f2734?q=80&w=1200&auto=format&fit=crop"
+                class="p2-header-img" alt="Car Inspection">
+            <span class="tag-label">Buying Support</span>
+            <h2 style="font-size: 42px; margin-bottom: 16px;">Don’t Buy a Problem.</h2>
+            <p class="body-text" style="margin-bottom: 40px; font-size: 16px;">Used cars can hide expensive surprises.
+                We help you buy with confidence before money changes hands.</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+                <div>
+                    <p class="feature-title" style="font-size: 15px;">Pre-Purchase Inspection</p>
+                    <p class="body-text" style="font-size: 13px;">We inspect cars before you commit, so hidden faults
+                        and red flags do not become your burden.</p>
+                </div>
+                <div>
+                    <p class="feature-title" style="font-size: 15px;">Paperwork Without Wahala</p>
+                    <p class="body-text" style="font-size: 13px;">Registration, ownership transfer and documentation
+                        support handled properly in Lagos or Abuja.</p>
+                </div>
+            </div>
+
+            <div class="card-photo"
+                style="background-image: url('https://images.unsplash.com/photo-1560361586-8242b1fc06c5?w=1000&auto=format&fit=crop'); margin-top: auto; height: 120px;">
+                <div class="card-photo-overlay" style="background: rgba(128, 0, 32, 0.229); color: white;">
+                    <p style="font-weight: 700; font-size: 18px; margin-bottom: 4px;">Protect Your Resale Value</p>
+                    <p style="font-size: 13px; opacity: 1;">Good maintenance records and smart ownership decisions help
+                        your car hold stronger market value.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE 3 -->
+        <div class="panel page-3">
+            <span class="tag-label">Ownership Support</span>
+            <h2 style="font-size: 36px; margin-bottom: 16px;">Keep Your Car Off The <br>Mechanic’s Bench.</h2>
+            <p class="body-text" style="margin-bottom: 32px;">Nigerian roads put pressure on vehicles. We stay ahead of
+                avoidable breakdowns and costly repairs.</p>
+
+            <div class="service-row">
+                <div class="icon-box"><i data-lucide="wrench"></i></div>
+                <div>
+                    <p class="feature-title" style="font-size: 15px;">Vehicle Health Checks</p>
+                    <p class="body-text">Diagnostics and inspections to catch issues early before they become expensive.
+                    </p>
+                </div>
+            </div>
+
+            <div class="service-row">
+                <div class="icon-box"><i data-lucide="truck"></i></div>
+                <div>
+                    <p class="feature-title" style="font-size: 15px;">Roadside Support</p>
+                    <p class="body-text">Support when unexpected problems happen, so you are not stranded figuring
+                        things out alone.</p>
+                </div>
+            </div>
+
+            <div class="card-photo"
+                style="background-image: url('https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&q=80&w=1000'); margin-top: auto;">
+                <div class="card-photo-overlay" style="background: rgba(47, 61, 96, 0.289); color: white;">
+                    <p class="tag-label" style="color:rgba(255,255,255,0.6); margin-bottom:12px;">Why Owners Use
+                        AutoGaard</p>
+                    <div class="benefit-bullet" style="color: white;"><i data-lucide="check-circle-2"
+                            style="width:14px;"></i> Avoid costly
+                        buying mistakes</div>
+                    <div class="benefit-bullet" style="color: white;"><i data-lucide="check-circle-2"
+                            style="width:14px;"></i> Reduce surprise
+                        repairs</div>
+                    <div class="benefit-bullet" style="color: white;"><i data-lucide="check-circle-2"
+                            style="width:14px;"></i> Handle
+                        registration renewals easily</div>
+                    <div class="benefit-bullet" style="color: white;"><i data-lucide="check-circle-2"
+                            style="width:14px;"></i> Protect
+                        long-term resale value</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>lucide.createIcons();</script>
+</body>
+
+</html>

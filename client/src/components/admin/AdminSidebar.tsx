@@ -12,7 +12,8 @@ import {
     ShieldCheck,
     FileText,
     TrendingUp,
-    Settings
+    Settings,
+    MessageCircle
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -22,6 +23,7 @@ const menuItems = [
     { name: 'Auctions', href: '/admin/auctions', icon: Gavel },
     { name: 'Users / KYC', href: '/admin/users', icon: Users },
     { name: 'Wallet Approvals', href: '/admin/wallet', icon: Wallet },
+    { name: 'Leads', href: '/admin/leads', icon: MessageCircle },
     { name: 'Audit Logs', href: '/admin/audit', icon: FileText },
 ];
 

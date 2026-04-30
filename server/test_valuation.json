@@ -1,0 +1,11 @@
+{
+    "name": "Valuation Test",
+    "phone": "08011223344",
+    "location": "Lagos",
+    "vehicle_make": "Toyota",
+    "vehicle_model": "Camry",
+    "year": 2018,
+    "estimated_value": "15,000,000",
+    "action": "sell",
+    "notes": "Testing Telegram from valuation"
+}

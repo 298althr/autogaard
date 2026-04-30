@@ -1,0 +1,91 @@
+# Universal Scraper Configuration
+
+# Browser Settings
+browser:
+  headless: true
+  stealth: true
+  viewport: "random"  # or "1920x1080"
+  timeout: 30000
+  user_agent_rotation: true
+  
+# Rate Limiting
+rate_limiting:
+  delay_min: 2
+  delay_max: 5
+  concurrent_requests: 1
+  daily_limit: 100
+  
+# Proxy Rotation
+proxy_rotation:
+  enabled: false
+  rotation_interval: 50
+  proxy_list: []
+  
+# Output Settings
+output:
+  base_dir: "scraped_data"
+  save_debug: true
+  save_html: true
+  save_screenshots: true
+  export_formats: ["json", "csv", "excel"]
+  
+# Platform-Specific Settings
+platforms:
+  zillow:
+    max_images: 20
+    wait_for_selector: "h1"
+    scroll_to_load: true
+    
+  amazon:
+    max_images: 10
+    wait_for_selector: "#productTitle"
+    scroll_to_load: false
+    
+  cars:
+    max_images: 15
+    wait_for_selector: "h1"
+    scroll_to_load: true
+    
+  ebay:
+    max_images: 12
+    wait_for_selector: "h1"
+    scroll_to_load: true
+    
+  craigslist:
+    max_images: 8
+    wait_for_selector: "#titletextonly"
+    scroll_to_load: false
+    
+  generic:
+    max_images: 10
+    wait_for_selector: "h1"
+    scroll_to_load: true
+
+# Anti-Detection Settings
+anti_detection:
+  random_mouse_movements: true
+  random_scrolling: true
+  random_typing: true
+  canvas_fingerprinting: false
+  webdriver_detection: false
+  
+# Error Handling
+error_handling:
+  max_retries: 3
+  retry_delay: 5
+  continue_on_error: true
+  save_failed_urls: true
+  
+# Logging
+logging:
+  level: "INFO"
+  file: "scraper.log"
+  console: true
+  format: "detailed"
+  
+# Performance
+performance:
+  memory_limit: "2GB"
+  timeout_per_request: 60
+  parallel_processing: false
+  cache_results: true

@@ -1,0 +1,8 @@
+{
+    "name": "Inspection Test",
+    "phone": "08011223344",
+    "location": "Lekki",
+    "vehicle_make": "Toyota Camry 2018",
+    "service_type": "120-Point Audit",
+    "notes": "Testing fixed payload"
+}

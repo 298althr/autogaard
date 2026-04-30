@@ -61,8 +61,11 @@ app.use('/uploads', express.static('uploads'));
 
 const { query } = require('./config/database');
 
+const notificationRoutes = require('./routes/notificationRoutes');
+const leadRoutes = require('./routes/leadRoutes');
+const vehicleRoutes = require('./routes/vehicleRoutes');
+
 app.use('/api/auth', authLimiter, require('./routes/authRoutes'));
-app.use('/api/vehicles', require('./routes/vehicleRoutes'));
 app.use('/api/valuation', aiLimiter, require('./routes/valuationRoutes'));
 app.use('/api/wallet', require('./routes/walletRoutes'));
 app.use('/api/auctions', require('./routes/auctionRoutes'));
@@ -75,6 +78,8 @@ app.use('/api/blog', require('./routes/blogRoutes'));
 app.use('/api/escrow', require('./routes/escrowRoutes'));
 app.use('/api/registration', require('./routes/registrationRoutes'));
 app.use('/api/workshop', require('./routes/workshopRoutes'));
+app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/leads', leadRoutes);
 
 app.get('/health', async (req, res) => {
     try {

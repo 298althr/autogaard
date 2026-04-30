@@ -1,28 +1,35 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { apiFetch } from '@/lib/api';
-import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, AlertCircle, Zap, Share2, Copy, Twitter, ExternalLink } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { 
+    Sparkles, 
+    ArrowRight, 
+    ArrowLeft, 
+    CheckCircle2, 
+    AlertCircle, 
+    MessageCircle,
+    Send
+} from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
-import MotionBackground from '@/components/landing/MotionBackground';
-import PillHeader from '@/components/landing/PillHeader';
-import PremiumButton from '@/components/ui/PremiumButton';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 const STEPS = [
-    { id: 'vehicle', title: 'Vehicle Info', description: 'What are you valuing?' },
-    { id: 'condition', title: 'Condition', description: 'Be honest for best results' },
-    { id: 'result', title: 'Estimation', description: 'AI-powered market analysis' }
+    { id: 'vehicle', title: 'Vehicle Details' },
+    { id: 'condition', title: 'Condition' },
+    { id: 'contact', title: 'Contact Info' },
+    { id: 'done', title: 'Request Sent' }
 ];
 
 export default function ValuationPage() {
-    const { token } = useAuth();
+    const searchParams = useSearchParams();
     const [step, setStep] = useState(0);
     const [formData, setFormData] = useState({
-        make: '',
-        model: '',
+        make: searchParams.get('make') || '',
+        model: searchParams.get('model') || '',
         trim: '',
         year: 2020,
         transmission: 'automatic',
@@ -31,55 +38,77 @@ export default function ValuationPage() {
         accident_history: false,
         condition: 'good'
     });
+    
+    // Lead form state
+    const [leadData, setLeadData] = useState({ name: '', whatsapp: '', email: '', location: '', intent: 'valuation' });
+    const [leadStatus, setLeadStatus] = useState<'idle' | 'loading' | 'done'>('idle');
+
     const [result, setResult] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [modelSearch, setModelSearch] = useState('');
+    const [engineSearch, setEngineSearch] = useState('');
 
     const [brands, setBrands] = useState<any[]>([]);
     const [models, setModels] = useState<any[]>([]);
     const [engines, setEngines] = useState<any[]>([]);
+    const [loadingModels, setLoadingModels] = useState(false);
+    const [loadingEngines, setLoadingEngines] = useState(false);
 
     const [selectedMakeId, setSelectedMakeId] = useState<string | null>(null);
     const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         apiFetch('/catalog/brands').then(res => {
             if (res.data) setBrands(res.data);
         }).catch(console.error);
+
+        // If pre-filled, jump to condition step
+        if (searchParams.get('make') && searchParams.get('model')) {
+            setStep(1);
+        }
     }, []);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!selectedMakeId) return;
         setModels([]);
         setEngines([]);
         setFormData(prev => ({ ...prev, model: '', trim: '' }));
         setSelectedModelId(null);
+        setLoadingModels(true);
         apiFetch(`/catalog/models?makeId=${selectedMakeId}`).then(res => {
             if (res.data) setModels(res.data);
-        }).catch(console.error);
+        }).catch(console.error).finally(() => setLoadingModels(false));
     }, [selectedMakeId]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!selectedModelId) return;
         setEngines([]);
         setFormData(prev => ({ ...prev, trim: '' }));
+        setLoadingEngines(true);
         apiFetch(`/catalog/engines?modelId=${selectedModelId}`).then(res => {
             if (res.data) setEngines(res.data);
-        }).catch(console.error);
+        }).catch(console.error).finally(() => setLoadingEngines(false));
     }, [selectedModelId]);
 
-    const nextStep = () => setStep(s => s + 1);
-    const prevStep = () => setStep(s => s - 1);
+    const nextStep = () => {
+        setStep(s => s + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    const prevStep = () => {
+        setStep(s => s - 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
-    const handlePredict = async () => {
+    const handleSubmitRequest = async () => {
         setLoading(true);
         setError('');
         try {
-            const response = await apiFetch('/valuation/predict', {
+            const { type, ...dataToSend } = { ...formData, ...leadData };
+            await apiFetch('/leads/valuation', {
                 method: 'POST',
-                body: formData
+                body: dataToSend
             });
-            setResult(response.data);
             nextStep();
         } catch (err: any) {
             setError(err.message);
@@ -88,54 +117,69 @@ export default function ValuationPage() {
         }
     };
 
-    return (
-        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-80 pb-20">
-            <MotionBackground />
-            <PillHeader />
+    const handleLeadSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLeadStatus('loading');
+        try {
+            await apiFetch('/leads/valuation', {
+                method: 'POST',
+                body: {
+                    ...leadData,
+                    vehicle_make: formData.make,
+                    vehicle_model: formData.model,
+                    year: formData.year,
+                    estimated_value: result?.estimated_value,
+                    notes: `Condition: ${formData.condition}. Reasoning: ${result?.reasoning}`
+                },
+            });
+            setLeadStatus('done');
+        } catch (err) {
+            setLeadStatus('idle');
+        }
+    };
 
-            <div className="max-w-3xl mx-auto px-6 relative z-10">
-                {/* Progress Header */}
+    return (
+        <main className="bg-page min-h-screen">
+            <Navbar />
+
+            {/* Header Area */}
+            <section className="pt-32 pb-16 px-6 bg-cinema text-white relative">
+                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+                <div className="max-w-4xl mx-auto text-center relative z-10">
+                    <h1 className="type-display mb-4">Smart Valuation.</h1>
+                    <p className="type-body-lg text-white/50">
+                        Get a fair market estimate based on real Nigerian sales data and AI analysis.
+                    </p>
+                </div>
+            </section>
+
+            <div className="max-w-3xl mx-auto px-6 py-16">
+                {/* Progress Tracker */}
                 <div className="flex justify-between mb-16 relative">
-                    <div className="absolute top-1/2 left-0 w-full h-[1px] bg-slate-200 -translate-y-1/2 z-0" />
+                    <div className="absolute top-1/2 left-0 w-full h-[1px] bg-border-subtle -translate-y-1/2 z-0" />
                     {STEPS.map((s, i) => (
-                        <div key={s.id} className="relative z-10 flex flex-col items-center group">
+                        <div key={s.id} className="relative z-10 flex flex-col items-center">
                             <motion.div
-                                initial={false}
                                 animate={{
-                                    backgroundColor: step >= i ? '#600018' : '#ffffff',
-                                    borderColor: step >= i ? '#600018' : '#E2E8F0',
-                                    color: step >= i ? '#ffffff' : '#94A3B8'
+                                    backgroundColor: step >= i ? 'var(--burgundy)' : 'var(--surface)',
+                                    borderColor: step >= i ? 'var(--burgundy)' : 'var(--border-subtle)',
+                                    color: step >= i ? '#ffffff' : 'var(--text-muted)'
                                 }}
-                                className="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 font-bold shadow-lg shadow-blurry"
+                                className="w-10 h-10 rounded-full flex items-center justify-center border-2 font-bold transition-colors"
                             >
                                 {step > i ? <CheckCircle2 size={18} /> : i + 1}
                             </motion.div>
-                            <span className={`mt-4 text-[10px] font-bold uppercase tracking-widest transition-colors duration-500 ${step >= i ? 'text-burgundy' : 'text-slate-400'}`}>
+                            <span className={`mt-4 text-[10px] font-bold uppercase tracking-widest text-center max-w-[60px] sm:max-w-none ${step >= i ? 'text-burgundy' : 'text-muted'}`}>
                                 {s.title}
                             </span>
                         </div>
                     ))}
                 </div>
 
-                {/* Step Content */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                    className="glass-card p-8 md:p-12 overflow-hidden relative"
-                >
+                {/* Form Content */}
+                <div className="bg-surface border border-border-subtle rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5">
                     {step === 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            className="space-y-8"
-                        >
-                            <div className="text-center mb-10">
-                                <h2 className="text-3xl md:text-4xl font-heading font-extrabold tracking-tight text-slate-900 mb-2">Identify your vehicle.</h2>
-                                <p className="text-slate-500 text-sm font-subheading">Provide exact details for a forensic valuation.</p>
-                            </div>
-
+                        <div className="space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="premium-label">Make</label>
@@ -155,118 +199,129 @@ export default function ValuationPage() {
                                 </div>
                                 <div>
                                     <label className="premium-label">Model</label>
-                                    <select
-                                        value={selectedModelId || ''}
-                                        onChange={e => {
-                                            const val = e.target.value;
-                                            setSelectedModelId(val);
-                                            const mName = models.find(m => m.id.toString() === val)?.name || '';
-                                            setFormData({ ...formData, model: mName });
-                                        }}
-                                        className="premium-input"
-                                        disabled={!selectedMakeId || models.length === 0}
-                                    >
-                                        <option value="">Select Model</option>
-                                        {models.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="premium-label">Trim / Engine</label>
-                                    <select
-                                        value={formData.trim}
-                                        onChange={e => setFormData({ ...formData, trim: e.target.value })}
-                                        className="premium-input"
-                                        disabled={!selectedModelId || engines.length === 0}
-                                    >
-                                        <option value="">Select Edition</option>
-                                        {engines.map(e => (
-                                            <option key={e.id} value={e.name}>
-                                                {e.name} {e.specs?.['Engine Specs']?.['Displacement:'] ? `— ${e.specs['Engine Specs']['Displacement:']}` : ''}
-                                            </option>
+                                    <input 
+                                        type="text"
+                                        placeholder="Search model..."
+                                        value={modelSearch}
+                                        onChange={e => setModelSearch(e.target.value)}
+                                        className="premium-input mb-4"
+                                    />
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                        {loadingModels ? (
+                                            Array.from({ length: 6 }).map((_, i) => (
+                                                <div key={i} className="h-16 bg-slate-100 animate-pulse rounded-2xl" />
+                                            ))
+                                        ) : models.filter(m => m.name.toLowerCase().includes(modelSearch.toLowerCase())).map((m) => (
+                                            <button
+                                                key={m.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setFormData({ ...formData, model: m.name });
+                                                    setSelectedModelId(m.id);
+                                                }}
+                                                className={`p-4 rounded-2xl border text-sm font-semibold transition-all ${
+                                                    formData.model === m.name 
+                                                        ? 'bg-burgundy border-burgundy text-white shadow-lg shadow-burgundy/20' 
+                                                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-white'
+                                                }`}
+                                            >
+                                                {m.name}
+                                            </button>
                                         ))}
-                                    </select>
+                                    </div>
                                 </div>
                                 <div>
                                     <label className="premium-label">Year</label>
-                                    <select value={formData.year} onChange={e => setFormData({ ...formData, year: parseInt(e.target.value) })} className="premium-input">
-                                        {Array.from({ length: 30 }, (_, i) => 2026 - i).map(y => <option key={y} value={y}>{y}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="premium-label">Transmission</label>
-                                    <select value={formData.transmission} onChange={e => setFormData({ ...formData, transmission: e.target.value })} className="premium-input">
-                                        <option value="automatic">Automatic</option>
-                                        <option value="manual">Manual</option>
+                                    <select 
+                                        value={formData.year} 
+                                        onChange={e => setFormData({ ...formData, year: parseInt(e.target.value) })} 
+                                        className="premium-input"
+                                    >
+                                        {Array.from({ length: 25 }, (_, i) => 2026 - i).map(y => <option key={y} value={y}>{y}</option>)}
                                     </select>
                                 </div>
                                 <div>
                                     <label className="premium-label">Mileage (KM)</label>
-                                    <input type="number" value={formData.mileage_km} onChange={e => setFormData({ ...formData, mileage_km: parseInt(e.target.value) })} className="premium-input" />
+                                    <input 
+                                        type="number" 
+                                        value={formData.mileage_km} 
+                                        onChange={e => setFormData({ ...formData, mileage_km: parseInt(e.target.value) })} 
+                                        className="premium-input" 
+                                    />
                                 </div>
                                 <div>
-                                    <label className="premium-label">Year of Entry to NG</label>
-                                    <select value={formData.year_of_entry} onChange={e => setFormData({ ...formData, year_of_entry: parseInt(e.target.value) })} className="premium-input">
-                                        {Array.from({ length: 11 }, (_, i) => 2025 - i).map(y => <option key={y} value={y}>{y}</option>)}
+                                    <label className="premium-label">Transmission</label>
+                                    <select 
+                                        value={formData.transmission} 
+                                        onChange={e => setFormData({ ...formData, transmission: e.target.value })} 
+                                        className="premium-input"
+                                    >
+                                        <option value="automatic">Automatic</option>
+                                        <option value="manual">Manual</option>
                                     </select>
                                 </div>
-                                <div className="flex items-center space-x-3 pt-6 px-4">
-                                    <input type="checkbox" id="accident_history" checked={formData.accident_history} onChange={e => setFormData({ ...formData, accident_history: e.target.checked })} className="w-5 h-5 accent-burgundy cursor-pointer rounded" />
-                                    <label htmlFor="accident_history" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 cursor-pointer">Has Accident History?</label>
+                                <div className="flex items-center gap-3 pt-6 px-4">
+                                    <input 
+                                        type="checkbox" 
+                                        id="accident" 
+                                        checked={formData.accident_history} 
+                                        onChange={e => setFormData({ ...formData, accident_history: e.target.checked })} 
+                                        className="w-5 h-5 accent-burgundy" 
+                                    />
+                                    <label htmlFor="accident" className="text-[10px] font-bold uppercase tracking-widest text-muted">Accident History?</label>
+                                </div>
+                                <div>
+                                    <label className="premium-label">Trim / Variant</label>
+                                    <input 
+                                        type="text"
+                                        placeholder="Search trim..."
+                                        value={engineSearch}
+                                        onChange={e => setEngineSearch(e.target.value)}
+                                        className="premium-input mb-4"
+                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                        {loadingEngines ? (
+                                            Array.from({ length: 4 }).map((_, i) => (
+                                                <div key={i} className="h-20 bg-slate-100 animate-pulse rounded-2xl" />
+                                            ))
+                                        ) : engines.filter(e => e.name.toLowerCase().includes(engineSearch.toLowerCase())).map((e) => (
+                                            <button
+                                                key={e.id}
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, trim: e.name })}
+                                                className={`p-6 rounded-2xl border text-left transition-all ${
+                                                    formData.trim === e.name 
+                                                        ? 'bg-burgundy border-burgundy text-white shadow-lg shadow-burgundy/20' 
+                                                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-white'
+                                                }`}
+                                            >
+                                                <div className="font-bold mb-1">{e.name}</div>
+                                                <div className="text-[10px] uppercase tracking-widest opacity-60">
+                                                    {e.specs?.name || 'Standard Variant'}
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
-                            {selectedModelId && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="bg-slate-50 border border-slate-100 rounded-3xl p-6 flex items-center space-x-6"
+                            <div className="flex justify-end pt-6">
+                                <button 
+                                    onClick={nextStep} 
+                                    disabled={!formData.make || !formData.model}
+                                    className="bg-burgundy text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-burgundy-dark transition-all disabled:opacity-50"
                                 >
-                                    <div className="w-32 h-20 bg-white rounded-xl overflow-hidden relative border border-slate-200">
-                                        {(() => {
-                                            const model = models.find(m => m.id.toString() === selectedModelId);
-                                            let photoUrl = '';
-                                            if (model && model.photos) {
-                                                try {
-                                                    const p = typeof model.photos === 'string' && model.photos.startsWith('[')
-                                                        ? JSON.parse(model.photos)
-                                                        : model.photos.split(',');
-                                                    photoUrl = Array.isArray(p) ? p[0] : p;
-                                                } catch (e) { photoUrl = model.photos; }
-                                            }
-                                            return photoUrl ? (
-                                                <Image src={photoUrl} alt={model?.name || 'Vehicle'} fill className="object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                                    <Zap size={24} />
-                                                </div>
-                                            );
-                                        })()}
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-burgundy">{formData.make}</p>
-                                        <p className="text-xl font-heading font-extrabold text-slate-900">{formData.model}</p>
-                                        <p className="text-xs font-subheading text-slate-400">Selected Configuration Node</p>
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            <div className="pt-6 flex justify-end">
-                                <PremiumButton onClick={nextStep} disabled={!formData.make || !formData.model} icon={ArrowRight} tooltip="Proceed to Condition Check">
-                                    Assemble Profile
-                                </PremiumButton>
+                                    Next Step <ArrowRight size={14} />
+                                </button>
                             </div>
-                        </motion.div>
+                        </div>
                     )}
 
                     {step === 1 && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="space-y-8"
-                        >
+                        <div className="space-y-8">
                             <div className="text-center mb-10">
-                                <h2 className="text-3xl md:text-4xl font-heading font-extrabold tracking-tight text-slate-900 mb-2">Current Condition.</h2>
-                                <p className="text-slate-500 text-sm font-subheading">Precision affects liquidity matching.</p>
+                                <h2 className="type-h2 mb-2">How is the condition?</h2>
+                                <p className="text-muted text-sm">Be honest for the most accurate market price.</p>
                             </div>
 
                             <div className="grid grid-cols-1 gap-4">
@@ -274,136 +329,124 @@ export default function ValuationPage() {
                                     <button
                                         key={c}
                                         onClick={() => setFormData({ ...formData, condition: c })}
-                                        className={`flex items-center justify-between p-6 rounded-2xl border transition-all text-left ${formData.condition === c ? 'border-burgundy bg-burgundy/5 shadow-md shadow-burgundy/10' : 'border-slate-200 bg-white hover:border-burgundy/30'}`}
+                                        className={`flex items-center justify-between p-6 rounded-2xl border transition-all text-left ${formData.condition === c ? 'border-burgundy bg-burgundy/5' : 'border-border-subtle hover:border-burgundy/20'}`}
                                     >
                                         <div>
-                                            <p className="font-heading font-bold capitalize text-lg text-slate-900">{c}</p>
-                                            <p className="text-xs font-body text-slate-500 mt-1">
+                                            <p className="font-bold capitalize text-lg">{c}</p>
+                                            <p className="text-xs text-muted mt-1">
                                                 {c === 'excellent' && 'Like new, no mechanical or visual defects.'}
                                                 {c === 'good' && 'Minor wear, well-maintained.'}
                                                 {c === 'fair' && 'Visible wear, might need minor repairs.'}
                                                 {c === 'poor' && 'Significant wear or mechanical issues.'}
                                             </p>
                                         </div>
-                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${formData.condition === c ? 'border-burgundy bg-burgundy' : 'border-slate-200'}`}>
-                                            {formData.condition === c && <motion.div layoutId="checkdot" className="w-2 h-2 bg-white rounded-full" />}
+                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.condition === c ? 'border-burgundy bg-burgundy' : 'border-border-subtle'}`}>
+                                            {formData.condition === c && <div className="w-2 h-2 bg-white rounded-full" />}
                                         </div>
                                     </button>
                                 ))}
                             </div>
 
-                            {error && (
-                                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-red-50 text-red-600 rounded-xl flex items-center space-x-2 text-xs font-bold font-subheading">
-                                    <AlertCircle size={16} />
-                                    <span>{error}</span>
-                                </motion.div>
-                            )}
-
-                            <div className="flex gap-4 pt-6 justify-between">
-                                <PremiumButton variant="ghost" onClick={prevStep} icon={ArrowLeft} tooltip="Return to Vehicle Info">Back</PremiumButton>
-                                <PremiumButton onClick={handlePredict} isLoading={loading} icon={Sparkles} tooltip="Run ML Engine">
-                                    Get Valuation Engine Result
-                                </PremiumButton>
+                            <div className="flex justify-between pt-6">
+                                <button onClick={prevStep} className="text-xs font-bold uppercase tracking-widest text-muted hover:text-primary flex items-center gap-2">
+                                    <ArrowLeft size={14} /> Back
+                                </button>
+                                <button 
+                                    onClick={nextStep} 
+                                    className="bg-burgundy text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-burgundy-dark transition-all"
+                                >
+                                    Next Step <ArrowRight size={14} />
+                                </button>
                             </div>
-                        </motion.div>
+                        </div>
                     )}
 
-                    {step === 2 && result && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="space-y-10"
-                        >
-                            <div className="text-center">
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                                    className="w-16 h-16 bg-slate-900/5 text-slate-900 rounded-full flex items-center justify-center mx-auto mb-6"
-                                >
-                                    <Sparkles size={24} />
-                                </motion.div>
-                                <h2 className="text-4xl font-heading font-extrabold mb-2 text-slate-900 tracking-tight">Market Protocol Complete.</h2>
-                                <p className="text-slate-500 text-sm font-subheading">Analyzed real-time liquidity datasets.</p>
+                    {step === 2 && (
+                        <div className="space-y-8">
+                            <div className="text-center mb-10">
+                                <h2 className="type-h2 mb-2">Almost there!</h2>
+                                <p className="text-muted text-sm">Where should we send your professional valuation?</p>
                             </div>
 
-                            <div className="bg-slate-900 text-white p-10 md:p-14 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 p-10 opacity-5 transition-transform group-hover:rotate-12 group-hover:scale-110">
-                                    <Zap size={140} />
-                                </div>
-                                <div className="relative z-10 text-center">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50 mb-3">AI Engine Output ({result.source})</p>
-                                    <p className="text-5xl md:text-7xl font-heading font-extrabold mb-6 tracking-tighter">₦{result.estimated_value.toLocaleString()}</p>
-                                    <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-5 py-2 rounded-full border border-white/10">
-                                        <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-50">Confidence: {Math.round(result.confidence * 100)}%</span>
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="premium-label">Full Name</label>
+                                        <input 
+                                            type="text"
+                                            placeholder="Your Name"
+                                            value={leadData.name}
+                                            onChange={e => setLeadData({ ...leadData, name: e.target.value })}
+                                            className="premium-input"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="premium-label">WhatsApp Number</label>
+                                        <input 
+                                            type="tel"
+                                            placeholder="+234 ..."
+                                            value={leadData.whatsapp}
+                                            onChange={e => setLeadData({ ...leadData, whatsapp: e.target.value })}
+                                            className="premium-input"
+                                        />
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-center shadow-inner">
-                                <p className="text-sm text-slate-600 font-body leading-relaxed max-w-lg mx-auto italic">&quot;{result.reasoning}&quot;</p>
-                            </div>
-
-                            {/* Social Sharing UI */}
-                            <div className="pt-4 border-t border-slate-100">
-                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-center mb-6">Distribute Valuation Record</p>
-                                <div className="flex justify-center gap-4">
-                                    <button
-                                        onClick={() => {
-                                            const text = `I just valued my ${formData.year} ${formData.make} ${formData.model} at ₦${result.estimated_value.toLocaleString()} on Autogaard! Get yours here: ${window.location.origin}/valuation`;
-                                            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-                                        }}
-                                        className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-[#25D366] hover:border-[#25D366]/30 hover:bg-[#25D366]/5 transition-all shadow-sm"
-                                        title="Share on WhatsApp"
-                                    >
-                                        <Share2 size={20} />
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            const text = `I just valued my ${formData.year} ${formData.make} ${formData.model} at ₦${result.estimated_value.toLocaleString()} on Autogaard!`;
-                                            const url = `${window.location.origin}/valuation`;
-                                            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-                                        }}
-                                        className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-[#1DA1F2] hover:border-[#1DA1F2]/30 hover:bg-[#1DA1F2]/5 transition-all shadow-sm"
-                                        title="Share on X"
-                                    >
-                                        <Twitter size={20} />
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            const text = `I just valued my ${formData.year} ${formData.make} ${formData.model} at ₦${result.estimated_value.toLocaleString()} on Autogaard! Get yours here: ${window.location.origin}/valuation`;
-                                            navigator.clipboard.writeText(text);
-                                            alert('Valuation summary copied to clipboard!');
-                                        }}
-                                        className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-burgundy hover:border-burgundy/30 hover:bg-burgundy/5 transition-all shadow-sm"
-                                        title="Copy Link"
-                                    >
-                                        <Copy size={20} />
-                                    </button>
+                                <div>
+                                    <label className="premium-label">Email Address</label>
+                                    <input 
+                                        type="email"
+                                        placeholder="email@example.com"
+                                        value={leadData.email}
+                                        onChange={e => setLeadData({ ...leadData, email: e.target.value })}
+                                        className="premium-input"
+                                    />
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <PremiumButton
-                                    onClick={() => {
-                                        sessionStorage.setItem('pending_listing', JSON.stringify({ ...formData, estimated_value: result.estimated_value }));
-                                        window.location.href = token ? '/sell' : '/register?redirect=/sell';
-                                    }}
-                                    className="w-full"
-                                    icon={Zap}
-                                    tooltip="Initiate Escrow Protocol"
+                            {error && (
+                                <div className="p-4 bg-red-50 text-red-500 rounded-2xl text-xs flex items-center gap-2">
+                                    <AlertCircle size={14} /> {error}
+                                </div>
+                            )}
+
+                            <div className="flex justify-between pt-6">
+                                <button onClick={prevStep} className="text-xs font-bold uppercase tracking-widest text-muted hover:text-primary flex items-center gap-2">
+                                    <ArrowLeft size={14} /> Back
+                                </button>
+                                <button 
+                                    onClick={handleSubmitRequest} 
+                                    disabled={loading || !leadData.name || !leadData.whatsapp}
+                                    className="bg-burgundy text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-2 hover:bg-burgundy-dark transition-all disabled:opacity-50"
                                 >
-                                    Liquidate Asset at Price
-                                </PremiumButton>
-                                <PremiumButton variant="outline" onClick={() => setStep(0)} className="w-full" tooltip="Reset state">
-                                    Reset Engine
-                                </PremiumButton>
+                                    {loading ? 'Submitting...' : 'Request Valuation'} <Send size={14} />
+                                </button>
                             </div>
-                        </motion.div>
+                        </div>
                     )}
 
-                </motion.div>
+                    {step === 3 && (
+                        <div className="text-center py-12">
+                            <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                                <CheckCircle2 size={40} className="text-emerald-500" />
+                            </div>
+                            <h2 className="type-h2 mb-4">Request Received.</h2>
+                            <p className="type-body text-secondary mb-12 max-w-sm mx-auto">
+                                Our advisors are now reviewing your vehicle details. 
+                                You will receive your professional market valuation via <strong>WhatsApp</strong> and <strong>Email</strong> shortly.
+                            </p>
+
+                            <button 
+                                onClick={() => window.location.href = '/'}
+                                className="bg-cinema text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-page hover:text-primary transition-all border border-transparent hover:border-border-subtle"
+                            >
+                                Return to Homepage
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
+
+            <Footer />
         </main>
     );
 }

@@ -9,12 +9,15 @@ const nextConfig = {
         ignoreDuringBuilds: true,
     },
     images: {
-        // We removed unoptimized: true to enable Next.js image optimization (resizing/chunking)
-        // ensure sharp is installed in production for best performance.
         remotePatterns: [
             {
                 protocol: 'https',
                 hostname: 'res.cloudinary.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: '**.unsplash.com',
                 pathname: '/**',
             },
             {
@@ -28,11 +31,14 @@ const nextConfig = {
                 pathname: '/**',
             },
             {
-                protocol: 'http',
-                hostname: '**.autoevolution.com',
+                protocol: 'https',
+                hostname: 'source.unsplash.com',
                 pathname: '/**',
             }
         ],
+    },
+    async redirects() {
+        return [];
     },
 };
 

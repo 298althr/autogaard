@@ -1,0 +1,3 @@
+name,email,phone,message,status
+"John Import","john@import.com","08012345678","Test Import Lead","new"
+"Jane CSV","jane@csv.com","09012345678","Another Lead","new"
