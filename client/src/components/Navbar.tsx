@@ -13,11 +13,7 @@ import { apiFetch } from '@/lib/api';
 export const navLinks = [
     { name: 'Services', href: '/services' },
     { name: 'Vehicles', href: '/vehicles' },
-    { name: 'Valuation', href: '/valuation' },
-    { name: 'Compare', href: '/compare' },
     { name: 'About', href: '/about' },
-    { name: 'FAQ', href: '/faq' },
-    { name: 'Contact', href: '/contact' },
 ];
 
 const Navbar = () => {
@@ -204,30 +200,30 @@ const Navbar = () => {
                         exit={{ y: 100, opacity: 0 }}
                         className="fixed bottom-6 left-6 right-6 md:left-auto md:max-w-sm z-[1000]"
                     >
-                        <div className="bg-cinema/95 backdrop-blur-xl border border-white/10 p-6 rounded-[2rem] shadow-2xl">
-                            <div className="flex items-start gap-4 mb-4">
-                                <div className="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center shrink-0">
-                                    <ShieldCheck className="text-white" size={20} />
+                        <div className="bg-cinema border border-white/20 p-8 rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.8)]">
+                            <div className="flex items-start gap-4 mb-8">
+                                <div className="w-12 h-12 bg-burgundy rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-burgundy/20">
+                                    <ShieldCheck className="text-white" size={24} />
                                 </div>
                                 <div>
-                                    <h4 className="text-white font-bold text-sm mb-1">Privacy & Experience</h4>
-                                    <p className="text-white/60 text-[11px] leading-relaxed">
-                                        We use cookies to ensure you get the most elite automotive advisory experience on AutoGaard.
+                                    <h4 className="text-white font-black uppercase tracking-widest text-xs mb-1.5">Elite Privacy</h4>
+                                    <p className="text-white/70 text-[11px] leading-relaxed">
+                                        We use premium tracking to optimize your advisory experience. Review our <Link href="/privacy" className="text-white underline font-bold">Privacy Policy</Link> for details.
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={acceptCookies}
-                                    className="flex-1 bg-white text-cinema py-3 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-white/90 transition-all"
+                                    className="flex-1 bg-white text-cinema py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-burgundy hover:text-white transition-all active:scale-95 shadow-xl"
                                 >
                                     Accept All
                                 </button>
                                 <button
                                     onClick={() => setShowCookieBanner(false)}
-                                    className="p-3 text-white/40 hover:text-white transition-colors"
+                                    className="px-6 py-4 border border-white/20 text-white/60 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
                                 >
-                                    <XCircle size={20} />
+                                    Close
                                 </button>
                             </div>
                         </div>

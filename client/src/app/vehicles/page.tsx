@@ -153,6 +153,45 @@ export default function VehicleCatalog() {
                 </div>
             </section>
 
+            {/* Market Intelligence Tools */}
+            <section className="py-20 px-6 bg-page">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <Link href="/vehicles/compare" className="group p-8 md:p-12 rounded-[2.5rem] bg-white border border-border-subtle hover:border-burgundy transition-all shadow-xl shadow-black/5 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-burgundy/5 rounded-bl-[100%] transition-all group-hover:bg-burgundy/10" />
+                            <div className="relative z-10">
+                                <div className="w-16 h-16 bg-burgundy/10 rounded-2xl flex items-center justify-center text-burgundy mb-8 group-hover:scale-110 transition-transform">
+                                    <ArrowLeftRight size={32} />
+                                </div>
+                                <h3 className="text-2xl font-black mb-4">Comparison Matrix</h3>
+                                <p className="text-sm text-muted leading-relaxed max-w-sm mb-8">
+                                    Analyze reliability scores and resale rankings side-by-side for up to 4 models to find your perfect match.
+                                </p>
+                                <span className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-burgundy">
+                                    Launch Analysis <ArrowRight size={14} />
+                                </span>
+                            </div>
+                        </Link>
+
+                        <Link href="/vehicles/valuation" className="group p-8 md:p-12 rounded-[2.5rem] bg-cinema text-white border border-white/5 hover:border-burgundy/30 transition-all shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-bl-[100%] transition-all group-hover:bg-burgundy/20" />
+                            <div className="relative z-10">
+                                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
+                                    <TrendingUp size={32} />
+                                </div>
+                                <h3 className="text-2xl font-black mb-4">Smart Valuation</h3>
+                                <p className="text-sm text-white/50 leading-relaxed max-w-sm mb-8">
+                                    Get an instant, fair market estimate based on real Nigerian sales data and professional AI analysis.
+                                </p>
+                                <span className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-white">
+                                    Value My Vehicle <ArrowRight size={14} />
+                                </span>
+                            </div>
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
             {/* Filters & Search */}
             <section className="py-10 px-6 border-b border-border-subtle bg-surface sticky top-[80px] z-40 backdrop-blur-xl bg-surface/90">
                 <div className="max-w-7xl mx-auto">
@@ -335,7 +374,7 @@ export default function VehicleCatalog() {
                         </div>
 
                         <Link 
-                            href={`/compare?ids=${comparisonIds.join(',')}`}
+                            href={`/vehicles/compare?ids=${comparisonIds.join(',')}`}
                             className="bg-white text-cinema px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-burgundy hover:text-white transition-all shadow-xl"
                         >
                             <ArrowLeftRight size={14} /> Compare Now

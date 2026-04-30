@@ -1,12 +1,67 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ShieldCheck, Zap, Users, Heart, MessageCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    ShieldCheck, 
+    Zap, 
+    Users, 
+    Heart, 
+    MessageCircle, 
+    Plus, 
+    Minus, 
+    Send, 
+    CheckCircle2, 
+    MapPin, 
+    Phone, 
+    Mail 
+} from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { apiFetch } from '@/lib/api';
+
+const FAQS = [
+    {
+        question: "What does Autogaard actually do?",
+        answer: "We are your automotive peace-of-mind partners. We help you inspect used cars before you buy, value your current car accurately, and provide professional maintenance and repair services at our workshop in Ikorodu."
+    },
+    {
+        question: "Is your valuation engine accurate for Nigeria?",
+        answer: "Yes. Unlike global engines that use US/UK data, our system is trained on local Nigerian market data, taking into account 'Tokunbo' entry dates, Nigerian road conditions, and local resale popularity."
+    },
+    {
+        question: "Where is your workshop located?",
+        answer: "Our main workshop is located in Ikorodu, Lagos. We serve clients from across the city who value transparency and professional expertise over 'trial and error' mechanics."
+    },
+    {
+        question: "How do I book an inspection?",
+        answer: "You can book directly via our Services Hub or send us a message on WhatsApp. We send a professional to the vehicle's location anywhere in Lagos to perform a high-fidelity check."
+    },
+    {
+        question: "Can you help me buy a car from the US?",
+        answer: "Yes, we provide purchase support for foreign used vehicles (Tokunbo). We handle the verification and inspection process to ensure you don't buy a 'salvage' or flooded car."
+    }
+];
 
 export default function AboutPage() {
+    const [openIndex, setOpenIndex] = useState<number | null>(0);
+    const [status, setStatus] = useState<'idle' | 'loading' | 'done'>('idle');
+    const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
+
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        setStatus('loading');
+        try {
+            await apiFetch('/leads/contact', {
+                method: 'POST',
+                body: formData,
+            });
+            setStatus('done');
+        } catch (err) {
+            setStatus('idle');
+        }
+    }
+
     return (
         <main className="bg-page min-h-screen">
             <Navbar />
@@ -29,86 +84,146 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* The Mission */}
-            <section className="py-24 px-6">
-                <div className="max-w-5xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                        <div>
-                            <h2 className="type-h2 mb-6">Why we exist.</h2>
-                            <p className="text-secondary leading-relaxed mb-6">
-                                For most Nigerians, a car is the second most expensive asset they will ever buy. 
-                                Yet, the market is filled with hidden defects, fake documentation, and unreliable mechanics.
-                            </p>
-                            <p className="text-secondary leading-relaxed">
-                                We believe car ownership should be a source of pride, not stress. 
-                                Our mission is to promote maintenance awareness and help every Nigerian 
-                                drive with absolute peace of mind.
-                            </p>
-                        </div>
-                        <div className="bg-surface border border-border-subtle p-12 rounded-[3rem] relative">
-                            <div className="absolute -top-6 -right-6 w-24 h-24 bg-burgundy/5 rounded-full flex items-center justify-center">
-                                <ShieldCheck size={48} className="text-burgundy" />
-                            </div>
-                            <h3 className="type-h3 mb-4">Founded 2023</h3>
-                            <p className="text-sm text-muted italic">
-                                "Our goal isn't just to fix cars; it's to fix the relationship between people and their vehicles."
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Values */}
+            {/* Values Section */}
             <section className="py-24 px-6 bg-surface border-y border-border-subtle">
                 <div className="max-w-7xl mx-auto">
-                    <h2 className="type-h2 text-center mb-16">The Autogaard Way.</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                         <div className="text-center">
                             <div className="w-16 h-16 bg-burgundy/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
                                 <Zap className="text-burgundy" size={28} />
                             </div>
-                            <h3 className="type-h3 mb-4">Avoid Costly Mistakes</h3>
+                            <h3 className="type-h3 mb-4">Avoid Mistakes</h3>
                             <p className="text-sm text-secondary leading-relaxed">
-                                We help you see the hidden defects in used cars before you pay a single Naira.
+                                We help you see hidden defects in used cars before you pay a single Naira.
                             </p>
                         </div>
                         <div className="text-center">
                             <div className="w-16 h-16 bg-burgundy/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
                                 <Users className="text-burgundy" size={28} />
                             </div>
-                            <h3 className="type-h3 mb-4">Human & Relatable</h3>
+                            <h3 className="type-h3 mb-4">Relatable Advice</h3>
                             <p className="text-sm text-secondary leading-relaxed">
-                                We speak your language. No institutional jargon, just honest advice from real experts.
+                                No institutional jargon, just honest advice from real experts who know Nigeria.
                             </p>
                         </div>
                         <div className="text-center">
                             <div className="w-16 h-16 bg-burgundy/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
                                 <Heart className="text-burgundy" size={28} />
                             </div>
-                            <h3 className="type-h3 mb-4">Drive with Confidence</h3>
+                            <h3 className="type-h3 mb-4">Pure Confidence</h3>
                             <p className="text-sm text-secondary leading-relaxed">
-                                We stay with you through every stage of ownership, from inspection to maintenance.
+                                We stay with you through every stage, from inspection to professional maintenance.
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Location CTA */}
-            <section className="py-24 px-6 text-center">
-                <div className="max-w-3xl mx-auto p-12 rounded-[3rem] bg-cinema text-white relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-                    <h2 className="type-h2 mb-4">Based in Ikorodu, Lagos.</h2>
-                    <p className="text-white/50 mb-10">Serving car owners across Lagos and Nigeria with transparency.</p>
-                    <a 
-                        href="https://wa.me/2348029933575"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-3 bg-[#25D366] text-white px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:scale-105 transition-transform"
-                    >
-                        <MessageCircle size={20} />
-                        Get in Touch on WhatsApp
-                    </a>
+            {/* FAQ Section */}
+            <section className="py-24 px-6">
+                <div className="max-w-3xl mx-auto">
+                    <div className="text-center mb-16">
+                        <h2 className="type-h2 mb-4">Common Questions.</h2>
+                        <p className="text-muted text-sm">Everything you need to know about AutoGaard intelligence.</p>
+                    </div>
+                    <div className="space-y-4">
+                        {FAQS.map((faq, idx) => (
+                            <div key={idx} className="bg-surface border border-border-subtle rounded-3xl overflow-hidden shadow-sm">
+                                <button 
+                                    onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+                                    className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-page transition-colors"
+                                >
+                                    <span className="font-bold text-primary text-sm">{faq.question}</span>
+                                    {openIndex === idx ? <Minus size={18} className="text-burgundy" /> : <Plus size={18} className="text-muted" />}
+                                </button>
+                                <AnimatePresence>
+                                    {openIndex === idx && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            className="px-8 pb-8"
+                                        >
+                                            <p className="text-secondary text-[11px] leading-relaxed italic">{faq.answer}</p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Contact Section */}
+            <section className="py-24 px-6 bg-cinema text-white relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+                <div className="max-w-7xl mx-auto relative z-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                        <div>
+                            <h2 className="type-h2 mb-6">Expert Consultation.</h2>
+                            <p className="text-white/50 mb-12 leading-relaxed">
+                                Whether you need an inspection, a repair, or just some advice, our advisors are here to help.
+                            </p>
+                            <div className="space-y-8">
+                                <div className="flex items-center gap-6">
+                                    <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-burgundy shrink-0">
+                                        <MapPin size={24} />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Workshop</p>
+                                        <p className="font-bold">Ikorodu, Lagos, Nigeria</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-6">
+                                    <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-burgundy shrink-0">
+                                        <Phone size={24} />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-white/40">WhatsApp</p>
+                                        <p className="font-bold">+234 802 993 3575</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white/5 backdrop-blur-3xl border border-white/10 p-8 md:p-12 rounded-[2.5rem] shadow-2xl">
+                            {status === 'done' ? (
+                                <div className="text-center py-12">
+                                    <CheckCircle2 size={48} className="text-emerald-500 mx-auto mb-6" />
+                                    <h3 className="type-h3">Inquiry Sent.</h3>
+                                    <p className="text-white/60 text-xs mt-2">We'll respond within 24 hours.</p>
+                                    <button onClick={() => setStatus('idle')} className="mt-8 text-[10px] font-black uppercase tracking-widest text-burgundy underline">Send Another</button>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <input 
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-xs focus:outline-none focus:border-burgundy transition-all"
+                                            placeholder="Name" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})}
+                                        />
+                                        <input 
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-xs focus:outline-none focus:border-burgundy transition-all"
+                                            placeholder="Phone" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})}
+                                        />
+                                    </div>
+                                    <input 
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-xs focus:outline-none focus:border-burgundy transition-all"
+                                        placeholder="Email Address" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
+                                    />
+                                    <textarea 
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-xs focus:outline-none focus:border-burgundy transition-all min-h-[120px]"
+                                        placeholder="Tell us about your vehicle needs..." required value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})}
+                                    />
+                                    <button 
+                                        type="submit" disabled={status === 'loading'}
+                                        className="w-full bg-white text-cinema py-5 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl hover:bg-burgundy hover:text-white transition-all flex items-center justify-center gap-3 active:scale-95"
+                                    >
+                                        {status === 'loading' ? 'Sending...' : <><Send size={16} /> Request Brief</>}
+                                    </button>
+                                </form>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </section>
 
