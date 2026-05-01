@@ -25,7 +25,7 @@ const SERVICE_DETAILS: Record<string, any> = {
         title: 'Buying & Selling Support',
         icon: Search,
         description: 'Expert guidance to ensure you make the right moves in the automotive market.',
-        heroImage: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?auto=format&fit=crop&q=80&w=1600',
+        heroImage: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606812/autogaard/assets/ag016.jpg',
         subServices: [
             {
                 name: 'Smart Selection Support',
@@ -45,7 +45,7 @@ const SERVICE_DETAILS: Record<string, any> = {
         title: 'Health & Safety Inspections',
         icon: ShieldCheck,
         description: 'Knowing exactly what’s happening under the hood with professional diagnostic audits.',
-        heroImage: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&q=80&w=1600',
+        heroImage: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606466/autogaard/assets/ag004.jpg',
         subServices: [
             {
                 name: 'Engine Health Scan',
@@ -105,7 +105,7 @@ const SERVICE_DETAILS: Record<string, any> = {
         title: 'Professional Restoration',
         icon: Paintbrush,
         description: 'Keeping your vehicle looking and feeling factory-fresh with elite care.',
-        heroImage: 'https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&q=80&w=1600',
+        heroImage: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606550/autogaard/assets/ag008.jpg',
         subServices: [
             {
                 name: 'Master Class Repainting',
@@ -121,7 +121,7 @@ const SERVICE_DETAILS: Record<string, any> = {
         title: 'Logistics & Protection',
         icon: Truck,
         description: 'Moving and protecting your assets with care across Nigeria and beyond.',
-        heroImage: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=1600',
+        heroImage: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606487/autogaard/assets/ag005.jpg',
         subServices: [
             {
                 name: 'Port Clearing Support',

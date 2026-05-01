@@ -93,8 +93,12 @@ export default function ServicesHub() {
             <Navbar />
 
             {/* Hero Section */}
-            <section className="relative pt-32 pb-24 px-6 overflow-hidden bg-cinema text-white">
-                <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+            <section className="relative pt-40 pb-32 px-6 overflow-hidden bg-cinema text-white">
+                <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-30"
+                    style={{ backgroundImage: "url('https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606386/autogaard/assets/ag001.jpg')" }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-cinema via-transparent to-cinema/60" />
                 <div className="max-w-7xl mx-auto relative z-10 text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}

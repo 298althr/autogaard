@@ -120,8 +120,12 @@ export default function AboutPage() {
             </section>
 
             {/* FAQ Section */}
-            <section className="py-24 px-6">
-                <div className="max-w-3xl mx-auto">
+            <section className="py-24 px-6 relative overflow-hidden">
+                <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-5"
+                    style={{ backgroundImage: "url('https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606902/autogaard/assets/ag018.jpg')" }}
+                />
+                <div className="max-w-3xl mx-auto relative z-10">
                     <div className="text-center mb-16">
                         <h2 className="type-h2 mb-4">Common Questions.</h2>
                         <p className="text-muted text-sm">Everything you need to know about AutoGaard intelligence.</p>
@@ -155,8 +159,12 @@ export default function AboutPage() {
             </section>
 
             {/* Contact Section */}
-            <section className="py-24 px-6 bg-cinema text-white relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+            <section className="py-32 px-6 bg-cinema text-white relative overflow-hidden">
+                <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-20"
+                    style={{ backgroundImage: "url('https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606812/autogaard/assets/ag016.jpg')" }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-cinema via-transparent to-cinema/60" />
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         <div>

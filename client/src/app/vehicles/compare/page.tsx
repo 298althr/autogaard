@@ -193,8 +193,12 @@ export default function ComparePage() {
             <Navbar />
 
             {/* Hero */}
-            <section className="pt-32 pb-24 px-6 bg-cinema text-white relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+            <section className="pt-40 pb-32 px-6 bg-cinema text-white relative overflow-hidden">
+                <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-20"
+                    style={{ backgroundImage: "url('https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606423/autogaard/assets/ag002.jpg')" }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-cinema via-transparent to-cinema/60" />
                 <div className="max-w-7xl mx-auto relative z-10">
                     <div className="flex items-center gap-4 mb-6">
                         <div className="w-12 h-12 rounded-2xl bg-burgundy/20 flex items-center justify-center border border-burgundy/30">

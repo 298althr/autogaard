@@ -125,8 +125,12 @@ function ValuationContent() {
             <Navbar />
 
             {/* Header Area */}
-            <section className="pt-32 pb-16 px-6 bg-cinema text-white relative">
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+            <section className="pt-40 pb-24 px-6 bg-cinema text-white relative overflow-hidden">
+                <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-20"
+                    style={{ backgroundImage: "url('https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606386/autogaard/assets/ag001.jpg')" }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-cinema via-transparent to-cinema/60" />
                 <div className="max-w-4xl mx-auto text-center relative z-10">
                     <h1 className="type-display mb-4">Smart Valuation.</h1>
                     <p className="type-body-lg text-white/50">
