@@ -312,13 +312,13 @@ export default function Home() {
                 ref={heroRef}
                 className="relative h-screen w-full overflow-hidden bg-black"
             >
-                <AnimatePresence mode="wait">
+                <AnimatePresence initial={false}>
                     <motion.div
                         key={slideIndex}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 1.2, ease: 'easeInOut' }}
+                        transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
                         className="absolute inset-0 w-full h-full"
                     >
                         {HERO_SLIDES[slideIndex].type === 'video' ? (
@@ -331,13 +331,19 @@ export default function Home() {
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <div 
-                                className="w-full h-full bg-cover bg-center"
+                            <motion.div 
+                                initial={{ x: '-5%', scale: 1.1 }}
+                                animate={{ x: '0%', scale: 1.1 }}
+                                transition={{ 
+                                    duration: HERO_SLIDES[slideIndex].duration / 1000 + 1.5, 
+                                    ease: 'linear' 
+                                }}
+                                className="w-full h-full bg-cover bg-center md:!transform-none md:!scale-100"
                                 style={{ backgroundImage: `url('${HERO_SLIDES[slideIndex].url}')` }}
                             />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-cinema via-cinema/40 to-transparent" />
-                        <div className="absolute inset-0 bg-black/20" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-cinema via-cinema/40 to-transparent z-10" />
+                        <div className="absolute inset-0 bg-black/20 z-10" />
 
                         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center text-center px-6">
                             <div className="max-w-4xl">
