@@ -122,7 +122,7 @@ export default function AboutPage() {
             {/* FAQ Section */}
             <section className="py-24 px-6 relative overflow-hidden">
                 <div 
-                    className="absolute inset-0 bg-cover bg-center opacity-5"
+                    className="absolute inset-0 bg-cover bg-center opacity-15"
                     style={{ backgroundImage: "url('https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606902/autogaard/assets/ag018.jpg')" }}
                 />
                 <div className="max-w-3xl mx-auto relative z-10">

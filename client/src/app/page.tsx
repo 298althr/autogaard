@@ -120,36 +120,42 @@ const SERVICE_GROUPS = [
         slug: 'buying-selling',
         icon: Search,
         desc: 'Smart Selection, Valuation, and Sales Concierge.',
+        image: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777610157/autogaard/assets/ag020.jpg',
     },
     {
         title: 'Inspections',
         slug: 'inspections',
         icon: Wrench,
         desc: 'Engine Scans, 120-Point Audits, and Background Checks.',
+        image: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777610165/autogaard/assets/ag021.jpg',
     },
     {
         title: 'Paperwork',
         slug: 'paperwork',
         icon: FileText,
         desc: 'Renewals, Roadworthiness, and Police CMR Clearance.',
+        image: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606812/autogaard/assets/ag016.jpg',
     },
     {
         title: 'Efficiency & Tech',
         slug: 'technology',
         icon: Zap,
         desc: 'CNG Conversion, AC Optimisation, and Security Tech.',
+        image: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606466/autogaard/assets/ag004.jpg',
     },
     {
         title: 'Restoration',
         slug: 'restoration',
         icon: Paintbrush,
         desc: 'Professional Repaint, Detailing, and Ceramic Shield.',
+        image: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606550/autogaard/assets/ag008.jpg',
     },
     {
         title: 'Logistics',
         slug: 'logistics',
         icon: Truck,
         desc: 'Port Clearing, Haulage, and Global Shipping.',
+        image: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606487/autogaard/assets/ag005.jpg',
     },
 ];
 
@@ -166,14 +172,14 @@ const VEHICLE_SAMPLES = [
         model: 'Accord',
         bodyType: 'Sedan',
         years: '2017 – 2023',
-        image: 'https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?auto=format&fit=crop&w=800&q=80',
+        image: 'https://images.unsplash.com/photo-1634737581963-5a22ba471961?w=800&auto=format&fit=crop&q=80',
     },
     {
         make: 'Toyota',
         model: 'Highlander',
         bodyType: 'SUV',
         years: '2016 – 2024',
-        image: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80',
+        image: 'https://images.unsplash.com/photo-1610855143470-0967a7348972?w=800&auto=format&fit=crop&q=80',
     },
 ];
 
@@ -449,18 +455,26 @@ export default function Home() {
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {SERVICE_GROUPS.map((group) => (
                             <Link key={group.slug} href={`/services/${group.slug}`}>
-                                <TiltCard className="service-card card h-full p-10 group hover:border-burgundy/30">
-                                    <div className="w-14 h-14 rounded-2xl bg-burgundy-subtle text-burgundy flex items-center justify-center mb-8 group-hover:bg-burgundy group-hover:text-white transition-all duration-500">
-                                        <group.icon size={28} />
-                                    </div>
-                                    <h3 className="type-h3 text-primary mb-4">{group.title}</h3>
-                                    <p className="text-secondary mb-8 leading-relaxed">{group.desc}</p>
-                                    <div className="flex items-center gap-2 text-burgundy font-bold text-sm uppercase tracking-wider">
-                                        Learn More{' '}
-                                        <ArrowRight
-                                            size={16}
-                                            className="transition-transform group-hover:translate-x-2"
+                                <TiltCard className="service-card group h-full bg-surface border border-border-subtle rounded-[2.5rem] overflow-hidden hover:border-burgundy/30 transition-all duration-500 hover:shadow-2xl hover:shadow-burgundy/5">
+                                    <div className="aspect-[16/9] relative overflow-hidden">
+                                        <Image 
+                                            src={group.image} 
+                                            alt={group.title} 
+                                            fill 
+                                            className="object-cover transition-transform duration-700 group-hover:scale-105" 
                                         />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                                    </div>
+                                    
+                                    <div className="p-10">
+                                        <div className="w-12 h-12 rounded-2xl bg-burgundy/5 text-burgundy flex items-center justify-center mb-6 group-hover:bg-burgundy group-hover:text-white transition-all duration-500">
+                                            <group.icon size={24} />
+                                        </div>
+                                        <h3 className="type-h3 text-primary mb-4">{group.title}</h3>
+                                        <p className="text-secondary text-sm mb-8 leading-relaxed h-12 overflow-hidden">{group.desc}</p>
+                                        <div className="flex items-center gap-2 text-burgundy font-black text-[10px] uppercase tracking-[0.2em]">
+                                            Learn More <ArrowRight size={14} className="transition-transform group-hover:translate-x-2" />
+                                        </div>
                                     </div>
                                 </TiltCard>
                             </Link>
