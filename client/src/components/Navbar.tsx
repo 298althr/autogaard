@@ -16,7 +16,7 @@ export const navLinks = [
     { name: 'About', href: '/about' },
 ];
 
-const Navbar = () => {
+const Navbar = ({ scrollThreshold = 60 }: { scrollThreshold?: number }) => {
     const { user, logout } = useAuth();
     const { theme } = useTheme();
     const [isScrolled, setIsScrolled] = useState(false);
@@ -24,7 +24,7 @@ const Navbar = () => {
     const [showCookieBanner, setShowCookieBanner] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 60);
+        const handleScroll = () => setIsScrolled(window.scrollY > scrollThreshold);
         window.addEventListener('scroll', handleScroll, { passive: true });
         
         // Check for cookie consent

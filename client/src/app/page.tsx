@@ -244,6 +244,14 @@ export default function Home() {
                 },
             });
 
+            // Initial state for all slides except first
+            slides.forEach((slide, i) => {
+                if (i === 0) return;
+                gsap.set(slide, { 
+                    [isMobile ? 'xPercent' : 'yPercent']: 100 
+                });
+            });
+
             slides.forEach((slide, i) => {
                 if (i === 0) {
                     // First slide text reveal on load
@@ -265,8 +273,7 @@ export default function Home() {
                     duration: 1
                 }, i - 1);
 
-                tl.fromTo(slide, 
-                    { [isMobile ? 'xPercent' : 'yPercent']: 100 }, 
+                tl.to(slide, 
                     { [isMobile ? 'xPercent' : 'yPercent']: 0, ease: 'none', duration: 1 },
                     i - 1
                 );
@@ -280,8 +287,18 @@ export default function Home() {
                 tl.fromTo(currText,
                     { opacity: 0, y: 30 },
                     { opacity: 1, y: 0, ease: 'power2.out', duration: 0.8 },
-                    (i - 1) + 0.2 // Start shortly after slide starts moving
+                    (i - 1) + 0.2
                 );
+
+                // 3. Final slide CTA Reveal logic handled via CSS/state if needed
+                // But we can add a global fade here
+                if (i === totalSlides - 1) {
+                    tl.fromTo('.global-hero-ctas',
+                        { opacity: 0, y: 20 },
+                        { opacity: 1, y: 0, duration: 0.5 },
+                        '>'
+                    );
+                }
             });
 
             return () => tl.kill();
@@ -362,7 +379,7 @@ export default function Home() {
 
     return (
         <main ref={containerRef} className="relative bg-page selection:bg-burgundy selection:text-white">
-            <Navbar />
+            <Navbar scrollThreshold={HERO_SLIDES.length * 100 * (typeof window !== 'undefined' ? window.innerHeight / 100 : 1)} />
 
             {/* HERO - PINNED SECTION */}
             <section
@@ -374,7 +391,6 @@ export default function Home() {
                         <div 
                             key={i} 
                             className={`hero-slide absolute inset-0 w-full h-full overflow-hidden ${i === 0 ? 'z-10' : 'z-20'}`}
-                            style={{ transform: i === 0 ? 'none' : 'translateY(100%)' }}
                         >
                             {slide.type === 'video' ? (
                                 <video
@@ -400,25 +416,26 @@ export default function Home() {
                                         {slide.headline}
                                     </h1>
                                     
-                                    <p className="text-lg md:text-2xl font-body font-light text-white/90 mb-12 max-w-2xl mx-auto mt-8">
+                                    <p className="text-lg md:text-2xl font-body font-light text-white/90 max-w-2xl mx-auto mt-8">
                                         {slide.sub}
                                     </p>
-                                    
-                                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                                        <Link href="/services" className="btn-primary px-12 py-6 w-full sm:w-auto shadow-2xl shadow-burgundy/40 hover:scale-105 active:scale-95 transition-all">
-                                            Explore Services
-                                        </Link>
-                                        <a
-                                            href="https://wa.me/2348029933575"
-                                            className="btn-outline border-white/20 text-white backdrop-blur-md bg-white/5 px-12 py-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white hover:text-cinema active:scale-95 transition-all"
-                                        >
-                                            <MessageCircle size={20} /> Chat With Advisor
-                                        </a>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     ))}
+                </div>
+
+                {/* Global CTAs - Visible only at the end */}
+                <div className="global-hero-ctas absolute inset-x-0 bottom-32 z-50 flex flex-col sm:flex-row items-center justify-center gap-4 px-6 opacity-0">
+                    <Link href="/services" className="btn-primary px-12 py-6 w-full sm:w-auto shadow-2xl shadow-burgundy/40 hover:scale-105 active:scale-95 transition-all">
+                        Explore Services
+                    </Link>
+                    <a
+                        href="https://wa.me/2348029933575"
+                        className="btn-outline border-white/20 text-white backdrop-blur-md bg-white/5 px-12 py-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white hover:text-cinema active:scale-95 transition-all"
+                    >
+                        <MessageCircle size={20} /> Chat With Advisor
+                    </a>
                 </div>
 
                 {/* Progress Indicator (Optional but helpful for scroll status) */}
