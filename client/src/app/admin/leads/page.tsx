@@ -32,6 +32,7 @@ const LEAD_TABLES = [
     { id: 'technology', name: 'Technology', table: 'leads_technology' },
     { id: 'restoration', name: 'Restoration', table: 'leads_restoration' },
     { id: 'logistics', name: 'Logistics', table: 'leads_logistics' },
+    { id: 'service_provider', name: 'Service Specialists', table: 'leads_service_provider' },
 ];
 
 export default function AdminLeadsPage() {
@@ -297,7 +298,7 @@ export default function AdminLeadsPage() {
                                                     <User size={20} className="text-onyx" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-base font-black text-onyx">{lead.name}</p>
+                                                    <p className="text-base font-black text-onyx">{lead.full_name || lead.name}</p>
                                                     <p className="text-xs text-muted font-bold tracking-tight">{lead.phone || lead.email}</p>
                                                 </div>
                                             </div>
@@ -329,6 +330,21 @@ export default function AdminLeadsPage() {
                                                         <p className="text-[9px] px-2 py-0.5 bg-slate-100 rounded inline-block font-black uppercase tracking-tighter text-onyx-light">
                                                             Condition: {lead.condition}
                                                         </p>
+                                                    </div>
+                                                ) : activeTable.id === 'service_provider' ? (
+                                                    <div className="space-y-1">
+                                                        <p className="text-xs text-onyx-light font-medium line-clamp-2 leading-relaxed italic">
+                                                            "{lead.service_description}"
+                                                        </p>
+                                                        <p className="text-[10px] text-muted font-bold uppercase tracking-widest">
+                                                            {lead.service_address}
+                                                        </p>
+                                                        {(lead.website || lead.social_media) && (
+                                                            <div className="flex gap-2 mt-1">
+                                                                {lead.website && <span className="text-[8px] bg-slate-100 px-1.5 rounded uppercase font-black tracking-tighter">Web</span>}
+                                                                {lead.social_media && <span className="text-[8px] bg-slate-100 px-1.5 rounded uppercase font-black tracking-tighter">Social</span>}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ) : (
                                                     <p className="text-xs text-onyx-light font-medium line-clamp-2 leading-relaxed italic">

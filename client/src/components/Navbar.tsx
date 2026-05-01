@@ -14,6 +14,7 @@ export const navLinks = [
     { name: 'Services', href: '/services' },
     { name: 'Vehicles', href: '/vehicles' },
     { name: 'About', href: '/about' },
+    { name: 'Join Us', href: '/joinus' },
 ];
 
 const Navbar = ({ scrollThreshold = 60 }: { scrollThreshold?: number }) => {

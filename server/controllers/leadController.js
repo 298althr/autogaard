@@ -4,7 +4,7 @@ const telegramService = require('../services/telegramService');
 const VALID_LEAD_TYPES = [
     'contact', 'buy', 'sell', 'inspection', 'paperwork', 
     'technology', 'restoration', 'logistics', 'valuation', 
-    'comparison', 'vehicle_inquiry', 'waitlist'
+    'comparison', 'vehicle_inquiry', 'waitlist', 'service_provider'
 ];
 
 /**

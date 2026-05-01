@@ -108,7 +108,7 @@ class AdminController {
             const tableName = `leads_${type}`;
             
             // Basic validation to prevent SQL injection
-            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist'];
+            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist', 'service_provider'];
             if (!validTypes.includes(type)) {
                 return res.status(400).json({ success: false, message: 'Invalid lead type' });
             }
@@ -145,7 +145,7 @@ class AdminController {
             const updates = req.body;
             const tableName = `leads_${type}`;
             
-            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist'];
+            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist', 'service_provider'];
             if (!validTypes.includes(type)) {
                 return res.status(400).json({ success: false, message: 'Invalid lead type' });
             }
@@ -175,7 +175,7 @@ class AdminController {
             const { type, id } = req.params;
             const tableName = `leads_${type}`;
             
-            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist'];
+            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist', 'service_provider'];
             if (!validTypes.includes(type)) {
                 return res.status(400).json({ success: false, message: 'Invalid lead type' });
             }
@@ -199,7 +199,7 @@ class AdminController {
             const { type } = req.params;
             const tableName = `leads_${type}`;
             
-            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist'];
+            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist', 'service_provider'];
             if (!validTypes.includes(type)) {
                 return res.status(400).json({ success: false, message: 'Invalid lead type' });
             }
@@ -233,7 +233,7 @@ class AdminController {
             const { type } = req.params;
             const tableName = `leads_${type}`;
             
-            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist'];
+            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist', 'service_provider'];
             if (!validTypes.includes(type)) {
                 return res.status(400).json({ success: false, message: 'Invalid lead type' });
             }
@@ -266,7 +266,7 @@ class AdminController {
             const { type } = req.params;
             const tableName = `leads_${type}`;
             
-            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist'];
+            const validTypes = ['contact', 'buy', 'sell', 'inspection', 'paperwork', 'technology', 'restoration', 'logistics', 'valuation', 'comparison', 'vehicle_inquiry', 'waitlist', 'service_provider'];
             if (!validTypes.includes(type)) {
                 return res.status(400).json({ success: false, message: 'Invalid lead type' });
             }
