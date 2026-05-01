@@ -28,30 +28,25 @@ import { LoadingSpinner } from '@/components/Loading';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── SCRAMBLE TEXT ─────────────────────────────────────────────────────────────
-const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&';
-function ScrambleText({ text, className }: { text: string; className?: string }) {
-    const ref = useRef<HTMLSpanElement>(null);
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        let frame = 0;
-        const totalFrames = 30;
-        const interval = setInterval(() => {
-            el.innerText = text
-                .split('')
-                .map((char, i) => {
-                    if (char === ' ') return ' ';
-                    if (i < Math.floor((frame / totalFrames) * text.length)) return char;
-                    return CHARS[Math.floor(Math.random() * CHARS.length)];
-                })
-                .join('');
-            frame++;
-            if (frame > totalFrames) clearInterval(interval);
-        }, 50);
-        return () => clearInterval(interval);
-    }, [text]);
-    return <span ref={ref} className={className}>{text}</span>;
+// ─── CINEMATIC REVEAL ─────────────────────────────────────────────────────────
+function CinematicReveal({ text, className, delay = 0 }: { text: string; className?: string; delay?: number }) {
+    return (
+        <div className="overflow-hidden py-2">
+            <motion.span
+                initial={{ y: '100%', rotateX: -40, opacity: 0 }}
+                animate={{ y: 0, rotateX: 0, opacity: 1 }}
+                transition={{ 
+                    type: 'spring', 
+                    stiffness: 100, 
+                    damping: 20,
+                    delay: delay 
+                }}
+                className={`block will-change-transform ${className ?? ''}`}
+            >
+                {text}
+            </motion.span>
+        </div>
+    );
 }
 
 // ─── TILT CARD ─────────────────────────────────────────────────────────────────
@@ -88,29 +83,39 @@ function TiltCard({ children, className }: { children: React.ReactNode; classNam
 // ─── DATA ──────────────────────────────────────────────────────────────────────
 const HERO_SLIDES = [
     {
-        image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=80',
+        type: 'image',
+        url: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606713/autogaard/assets/ag013.jpg',
         headline: 'Buy Better.',
         sub: 'Avoid costly mistakes before money changes hands.',
+        duration: 4000
     },
     {
-        image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1600&q=80',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1600&q=80',
         headline: 'Maintain Smarter.',
         sub: 'Stay ahead of breakdowns. Protect your investment.',
+        duration: 4000
     },
     {
-        image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1600&q=80',
-        headline: 'Drive With Peace of Mind.',
-        sub: 'Paperwork, inspections, and total confidence. Handled.',
+        type: 'video',
+        url: 'https://res.cloudinary.com/dt6n4pnjb/video/upload/v1777608775/autogaard/assets/videos/agvid003.mp4',
+        headline: 'High-Fidelity.',
+        sub: 'Precision diagnostics for the modern driver.',
+        duration: 5000
     },
     {
-        image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1600&q=80',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1600&q=80',
         headline: 'Sell Better.',
         sub: 'Get the right price. We prepare and position your car.',
+        duration: 4000
     },
     {
-        image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1600&q=80',
-        headline: 'Your Car, Our Priority.',
+        type: 'video',
+        url: 'https://res.cloudinary.com/dt6n4pnjb/video/upload/v1777608713/autogaard/assets/videos/agvid001.mp4',
+        headline: 'Autogaard.',
         sub: 'From Lagos to anywhere. We handle it for you.',
+        duration: 7000
     },
 ];
 
@@ -214,14 +219,14 @@ export default function Home() {
     const [waitlist, setWaitlist] = useState({ name: '', email: '', phone: '' });
     const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'loading' | 'done'>('idle');
 
-    // Hero slideshow timer
+    // Hero slideshow timer logic with dynamic duration
     useEffect(() => {
-        const t = setInterval(
-            () => setSlideIndex((prev) => (prev + 1) % HERO_SLIDES.length),
-            4000,
-        );
-        return () => clearInterval(t);
-    }, []);
+        const currentSlide = HERO_SLIDES[slideIndex];
+        const t = setTimeout(() => {
+            setSlideIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+        }, currentSlide.duration || 4000);
+        return () => clearTimeout(t);
+    }, [slideIndex]);
 
     // GSAP scroll animations
     useGSAP(() => {
@@ -318,57 +323,89 @@ export default function Home() {
             {/* HERO */}
             <section
                 ref={heroRef}
-                className="sticky top-0 h-screen w-full z-0 overflow-hidden"
+                className="sticky top-0 h-screen w-full z-0 overflow-hidden bg-black"
                 style={{ perspective: '1200px' }}
             >
-                <AnimatePresence mode="sync">
+                <AnimatePresence mode="wait">
                     <motion.div
                         key={slideIndex}
-                        initial={{ opacity: 0, scale: 1.1 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 1.05 }}
-                        transition={{ duration: 1.5, ease: 'linear' }}
-                        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                        style={{ backgroundImage: `url('${HERO_SLIDES[slideIndex].image}')` }}
-                    />
+                        initial={{ opacity: 0, scale: 1.2, filter: 'blur(20px)' }}
+                        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, scale: 0.9, filter: 'blur(20px)' }}
+                        transition={{ 
+                            duration: 1.2, 
+                            ease: [0.16, 1, 0.3, 1] 
+                        }}
+                        className="absolute inset-0"
+                    >
+                        {HERO_SLIDES[slideIndex].type === 'video' ? (
+                            <video
+                                src={HERO_SLIDES[slideIndex].url}
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div 
+                                className="w-full h-full bg-cover bg-center"
+                                style={{ backgroundImage: `url('${HERO_SLIDES[slideIndex].url}')` }}
+                            />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-cinema via-cinema/40 to-transparent" />
+                        <div className="absolute inset-0 bg-black/30" />
+                    </motion.div>
                 </AnimatePresence>
 
-                <div className="absolute inset-0" style={{ background: 'var(--hero-overlay)' }} />
-
                 <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-                    <motion.div
-                        key={slideIndex}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                        className="max-w-4xl"
-                    >
-                        <h1 className="text-5xl md:text-8xl font-heading font-extrabold text-white tracking-tighter mb-6 leading-[0.9]">
-                            <ScrambleText text={HERO_SLIDES[slideIndex].headline} />
-                        </h1>
-                        <p className="text-lg md:text-2xl font-body font-light text-white/90 mb-12 max-w-2xl mx-auto">
-                            {HERO_SLIDES[slideIndex].sub}
-                        </p>
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Link href="/services" className="btn-primary px-10 py-5 w-full sm:w-auto">
-                                Explore Services
-                            </Link>
-                            <a
-                                href="https://wa.me/2348029933575"
-                                className="btn-outline border-white text-white hover:bg-white hover:text-onyx px-10 py-5 w-full sm:w-auto flex items-center justify-center gap-2"
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={slideIndex}
+                            className="max-w-4xl"
+                        >
+                            <CinematicReveal 
+                                text={HERO_SLIDES[slideIndex].headline} 
+                                className="text-6xl md:text-9xl font-heading font-extrabold text-white tracking-tighter leading-[0.8]"
+                            />
+                            
+                            <motion.p 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ delay: 0.4, duration: 0.8 }}
+                                className="text-lg md:text-2xl font-body font-light text-white/90 mb-12 max-w-2xl mx-auto mt-8"
                             >
-                                <MessageCircle size={20} /> Chat With Us
-                            </a>
-                        </div>
-                    </motion.div>
+                                {HERO_SLIDES[slideIndex].sub}
+                            </motion.p>
+                            
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                transition={{ delay: 0.6, duration: 0.8 }}
+                                className="flex flex-col sm:flex-row items-center justify-center gap-4"
+                            >
+                                <Link href="/services" className="btn-primary px-12 py-6 w-full sm:w-auto shadow-2xl shadow-burgundy/40 hover:scale-105 active:scale-95 transition-all">
+                                    Explore Services
+                                </Link>
+                                <a
+                                    href="https://wa.me/2348029933575"
+                                    className="btn-outline border-white/20 text-white backdrop-blur-md bg-white/5 px-12 py-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white hover:text-cinema active:scale-95 transition-all"
+                                >
+                                    <MessageCircle size={20} /> Chat With Advisor
+                                </a>
+                            </motion.div>
+                        </motion.div>
+                    </AnimatePresence>
 
-                    <div className="absolute bottom-12 flex gap-3">
+                    <div className="absolute bottom-12 flex gap-4">
                         {HERO_SLIDES.map((_, i) => (
                             <button
                                 key={i}
                                 onClick={() => setSlideIndex(i)}
-                                className={`h-1 rounded-full transition-all duration-500 ${
-                                    i === slideIndex ? 'bg-white w-12' : 'bg-white/30 w-4'
+                                className={`h-1 rounded-full transition-all duration-700 ${
+                                    i === slideIndex ? 'bg-burgundy w-16' : 'bg-white/20 w-4 hover:bg-white/40'
                                 }`}
                                 aria-label={`Go to slide ${i + 1}`}
                             />
