@@ -87,14 +87,14 @@ const HERO_SLIDES = [
         url: 'https://res.cloudinary.com/dt6n4pnjb/image/upload/v1777606713/autogaard/assets/ag013.jpg',
         headline: 'Buy Better.',
         sub: 'Avoid costly mistakes before money changes hands.',
-        duration: 4000
+        duration: 3000
     },
     {
         type: 'image',
         url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1600&q=80',
         headline: 'Maintain Smarter.',
         sub: 'Stay ahead of breakdowns. Protect your investment.',
-        duration: 4000
+        duration: 3000
     },
     {
         type: 'video',
@@ -108,7 +108,7 @@ const HERO_SLIDES = [
         url: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1600&q=80',
         headline: 'Sell Better.',
         sub: 'Get the right price. We prepare and position your car.',
-        duration: 4000
+        duration: 3000
     },
     {
         type: 'video',
@@ -219,91 +219,17 @@ export default function Home() {
     const [waitlist, setWaitlist] = useState({ name: '', email: '', phone: '' });
     const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'loading' | 'done'>('idle');
 
-    // GSAP Cinematic Scrubbing logic
+    // Slideshow state
+    const [slideIndex, setSlideIndex] = useState(0);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSlideIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+        }, HERO_SLIDES[slideIndex].duration);
+        return () => clearTimeout(timer);
+    }, [slideIndex]);
+
     useGSAP(() => {
-        const slides = gsap.utils.toArray<HTMLElement>('.hero-slide');
-        const totalSlides = slides.length;
-        
-        const mm = gsap.matchMedia();
-
-        mm.add({
-            isMobile: "(max-width: 768px)",
-            isDesktop: "(min-width: 769px)"
-        }, (context) => {
-            const { isMobile } = context.conditions as any;
-            
-            const tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: heroRef.current,
-                    start: 'top top',
-                    end: `+=${totalSlides * 100}%`, 
-                    scrub: 1,
-                    pin: true,
-                    anticipatePin: 1,
-                    snap: 1 / (totalSlides - 1),
-                },
-            });
-
-            // Initial state for all slides except first
-            slides.forEach((slide, i) => {
-                if (i === 0) return;
-                gsap.set(slide, { 
-                    [isMobile ? 'xPercent' : 'yPercent']: 100 
-                });
-            });
-
-            slides.forEach((slide, i) => {
-                if (i === 0) {
-                    // First slide text reveal on load
-                    gsap.fromTo(slide.querySelector('.slide-content'), 
-                        { opacity: 0, y: 30 }, 
-                        { opacity: 1, y: 0, duration: 1, delay: 0.5 }
-                    );
-                    return;
-                }
-
-                const prevSlide = slides[i-1];
-                const prevText = prevSlide.querySelector('.slide-content');
-                const currText = slide.querySelector('.slide-content');
-
-                // 1. Move Previous Unit OUT & Current Unit IN
-                tl.to(prevSlide, {
-                    [isMobile ? 'xPercent' : 'yPercent']: -100,
-                    ease: 'none',
-                    duration: 1
-                }, i - 1);
-
-                tl.to(slide, 
-                    { [isMobile ? 'xPercent' : 'yPercent']: 0, ease: 'none', duration: 1 },
-                    i - 1
-                );
-
-                // 2. Text Sync: Previous fades OUT, Current fades/reveals IN
-                tl.to(prevText, {
-                    opacity: 0,
-                    duration: 0.5,
-                }, i - 1);
-
-                tl.fromTo(currText,
-                    { opacity: 0, y: 30 },
-                    { opacity: 1, y: 0, ease: 'power2.out', duration: 0.8 },
-                    (i - 1) + 0.2
-                );
-
-                // 3. Final slide CTA Reveal logic handled via CSS/state if needed
-                // But we can add a global fade here
-                if (i === totalSlides - 1) {
-                    tl.fromTo('.global-hero-ctas',
-                        { opacity: 0, y: 20 },
-                        { opacity: 1, y: 0, duration: 0.5 },
-                        '>'
-                    );
-                }
-            });
-
-            return () => tl.kill();
-        });
-
         // Regular scroll animations for lower sections
         gsap.utils.toArray<HTMLElement>('.pillar-card').forEach((el, i) => {
             gsap.from(el, {
@@ -379,71 +305,88 @@ export default function Home() {
 
     return (
         <main ref={containerRef} className="relative bg-page selection:bg-burgundy selection:text-white">
-            <Navbar scrollThreshold={HERO_SLIDES.length * 100 * (typeof window !== 'undefined' ? window.innerHeight / 100 : 1)} />
+            <Navbar />
 
-            {/* HERO - PINNED SECTION */}
+            {/* HERO - AUTOMATED SLIDESHOW */}
             <section
                 ref={heroRef}
-                className="relative h-screen w-full z-0 overflow-hidden bg-black"
+                className="relative h-screen w-full overflow-hidden bg-black"
             >
-                <div ref={slidesContainerRef} className="h-full w-full relative">
-                    {HERO_SLIDES.map((slide, i) => (
-                        <div 
-                            key={i} 
-                            className={`hero-slide absolute inset-0 w-full h-full overflow-hidden ${i === 0 ? 'z-10' : 'z-20'}`}
-                        >
-                            {slide.type === 'video' ? (
-                                <video
-                                    src={slide.url}
-                                    autoPlay
-                                    muted
-                                    loop
-                                    playsInline
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <div 
-                                    className="w-full h-full bg-cover bg-center"
-                                    style={{ backgroundImage: `url('${slide.url}')` }}
-                                />
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-cinema via-cinema/40 to-transparent" />
-                            <div className="absolute inset-0 bg-black/20" />
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={slideIndex}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.2, ease: 'easeInOut' }}
+                        className="absolute inset-0 w-full h-full"
+                    >
+                        {HERO_SLIDES[slideIndex].type === 'video' ? (
+                            <video
+                                src={HERO_SLIDES[slideIndex].url}
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div 
+                                className="w-full h-full bg-cover bg-center"
+                                style={{ backgroundImage: `url('${HERO_SLIDES[slideIndex].url}')` }}
+                            />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-cinema via-cinema/40 to-transparent" />
+                        <div className="absolute inset-0 bg-black/20" />
 
-                            <div className="slide-content absolute inset-0 z-30 flex flex-col items-center justify-center text-center px-6">
-                                <div className="max-w-4xl">
-                                    <h1 className="text-6xl md:text-9xl font-heading font-extrabold text-white tracking-tighter leading-[0.8]">
-                                        {slide.headline}
-                                    </h1>
-                                    
-                                    <p className="text-lg md:text-2xl font-body font-light text-white/90 max-w-2xl mx-auto mt-8">
-                                        {slide.sub}
-                                    </p>
-                                </div>
+                        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center text-center px-6">
+                            <div className="max-w-4xl">
+                                <CinematicReveal 
+                                    text={HERO_SLIDES[slideIndex].headline} 
+                                    className="text-6xl md:text-9xl font-heading font-extrabold text-white tracking-tighter leading-[0.8]"
+                                />
+                                
+                                <motion.p 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.4, duration: 0.8 }}
+                                    className="text-lg md:text-2xl font-body font-light text-white/90 max-w-2xl mx-auto mt-8 mb-12"
+                                >
+                                    {HERO_SLIDES[slideIndex].sub}
+                                </motion.p>
+
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.6, duration: 0.8 }}
+                                    className="flex flex-col sm:flex-row items-center justify-center gap-4"
+                                >
+                                    <Link href="/services" className="btn-primary px-12 py-6 w-full sm:w-auto shadow-2xl shadow-burgundy/40 hover:scale-105 active:scale-95 transition-all">
+                                        Explore Services
+                                    </Link>
+                                    <a
+                                        href="https://wa.me/2348029933575"
+                                        className="btn-outline border-white/20 text-white backdrop-blur-md bg-white/5 px-12 py-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white hover:text-cinema active:scale-95 transition-all"
+                                    >
+                                        <MessageCircle size={20} /> Chat With Advisor
+                                    </a>
+                                </motion.div>
                             </div>
                         </div>
-                    ))}
-                </div>
+                    </motion.div>
+                </AnimatePresence>
 
-                {/* Global CTAs - Visible only at the end */}
-                <div className="global-hero-ctas absolute inset-x-0 bottom-32 z-50 flex flex-col sm:flex-row items-center justify-center gap-4 px-6 opacity-0">
-                    <Link href="/services" className="btn-primary px-12 py-6 w-full sm:w-auto shadow-2xl shadow-burgundy/40 hover:scale-105 active:scale-95 transition-all">
-                        Explore Services
-                    </Link>
-                    <a
-                        href="https://wa.me/2348029933575"
-                        className="btn-outline border-white/20 text-white backdrop-blur-md bg-white/5 px-12 py-6 w-full sm:w-auto flex items-center justify-center gap-2 hover:bg-white hover:text-cinema active:scale-95 transition-all"
-                    >
-                        <MessageCircle size={20} /> Chat With Advisor
-                    </a>
-                </div>
-
-                {/* Progress Indicator (Optional but helpful for scroll status) */}
-                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-50">
+                {/* Progress Indicators */}
+                <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-4 z-50">
                     {HERO_SLIDES.map((_, i) => (
-                        <div key={i} className="w-1 h-8 bg-white/10 rounded-full overflow-hidden">
-                            <div className="hero-progress-bar w-full h-0 bg-burgundy" />
-                        </div>
+                        <button
+                            key={i}
+                            onClick={() => setSlideIndex(i)}
+                            className={`h-1 rounded-full transition-all duration-700 ${
+                                i === slideIndex ? 'bg-burgundy w-16' : 'bg-white/20 w-4 hover:bg-white/40'
+                            }`}
+                            aria-label={`Go to slide ${i + 1}`}
+                        />
                     ))}
                 </div>
             </section>
